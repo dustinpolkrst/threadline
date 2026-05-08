@@ -8,6 +8,9 @@ class Workspace(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=180)
     slug = models.SlugField(unique=True)
+    first_response_target_minutes = models.PositiveIntegerField(default=240)
+    next_response_target_minutes = models.PositiveIntegerField(default=480)
+    resolution_target_minutes = models.PositiveIntegerField(default=4320)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

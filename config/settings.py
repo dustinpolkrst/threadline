@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "time_tracking",
     "activity",
     "customer_portal",
+    "communications",
     "search",
 ]
 

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-5 flex items-start justify-between">
+  <div><div class="tl-kicker">Reports</div><h1 class="text-2xl font-semibold">Monthly time report</h1><p class="text-sm text-slate-500">Billable and non-billable time for {{ month }}.</p></div>
+  <a class="tl-button" href="?month={{ month }}&format=csv">Export CSV</a>
+</div>
+<form method="get" class="tl-panel mb-6 flex max-w-sm items-end gap-3 p-4"><div><label>Month</label><input type="month" name="month" value="{{ month }}"></div><button class="tl-button-secondary">Apply</button></form>
+<div class="grid gap-6 lg:grid-cols-3">
+  <section class="tl-panel overflow-hidden"><div class="border-b border-slate-200 px-5 py-4 font-medium">By organization</div><table class="tl-table w-full text-left text-sm"><thead><tr><th>Name</th><th>Total</th><th>Billable</th><th>Non-billable</th></tr></thead><tbody>{% for row in org_rows %}<tr class="border-t border-slate-100"><td>{{ row.organization__name|default:"Unassigned" }}</td><td>{{ row.total }}m</td><td>{{ row.billable }}m</td><td>{{ row.non_billable }}m</td></tr>{% empty %}<tr><td class="p-5 text-slate-500" colspan="4">No time.</td></tr>{% endfor %}</tbody></table></section>
+  <section class="tl-panel overflow-hidden"><div class="border-b border-slate-200 px-5 py-4 font-medium">By ticket</div><table class="tl-table w-full text-left text-sm"><thead><tr><th>Name</th><th>Total</th><th>Billable</th><th>Non-billable</th></tr></thead><tbody>{% for row in ticket_rows %}<tr class="border-t border-slate-100"><td>{{ row.ticket__title|default:"General" }}</td><td>{{ row.total }}m</td><td>{{ row.billable }}m</td><td>{{ row.non_billable }}m</td></tr>{% empty %}<tr><td class="p-5 text-slate-500" colspan="4">No time.</td></tr>{% endfor %}</tbody></table></section>
+  <section class="tl-panel overflow-hidden"><div class="border-b border-slate-200 px-5 py-4 font-medium">By agent</div><table class="tl-table w-full text-left text-sm"><thead><tr><th>Name</th><th>Total</th><th>Billable</th><th>Non-billable</th></tr></thead><tbody>{% for row in agent_rows %}<tr class="border-t border-slate-100"><td>{{ row.user__username }}</td><td>{{ row.total }}m</td><td>{{ row.billable }}m</td><td>{{ row.non_billable }}m</td></tr>{% empty %}<tr><td class="p-5 text-slate-500" colspan="4">No time.</td></tr>{% endfor %}</tbody></table></section>
+</div>
+{% endblock %}

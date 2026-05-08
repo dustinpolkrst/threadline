@@ -11,16 +11,38 @@ from time_tracking.forms import TimeEntryForm, TimerStartForm, TimerStopForm
 from time_tracking.models import ActiveTimer, TimeEntry
 from .forms import CommentForm, TicketForm
 from .models import Ticket, TicketComment
+from .services import OPEN_STATUSES, apply_initial_sla, mark_agent_reply, mark_resolved, sla_state
 
 
 @login_required
 def ticket_list(request):
     workspace = require_internal_workspace(request.user)
     tickets = Ticket.objects.filter(workspace=workspace).select_related("organization", "contact", "assignee")
+    queue = request.GET.get("queue", "all")
+    now = timezone.now()
+    if queue == "my-open":
+        tickets = tickets.filter(assignee=request.user, status__in=OPEN_STATUSES)
+    elif queue == "unassigned":
+        tickets = tickets.filter(assignee__isnull=True, status__in=OPEN_STATUSES)
+    elif queue == "sla-at-risk":
+        tickets = tickets.filter(status__in=OPEN_STATUSES).filter(next_response_due_at__lte=now + timezone.timedelta(hours=1))
+    elif queue == "recently-updated":
+        tickets = tickets.order_by("-updated_at")
+    elif queue == "waiting-on-customer":
+        tickets = tickets.filter(status=Ticket.Status.PENDING)
     status = request.GET.get("status")
     if status:
         tickets = tickets.filter(status=status)
-    return render(request, "tickets/ticket_list.html", {"tickets": tickets, "status": status})
+    all_tickets = Ticket.objects.filter(workspace=workspace)
+    summary = {
+        "total": all_tickets.count(),
+        "open": all_tickets.filter(status__in=[Ticket.Status.NEW, Ticket.Status.OPEN, Ticket.Status.PENDING]).count(),
+        "urgent": all_tickets.filter(priority=Ticket.Priority.URGENT).count(),
+        "unassigned": all_tickets.filter(assignee__isnull=True).count(),
+    }
+    for ticket in tickets:
+        ticket.sla_state = sla_state(ticket)
+    return render(request, "tickets/ticket_list.html", {"tickets": tickets, "status": status, "queue": queue, "summary": summary})
 
 
 @login_required
@@ -32,8 +54,9 @@ def ticket_create(request):
         ticket = form.save(commit=False)
         ticket.workspace = workspace
         ticket.requester = request.user
+        apply_initial_sla(ticket)
         ticket.save()
-        record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="ticket.created", summary=f"Ticket created: {ticket.title}", customer_visible=True)
+        record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="ticket.created", summary=f"Ticket created: {ticket.title}", customer_visible=False)
         return redirect("ticket_detail", pk=ticket.pk)
     return render(request, "tickets/form.html", {"form": form, "title": "New ticket"})
 
@@ -51,6 +74,7 @@ def ticket_detail(request, pk):
     time_total = time_entries.aggregate(total=Sum("duration_minutes"))["total"] or 0
     active_timer = ActiveTimer.objects.filter(workspace=workspace, user=request.user).select_related("ticket").first()
     activity = ticket.activity_events.filter(workspace=workspace).select_related("actor")
+    ticket.sla_state = sla_state(ticket)
     return render(
         request,
         "tickets/ticket_detail.html",
@@ -79,8 +103,19 @@ def ticket_add_comment(request, pk):
         comment.workspace = workspace
         comment.ticket = ticket
         comment.author = request.user
+        comment.visibility = TicketComment.Visibility.INTERNAL
         comment.save()
-        record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="comment.added", summary="Comment added", customer_visible=comment.visibility == TicketComment.Visibility.PUBLIC)
+        record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="comment.added", summary="Comment added", customer_visible=False)
+        mark_agent_reply(ticket)
+    return redirect("ticket_detail", pk=ticket.pk)
+
+
+@login_required
+def ticket_resolve(request, pk):
+    workspace = require_internal_workspace(request.user)
+    ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
+    mark_resolved(ticket)
+    record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="ticket.resolved", summary="Ticket resolved", customer_visible=False)
     return redirect("ticket_detail", pk=ticket.pk)
 
 
@@ -96,8 +131,9 @@ def ticket_add_time(request, pk):
         entry.ticket = ticket
         entry.organization = ticket.organization
         entry.contact = ticket.contact
+        entry.customer_visible = False
         entry.save()
-        record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="time.logged", summary=f"Logged {entry.duration_minutes} minutes", customer_visible=entry.customer_visible)
+        record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="time.logged", summary=f"Logged {entry.duration_minutes} minutes", customer_visible=False)
     return redirect("ticket_detail", pk=ticket.pk)
 
 
@@ -116,7 +152,7 @@ def ticket_start_timer(request, pk):
                 "contact": ticket.contact,
                 "started_at": timezone.now(),
                 "billable": form.cleaned_data["billable"],
-                "customer_visible": form.cleaned_data["customer_visible"],
+                "customer_visible": False,
                 "notes": form.cleaned_data["notes"],
             },
         )
@@ -145,11 +181,11 @@ def ticket_stop_timer(request, pk):
             ended_at=ended_at,
             duration_minutes=duration_minutes,
             billable=timer.billable,
-            customer_visible=timer.customer_visible,
+            customer_visible=False,
             notes=notes,
         )
         timer.delete()
-        record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="time.logged", summary=f"Timer logged {entry.duration_minutes} billable minutes", customer_visible=entry.customer_visible)
+        record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="time.logged", summary=f"Timer logged {entry.duration_minutes} billable minutes", customer_visible=False)
     return redirect("ticket_detail", pk=ticket.pk)
 
 

@@ -18,7 +18,7 @@ class PortalTicketForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = TicketComment
-        fields = ["body", "visibility"]
+        fields = ["body"]
 
 
 class PortalCommentForm(forms.ModelForm):

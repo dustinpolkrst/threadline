@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-5">
+  <div class="tl-kicker">Time entry</div>
+  <h1 class="text-2xl font-semibold">Edit time</h1>
+  <p class="text-sm text-slate-500">{% if entry.ticket %}{{ entry.ticket.title }}{% else %}General work{% endif %}</p>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-[minmax(0,680px)_1fr]">
+  <form method="post" class="tl-panel p-6">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="mt-5 flex gap-3">
+      <button class="tl-button">Save time entry</button>
+      {% if entry.ticket %}<a class="tl-button-secondary" href="{% url 'ticket_detail' entry.ticket.pk %}">Cancel</a>{% else %}<a class="tl-button-secondary" href="{% url 'timesheet' %}">Cancel</a>{% endif %}
+    </div>
+  </form>
+  <aside class="tl-panel p-6">
+    <h2 class="mb-3 font-medium">Entry context</h2>
+    <dl class="space-y-3 text-sm">
+      <div><dt class="tl-kicker">Customer</dt><dd>{{ entry.organization|default:"No customer" }}</dd></div>
+      <div><dt class="tl-kicker">Contact</dt><dd>{{ entry.contact|default:"No contact" }}</dd></div>
+      <div><dt class="tl-kicker">Created by</dt><dd>{{ entry.user }}</dd></div>
+      <div><dt class="tl-kicker">Current duration</dt><dd>{{ entry.duration_minutes }}m</dd></div>
+    </dl>
+  </aside>
+</div>
+{% endblock %}

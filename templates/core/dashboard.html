@@ -1,21 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-6 flex items-center justify-between">
-  <div><h1 class="text-2xl font-semibold">{{ workspace.name }} dashboard</h1><p class="text-sm text-slate-500">Ticket queue, activity, and time at a glance.</p></div>
-  <a href="{% url 'ticket_create' %}" class="bg-blue-700 px-3 py-2 text-sm font-medium text-white">New ticket</a>
+<div class="mb-6 flex items-start justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ workspace.name }} dashboard</h1>
+    <p class="text-sm text-slate-500">Workload, recent activity, and tracked support effort.</p>
+  </div>
+  <a href="{% url 'ticket_create' %}" class="tl-button">New ticket</a>
 </div>
-<div class="grid gap-4 lg:grid-cols-4">
-  {% for item in status_counts %}<div class="border border-slate-200 bg-white p-4"><div class="text-xs uppercase text-slate-500">{{ item.status }}</div><div class="text-2xl font-semibold">{{ item.count }}</div></div>{% endfor %}
-  <div class="border border-slate-200 bg-white p-4"><div class="text-xs uppercase text-slate-500">Tracked time</div><div class="text-2xl font-semibold">{{ time_total }}m</div></div>
+
+<div class="tl-panel grid gap-px overflow-hidden bg-slate-200 md:grid-cols-4">
+  {% for item in status_counts %}
+    <div class="tl-stat"><div class="tl-kicker">{{ item.status }}</div><div class="text-2xl font-semibold">{{ item.count }}</div></div>
+  {% endfor %}
+  <div class="tl-stat"><div class="tl-kicker">Tracked time</div><div class="text-2xl font-semibold">{{ time_total }}m</div></div>
 </div>
+
 <div class="mt-6 grid gap-6 lg:grid-cols-3">
-  <section class="lg:col-span-2 border border-slate-200 bg-white">
-    <div class="border-b border-slate-200 px-4 py-3 font-medium">Active tickets</div>
-    <table class="w-full text-left text-sm"><tbody>{% for ticket in tickets %}<tr class="border-b border-slate-100"><td class="p-3"><a class="font-medium text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a><div class="text-slate-500">{{ ticket.organization|default:"No organization" }}</div></td><td class="p-3">{{ ticket.status }}</td><td class="p-3">{{ ticket.priority }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500">No tickets yet.</td></tr>{% endfor %}</tbody></table>
+  <section class="tl-panel overflow-hidden lg:col-span-2">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <div class="font-medium">Active tickets</div>
+      <a class="text-sm text-blue-700" href="{% url 'ticket_list' %}">View queue</a>
+    </div>
+    <table class="tl-table w-full text-left text-sm">
+      <thead><tr><th>Ticket</th><th>Status</th><th>Priority</th></tr></thead>
+      <tbody>{% for ticket in tickets %}<tr class="border-t border-slate-100 hover:bg-slate-50"><td><a class="font-medium text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a><div class="text-xs text-slate-500">{{ ticket.organization|default:"No organization" }}</div></td><td>{{ ticket.get_status_display }}</td><td>{{ ticket.get_priority_display }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="3">No tickets yet.</td></tr>{% endfor %}</tbody>
+    </table>
   </section>
-  <section class="border border-slate-200 bg-white">
-    <div class="border-b border-slate-200 px-4 py-3 font-medium">Recent activity</div>
-    <div class="divide-y divide-slate-100">{% for event in activity %}<div class="p-3 text-sm"><div>{{ event.summary }}</div><div class="text-xs text-slate-500">{{ event.created_at }}</div></div>{% empty %}<div class="p-4 text-sm text-slate-500">No activity.</div>{% endfor %}</div>
+  <section class="tl-panel overflow-hidden">
+    <div class="border-b border-slate-200 px-5 py-4 font-medium">Recent activity</div>
+    <div class="divide-y divide-slate-100">{% for event in activity %}<div class="p-3 text-sm"><div>{{ event.summary }}</div><div class="text-xs text-slate-500">{{ event.created_at|date:"M j, g:i A" }}</div></div>{% empty %}<div class="p-4 text-sm text-slate-500">No activity.</div>{% endfor %}</div>
   </section>
 </div>
 {% endblock %}

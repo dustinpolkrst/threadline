@@ -7,6 +7,7 @@ from core.permissions import require_customer_profile
 from tickets.forms import PortalCommentForm, PortalTicketForm
 from tickets.models import Ticket, TicketComment
 from time_tracking.models import TimeEntry
+from tickets.services import apply_initial_sla, mark_customer_reply
 
 
 @login_required
@@ -27,6 +28,7 @@ def portal_ticket_create(request):
         ticket.contact = profile.contact
         ticket.requester = request.user
         ticket.source = Ticket.Source.PORTAL
+        apply_initial_sla(ticket)
         ticket.save()
         record_event(workspace=profile.workspace, actor=request.user, ticket=ticket, event_type="ticket.created", summary=f"Ticket created: {ticket.title}", customer_visible=True)
         return redirect("portal_ticket_detail", pk=ticket.pk)
@@ -56,6 +58,7 @@ def portal_ticket_reply(request, pk):
         comment.author = request.user
         comment.visibility = TicketComment.Visibility.PUBLIC
         comment.save()
+        mark_customer_reply(ticket)
         record_event(workspace=profile.workspace, actor=request.user, ticket=ticket, event_type="comment.added", summary="Customer reply added", customer_visible=True)
     return redirect("portal_ticket_detail", pk=ticket.pk)
 

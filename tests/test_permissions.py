@@ -28,7 +28,7 @@ def demo(db):
     TicketComment.objects.create(workspace=workspace, ticket=ticket, author=agent, body="internal secret", visibility=TicketComment.Visibility.INTERNAL)
     TimeEntry.objects.create(workspace=workspace, user=agent, ticket=ticket, organization=org, contact=contact, started_at=timezone.now(), duration_minutes=30, customer_visible=True)
     TimeEntry.objects.create(workspace=workspace, user=agent, ticket=ticket, organization=org, contact=contact, started_at=timezone.now(), duration_minutes=60, customer_visible=False)
-    return {"agent": agent, "customer": customer, "ticket": ticket, "other_ticket": other_ticket}
+    return {"agent": agent, "customer": customer, "ticket": ticket, "other_ticket": other_ticket, "workspace": workspace, "other_workspace": other_workspace}
 
 
 @pytest.mark.django_db
@@ -40,7 +40,7 @@ def test_customer_portal_hides_internal_notes_and_private_time(client, demo):
     assert "public" in content
     assert "internal secret" not in content
     assert "visible time 30m" in content
-    assert "60" not in content
+    assert "60m" not in content
 
 
 @pytest.mark.django_db
@@ -72,3 +72,55 @@ def test_agent_can_start_and_stop_billable_timer(client, demo):
     entry = TimeEntry.objects.filter(user=demo["agent"], ticket=demo["ticket"], notes="Resolved with config change").latest("created_at")
     assert entry.billable is True
     assert entry.duration_minutes >= 7
+
+
+@pytest.mark.django_db
+def test_agent_can_edit_ticket_time_entry(client, demo):
+    entry = TimeEntry.objects.filter(workspace=demo["workspace"], ticket=demo["ticket"]).first()
+    client.login(username="agent", password="password")
+    response = client.post(
+        reverse("time_entry_edit", args=[entry.pk]),
+        {
+            "started_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
+            "duration_minutes": "45",
+            "billable": "on",
+            "notes": "Adjusted after review",
+        },
+    )
+    assert response.status_code == 302
+    entry.refresh_from_db()
+    assert entry.duration_minutes == 45
+    assert entry.notes == "Adjusted after review"
+    assert entry.customer_visible is False
+
+
+@pytest.mark.django_db
+def test_agent_cannot_edit_other_workspace_time_entry(client, demo):
+    other_entry = TimeEntry.objects.create(
+        workspace=demo["other_workspace"],
+        user=demo["agent"],
+        ticket=demo["other_ticket"],
+        started_at=timezone.now(),
+        duration_minutes=10,
+    )
+    client.login(username="agent", password="password")
+    response = client.get(reverse("time_entry_edit", args=[other_entry.pk]))
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_ticket_detail_shows_all_time_entries_for_ticket(client, demo):
+    old_entry = TimeEntry.objects.create(
+        workspace=demo["workspace"],
+        user=demo["agent"],
+        ticket=demo["ticket"],
+        started_at=timezone.now() - timezone.timedelta(days=45),
+        duration_minutes=99,
+        notes="Old month entry",
+    )
+    client.login(username="agent", password="password")
+    response = client.get(reverse("ticket_detail", args=[demo["ticket"].pk]))
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "Old month entry" in content
+    assert f'href="/time/{old_entry.pk}/edit/"' in content

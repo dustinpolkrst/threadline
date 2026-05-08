@@ -1,7 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-4 flex items-center justify-between"><h1 class="text-2xl font-semibold">Tickets</h1><a class="bg-blue-700 px-3 py-2 text-sm text-white" href="{% url 'ticket_create' %}">New ticket</a></div>
-<div class="border border-slate-200 bg-white">
-  <table class="w-full text-left text-sm"><thead class="bg-slate-100 text-xs uppercase text-slate-600"><tr><th class="p-3">Ticket</th><th>Status</th><th>Priority</th><th>Customer</th><th>Assignee</th></tr></thead><tbody>{% for ticket in tickets %}<tr class="border-t border-slate-100"><td class="p-3"><a class="font-medium text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a></td><td>{{ ticket.status }}</td><td>{{ ticket.priority }}</td><td>{{ ticket.organization|default:"-" }}</td><td>{{ ticket.assignee|default:"Unassigned" }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500">No tickets.</td></tr>{% endfor %}</tbody></table>
+<div class="mb-5 flex items-start justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">Tickets</h1>
+    <p class="text-sm text-slate-500">Agent queue, priority work, ownership, and customer context.</p>
+  </div>
+  <a class="tl-button" href="{% url 'ticket_create' %}">New ticket</a>
+</div>
+
+<div class="tl-panel mb-6 grid gap-px overflow-hidden bg-slate-200 md:grid-cols-4">
+  <div class="tl-stat"><div class="tl-kicker">Total tickets</div><div class="text-2xl font-semibold">{{ summary.total }}</div></div>
+  <div class="tl-stat"><div class="tl-kicker">Open workload</div><div class="text-2xl font-semibold">{{ summary.open }}</div></div>
+  <div class="tl-stat"><div class="tl-kicker">Urgent</div><div class="text-2xl font-semibold">{{ summary.urgent }}</div></div>
+  <div class="tl-stat"><div class="tl-kicker">Unassigned</div><div class="text-2xl font-semibold">{{ summary.unassigned }}</div></div>
+</div>
+
+<div class="tl-panel overflow-hidden">
+  <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+    <div class="font-medium">Queue</div>
+    <div class="flex gap-2 text-xs">
+      <a class="tl-button-secondary {% if queue == 'all' and not status %}!bg-slate-900 !text-white{% endif %}" href="{% url 'ticket_list' %}">All</a>
+      <a class="tl-button-secondary {% if queue == 'my-open' %}!bg-slate-900 !text-white{% endif %}" href="?queue=my-open">My open</a>
+      <a class="tl-button-secondary {% if queue == 'unassigned' %}!bg-slate-900 !text-white{% endif %}" href="?queue=unassigned">Unassigned</a>
+      <a class="tl-button-secondary {% if queue == 'sla-at-risk' %}!bg-slate-900 !text-white{% endif %}" href="?queue=sla-at-risk">SLA at risk</a>
+      <a class="tl-button-secondary {% if queue == 'recently-updated' %}!bg-slate-900 !text-white{% endif %}" href="?queue=recently-updated">Recently updated</a>
+      <a class="tl-button-secondary {% if queue == 'waiting-on-customer' %}!bg-slate-900 !text-white{% endif %}" href="?queue=waiting-on-customer">Waiting on customer</a>
+    </div>
+  </div>
+  <table class="tl-table w-full text-left text-sm">
+    <thead><tr><th>Ticket</th><th>Status</th><th>SLA</th><th>Priority</th><th>Customer</th><th>Assignee</th><th>Updated</th></tr></thead>
+    <tbody>
+      {% for ticket in tickets %}
+        <tr class="border-t border-slate-100 align-top hover:bg-slate-50">
+          <td><a class="font-medium text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a><div class="mt-1 max-w-xl truncate text-xs text-slate-500">{{ ticket.description }}</div></td>
+          <td><span class="tl-badge bg-slate-100 text-slate-700">{{ ticket.get_status_display }}</span></td>
+          <td>{% if ticket.sla_state == "breached" %}<span class="tl-badge bg-rose-50 text-rose-700">Breached</span>{% elif ticket.sla_state == "due_soon" %}<span class="tl-badge bg-amber-50 text-amber-700">Due soon</span>{% elif ticket.sla_state == "on_track" %}<span class="tl-badge bg-emerald-50 text-emerald-700">On track</span>{% else %}<span class="text-slate-400">-</span>{% endif %}</td>
+          <td>{{ ticket.get_priority_display }}</td>
+          <td>{{ ticket.organization|default:"-" }}</td>
+          <td>{{ ticket.assignee|default:"Unassigned" }}</td>
+          <td class="text-slate-500">{{ ticket.updated_at|date:"M j" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td class="p-4 text-slate-500" colspan="7">No tickets.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

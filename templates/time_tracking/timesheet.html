@@ -1,5 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-2xl font-semibold">Timesheet</h1><p class="mb-5 text-sm text-slate-500">Last 7 days · {{ total }} minutes</p>
-<div class="border border-slate-200 bg-white"><table class="w-full text-left text-sm"><thead class="bg-slate-100 text-xs uppercase text-slate-600"><tr><th class="p-3">Started</th><th>Ticket</th><th>Customer</th><th>Minutes</th><th>Visibility</th></tr></thead><tbody>{% for entry in entries %}<tr class="border-t border-slate-100"><td class="p-3">{{ entry.started_at }}</td><td>{{ entry.ticket|default:"General" }}</td><td>{{ entry.organization|default:"-" }}</td><td>{{ entry.duration_minutes }}</td><td>{% if entry.customer_visible %}Customer{% else %}Internal{% endif %}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500">No time entries.</td></tr>{% endfor %}</tbody></table></div>
+<div class="mb-5">
+  <h1 class="text-2xl font-semibold">Timesheet</h1>
+  <p class="text-sm text-slate-500">Last 7 days of support work, billable effort, and customer-visible time.</p>
+</div>
+
+<div class="tl-panel mb-6 grid gap-px overflow-hidden bg-slate-200 md:grid-cols-2">
+  <div class="tl-stat"><div class="tl-kicker">Total time</div><div class="text-2xl font-semibold">{{ total }}m</div></div>
+  <div class="tl-stat"><div class="tl-kicker">Billable</div><div class="text-2xl font-semibold">{{ billable }}m</div></div>
+</div>
+
+<div class="tl-panel overflow-hidden">
+  <table class="tl-table w-full text-left text-sm">
+    <thead><tr><th>Started</th><th>Ticket</th><th>Customer</th><th>Minutes</th><th>Billing</th><th></th></tr></thead>
+    <tbody>
+      {% for entry in entries %}
+        <tr class="border-t border-slate-100 hover:bg-slate-50">
+          <td class="text-slate-500">{{ entry.started_at|date:"M j, g:i A" }}</td>
+          <td>{% if entry.ticket %}<a class="font-medium text-blue-700" href="{% url 'ticket_detail' entry.ticket.pk %}">{{ entry.ticket }}</a>{% else %}General work{% endif %}</td>
+          <td>{{ entry.organization|default:"-" }}</td>
+          <td class="font-medium">{{ entry.duration_minutes }}</td>
+          <td>{% if entry.billable %}<span class="tl-badge bg-emerald-50 text-emerald-700">Billable</span>{% else %}<span class="tl-badge bg-slate-100 text-slate-600">Non-billable</span>{% endif %}</td>
+          <td class="text-right"><a class="tl-button-secondary" href="{% url 'time_entry_edit' entry.pk %}">Edit</a></td>
+        </tr>
+      {% empty %}
+        <tr><td class="p-4 text-slate-500" colspan="6">No time entries.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

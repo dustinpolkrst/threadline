@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-5">
+  <div class="tl-kicker">Workspace settings</div>
+  <h1 class="text-2xl font-semibold">Team</h1>
+  <p class="text-sm text-slate-500">Manage internal roles and review customer portal users.</p>
+</div>
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="tl-panel p-5 lg:col-span-2">
+    <div class="mb-4">
+      <h2 class="font-medium">SLA targets</h2>
+      <p class="text-sm text-slate-500">Simple elapsed-time targets in minutes. Business calendars can come later.</p>
+    </div>
+    <form method="post" class="grid gap-4 md:grid-cols-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="sla">
+      {{ sla_form.as_p }}
+      <div class="flex items-end"><button class="tl-button">Save SLA targets</button></div>
+    </form>
+  </section>
+  <section class="tl-panel overflow-hidden">
+    <div class="border-b border-slate-200 px-5 py-4 font-medium">Internal users</div>
+    <table class="tl-table w-full text-left text-sm">
+      <thead><tr><th>User</th><th>Joined</th><th>Role</th><th></th></tr></thead>
+      <tbody>{% for membership in memberships %}<tr class="border-t border-slate-100"><td>{{ membership.user }}</td><td>{{ membership.created_at|date:"M j, Y" }}</td><td><form method="post" class="flex items-center gap-2">{% csrf_token %}<input type="hidden" name="membership_id" value="{{ membership.pk }}"><select name="role">{% for value,label in roles %}<option value="{{ value }}" {% if membership.role == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></td><td><button class="tl-button-secondary">Update</button></form></td></tr>{% endfor %}</tbody>
+    </table>
+  </section>
+  <section class="tl-panel overflow-hidden">
+    <div class="border-b border-slate-200 px-5 py-4 font-medium">Customer portal users</div>
+    <table class="tl-table w-full text-left text-sm">
+      <thead><tr><th>User</th><th>Organization</th><th>Contact</th></tr></thead>
+      <tbody>{% for profile in customer_profiles %}<tr class="border-t border-slate-100"><td>{{ profile.user }}</td><td>{{ profile.organization }}</td><td>{{ profile.contact }}</td></tr>{% empty %}<tr><td class="p-5 text-slate-500" colspan="3">No customer portal users.</td></tr>{% endfor %}</tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

@@ -1,5 +1,71 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-4 flex items-center justify-between"><h1 class="text-2xl font-semibold">Organizations</h1><a class="bg-blue-700 px-3 py-2 text-sm text-white" href="{% url 'organization_create' %}">New organization</a></div>
-<div class="border border-slate-200 bg-white divide-y divide-slate-100">{% for org in organizations %}<a class="block p-3 hover:bg-slate-50" href="{% url 'organization_detail' org.pk %}"><div class="font-medium">{{ org.name }}</div><div class="text-sm text-slate-500">{{ org.domain }}</div></a>{% empty %}<div class="p-4 text-slate-500">No organizations.</div>{% endfor %}</div>
+<div class="mb-5 flex items-start justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">Organizations</h1>
+    <p class="text-sm text-slate-500">Client accounts, ownership, support health, and related workload.</p>
+  </div>
+  <a class="tl-button" href="{% url 'organization_create' %}">New organization</a>
+</div>
+
+<div class="tl-panel overflow-hidden">
+  <div class="grid grid-cols-4 gap-px border-b border-slate-200 bg-slate-200 text-sm">
+    <div class="tl-stat">
+      <div class="text-xs uppercase text-slate-500">Accounts</div>
+      <div class="text-2xl font-semibold">{{ summary.account_count }}</div>
+    </div>
+    <div class="tl-stat">
+      <div class="text-xs uppercase text-slate-500">Open workload</div>
+      <div class="text-2xl font-semibold">{{ summary.open_ticket_count }}</div>
+    </div>
+    <div class="tl-stat">
+      <div class="text-xs uppercase text-slate-500">Priority clients</div>
+      <div class="text-2xl font-semibold">{{ summary.priority_count }}</div>
+    </div>
+    <div class="tl-stat">
+      <div class="text-xs uppercase text-slate-500">View</div>
+      <div class="text-sm font-medium">Account list</div>
+    </div>
+  </div>
+  <table class="tl-table w-full text-left text-sm">
+    <thead>
+      <tr>
+        <th class="p-3">Account</th>
+        <th>Owner</th>
+        <th>Status</th>
+        <th>Tier</th>
+        <th>Health</th>
+        <th>Contacts</th>
+        <th>Open tickets</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for org in organizations %}
+        <tr class="border-t border-slate-100 align-top hover:bg-slate-50">
+          <td>
+            <a class="font-medium text-blue-700" href="{% url 'organization_detail' org.pk %}">{{ org.name }}</a>
+            <div class="text-xs text-slate-500">{{ org.domain|default:"No domain" }}{% if org.industry %} - {{ org.industry }}{% endif %}</div>
+          </td>
+          <td>{{ org.account_owner|default:"Unassigned" }}</td>
+          <td>
+            <span class="tl-badge {% if org.status == 'at_risk' %}bg-rose-50 text-rose-700{% elif org.status == 'prospect' %}bg-amber-50 text-amber-700{% elif org.status == 'inactive' %}bg-slate-100 text-slate-600{% else %}bg-emerald-50 text-emerald-700{% endif %}">{{ org.get_status_display }}</span>
+          </td>
+          <td><span class="tl-badge min-w-20 bg-slate-100 text-slate-700">{{ org.get_tier_display }}</span></td>
+          <td>
+            <div class="w-24 bg-slate-200">
+              <div class="h-2 bg-blue-700" style="width: {{ org.health_score }}%"></div>
+            </div>
+            <div class="mt-1 text-xs text-slate-500">{{ org.health_score }}%</div>
+          </td>
+          <td>{{ org.contact_count }}</td>
+          <td>{{ org.open_ticket_count }}</td>
+          <td>{{ org.total_minutes|default:0 }}m</td>
+        </tr>
+      {% empty %}
+        <tr><td class="p-4 text-slate-500" colspan="8">No organizations.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

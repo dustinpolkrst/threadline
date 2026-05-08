@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-4 flex items-center justify-between"><h1 class="text-2xl font-semibold">Support requests</h1><a class="bg-blue-700 px-3 py-2 text-sm text-white" href="{% url 'portal_ticket_create' %}">New request</a></div>
-<div class="border border-slate-200 bg-white divide-y divide-slate-100">{% for ticket in tickets %}<a class="block p-3 hover:bg-slate-50" href="{% url 'portal_ticket_detail' ticket.pk %}"><div class="font-medium">{{ ticket.title }}</div><div class="text-sm text-slate-500">{{ ticket.status }} · {{ ticket.created_at }}</div></a>{% empty %}<div class="p-4 text-slate-500">No support requests.</div>{% endfor %}</div>
+<div class="mb-5 flex items-start justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">Support requests</h1>
+    <p class="text-sm text-slate-500">Open and closed requests for your organization.</p>
+  </div>
+  <a class="bg-blue-700 px-3 py-2 text-sm font-medium text-white" href="{% url 'portal_ticket_create' %}">New request</a>
+</div>
+<div class="border border-slate-200 bg-white">
+  <table class="w-full text-left text-sm">
+    <thead class="bg-slate-100 text-xs uppercase text-slate-600"><tr><th class="p-3">Request</th><th>Status</th><th>Priority</th><th>Created</th></tr></thead>
+    <tbody>{% for ticket in tickets %}<tr class="border-t border-slate-100 hover:bg-slate-50"><td class="p-3"><a class="font-medium text-blue-700" href="{% url 'portal_ticket_detail' ticket.pk %}">{{ ticket.title }}</a></td><td>{{ ticket.get_status_display }}</td><td>{{ ticket.get_priority_display }}</td><td class="text-slate-500">{{ ticket.created_at|date:"M j, Y" }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="4">No support requests.</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
 {% endblock %}

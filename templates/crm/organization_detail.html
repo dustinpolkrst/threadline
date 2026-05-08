@@ -1,9 +1,99 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-2xl font-semibold">{{ organization.name }}</h1><p class="mb-5 text-sm text-slate-500">{{ organization.domain }} · {{ time_total }} tracked minutes</p>
-<div class="grid gap-6 lg:grid-cols-3">
-  <section class="border border-slate-200 bg-white p-4"><h2 class="mb-3 font-medium">Contacts</h2>{% for contact in organization.contacts.all %}<a class="block border-t border-slate-100 py-2 text-sm text-blue-700" href="{% url 'contact_detail' contact.pk %}">{{ contact.name }}</a>{% endfor %}</section>
-  <section class="border border-slate-200 bg-white p-4"><h2 class="mb-3 font-medium">Tickets</h2>{% for ticket in tickets %}<a class="block border-t border-slate-100 py-2 text-sm text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a>{% endfor %}</section>
-  <section class="border border-slate-200 bg-white p-4"><h2 class="mb-3 font-medium">Recent activity</h2>{% for event in activity %}<div class="border-t border-slate-100 py-2 text-sm">{{ event.summary }}</div>{% endfor %}</section>
+<div class="mb-5 flex items-start justify-between gap-4">
+  <div>
+    <div class="mb-2 flex items-center gap-2 text-xs uppercase text-slate-500">
+      <span>{{ organization.get_status_display }}</span>
+      <span>-</span>
+      <span>{{ organization.get_tier_display }}</span>
+      {% if organization.account_owner %}<span>-</span><span>Owner: {{ organization.account_owner }}</span>{% endif %}
+    </div>
+    <h1 class="text-2xl font-semibold">{{ organization.name }}</h1>
+    <p class="text-sm text-slate-500">{{ organization.domain|default:"No domain" }}{% if organization.website %} - {{ organization.website }}{% endif %}</p>
+  </div>
+  <a class="border border-slate-300 bg-white px-3 py-2 text-sm font-medium" href="{% url 'organization_edit' organization.pk %}">Edit account</a>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-4">
+  <aside class="space-y-6">
+    <section class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-3 font-medium">Client Profile</h2>
+      <dl class="space-y-3 text-sm">
+        <div><dt class="text-xs uppercase text-slate-500">Health</dt><dd><div class="mt-1 bg-slate-200"><div class="h-2 bg-blue-700" style="width: {{ organization.health_score }}%"></div></div><span class="text-xs text-slate-500">{{ organization.health_score }}%</span></dd></div>
+        <div><dt class="text-xs uppercase text-slate-500">Industry</dt><dd>{{ organization.industry|default:"Not set" }}</dd></div>
+        <div><dt class="text-xs uppercase text-slate-500">Employees</dt><dd>{{ organization.employee_count|default:"Not set" }}</dd></div>
+        <div><dt class="text-xs uppercase text-slate-500">Annual revenue</dt><dd>{% if organization.annual_revenue %}${{ organization.annual_revenue }}{% else %}Not set{% endif %}</dd></div>
+        <div><dt class="text-xs uppercase text-slate-500">Renewal</dt><dd>{{ organization.renewal_date|default:"Not set" }}</dd></div>
+      </dl>
+    </section>
+    <section class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-3 font-medium">Contact Info</h2>
+      <dl class="space-y-3 text-sm">
+        <div><dt class="text-xs uppercase text-slate-500">Phone</dt><dd>{{ organization.phone|default:"Not set" }}</dd></div>
+        <div><dt class="text-xs uppercase text-slate-500">Billing email</dt><dd>{{ organization.billing_email|default:"Not set" }}</dd></div>
+        <div><dt class="text-xs uppercase text-slate-500">Address</dt><dd class="whitespace-pre-wrap">{{ organization.address|default:"Not set" }}</dd></div>
+      </dl>
+    </section>
+  </aside>
+
+  <section class="space-y-6 lg:col-span-2">
+    <div class="grid grid-cols-3 gap-3">
+      <div class="border border-slate-200 bg-white p-4"><div class="text-xs uppercase text-slate-500">Contacts</div><div class="text-2xl font-semibold">{{ contacts|length }}</div></div>
+      <div class="border border-slate-200 bg-white p-4"><div class="text-xs uppercase text-slate-500">Tickets</div><div class="text-2xl font-semibold">{{ tickets|length }}</div></div>
+      <div class="border border-slate-200 bg-white p-4"><div class="text-xs uppercase text-slate-500">Tracked time</div><div class="text-2xl font-semibold">{{ time_total }}m</div></div>
+    </div>
+
+    <section class="border border-slate-200 bg-white">
+      <div class="border-b border-slate-200 px-4 py-3 font-medium">People</div>
+      <div class="divide-y divide-slate-100">
+        {% for contact in contacts %}
+          <a class="grid grid-cols-3 gap-3 p-3 text-sm hover:bg-slate-50" href="{% url 'contact_detail' contact.pk %}">
+            <span class="font-medium text-blue-700">{{ contact.name }}</span>
+            <span>{{ contact.title|default:"No title" }}</span>
+            <span class="text-slate-500">{{ contact.email }}</span>
+          </a>
+        {% empty %}
+          <div class="p-4 text-sm text-slate-500">No contacts yet.</div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="border border-slate-200 bg-white">
+      <div class="border-b border-slate-200 px-4 py-3 font-medium">Support Work</div>
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-100 text-xs uppercase text-slate-600"><tr><th class="p-3">Ticket</th><th>Status</th><th>Priority</th><th>Assignee</th></tr></thead>
+        <tbody>
+          {% for ticket in tickets %}
+        <tr class="border-t border-slate-100"><td class="p-3"><a class="font-medium text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a></td><td>{{ ticket.get_status_display }}</td><td>{{ ticket.get_priority_display }}</td><td>{{ ticket.assignee|default:"Unassigned" }}</td></tr>
+          {% empty %}
+            <tr><td class="p-4 text-slate-500" colspan="4">No tickets yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </section>
+
+  <aside class="space-y-6">
+    <section class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-3 font-medium">Ticket Status</h2>
+      {% for item in status_counts %}
+        <div class="flex justify-between border-t border-slate-100 py-2 text-sm"><span>{{ item.status }}</span><span class="font-medium">{{ item.count }}</span></div>
+      {% empty %}
+        <div class="text-sm text-slate-500">No ticket history.</div>
+      {% endfor %}
+    </section>
+    <section class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-3 font-medium">Account Notes</h2>
+      <p class="whitespace-pre-wrap text-sm text-slate-700">{{ organization.notes|default:"No notes yet." }}</p>
+    </section>
+    <section class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-3 font-medium">Recent Activity</h2>
+      {% for event in activity %}
+        <div class="border-t border-slate-100 py-2 text-sm">{{ event.summary }}<div class="text-xs text-slate-500">{{ event.created_at }}</div></div>
+      {% empty %}
+        <div class="text-sm text-slate-500">No activity yet.</div>
+      {% endfor %}
+    </section>
+  </aside>
 </div>
 {% endblock %}

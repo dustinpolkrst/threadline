@@ -1,8 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-2xl font-semibold">{{ contact.name }}</h1><p class="mb-5 text-sm text-slate-500">{{ contact.email }} · {{ contact.organization }} · {{ time_total }} tracked minutes</p>
-<div class="grid gap-6 lg:grid-cols-2">
-  <section class="border border-slate-200 bg-white p-4"><h2 class="mb-3 font-medium">Related tickets</h2>{% for ticket in tickets %}<a class="block border-t border-slate-100 py-2 text-sm text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a>{% endfor %}</section>
-  <section class="border border-slate-200 bg-white p-4"><h2 class="mb-3 font-medium">Public communication</h2>{% for comment in comments %}<div class="border-t border-slate-100 py-2 text-sm"><a class="text-blue-700" href="{% url 'ticket_detail' comment.ticket.pk %}">{{ comment.ticket.title }}</a><p>{{ comment.body }}</p></div>{% endfor %}</section>
+<div class="mb-5">
+  <div class="text-xs uppercase text-slate-500">{{ contact.organization }}</div>
+  <h1 class="text-2xl font-semibold">{{ contact.name }}</h1>
+  <p class="text-sm text-slate-500">{{ contact.email }} - {{ contact.title|default:"No title" }} - {{ time_total }} tracked minutes</p>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-3">
+  <aside class="border border-slate-200 bg-white p-4">
+    <h2 class="mb-3 font-medium">Profile</h2>
+    <dl class="space-y-3 text-sm">
+      <div><dt class="text-xs uppercase text-slate-500">Organization</dt><dd><a class="text-blue-700" href="{% url 'organization_detail' contact.organization.pk %}">{{ contact.organization }}</a></dd></div>
+      <div><dt class="text-xs uppercase text-slate-500">Email</dt><dd>{{ contact.email }}</dd></div>
+      <div><dt class="text-xs uppercase text-slate-500">Phone</dt><dd>{{ contact.phone|default:"Not set" }}</dd></div>
+      <div><dt class="text-xs uppercase text-slate-500">Notes</dt><dd class="whitespace-pre-wrap">{{ contact.notes|default:"No notes yet." }}</dd></div>
+    </dl>
+  </aside>
+  <section class="border border-slate-200 bg-white lg:col-span-2">
+    <div class="border-b border-slate-200 px-4 py-3 font-medium">Related tickets</div>
+    <table class="w-full text-left text-sm">
+      <thead class="bg-slate-100 text-xs uppercase text-slate-600"><tr><th class="p-3">Ticket</th><th>Status</th><th>Priority</th></tr></thead>
+      <tbody>{% for ticket in tickets %}<tr class="border-t border-slate-100"><td class="p-3"><a class="font-medium text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a></td><td>{{ ticket.get_status_display }}</td><td>{{ ticket.get_priority_display }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="3">No related tickets.</td></tr>{% endfor %}</tbody>
+    </table>
+    <div class="border-t border-slate-200 px-4 py-3 font-medium">Communication history</div>
+    <div class="divide-y divide-slate-100">{% for comment in comments %}<div class="p-3 text-sm"><a class="font-medium text-blue-700" href="{% url 'ticket_detail' comment.ticket.pk %}">{{ comment.ticket.title }}</a><p class="mt-1">{{ comment.body }}</p></div>{% empty %}<div class="p-4 text-sm text-slate-500">No public communication yet.</div>{% endfor %}</div>
+  </section>
 </div>
 {% endblock %}

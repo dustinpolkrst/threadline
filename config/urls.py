@@ -20,6 +20,7 @@ from django.urls import path
 from core import views as core_views
 from crm import views as crm_views
 from customer_portal import views as portal_views
+from communications import views as comm_views
 from search import views as search_views
 from tickets import views as ticket_views
 from time_tracking import views as time_views
@@ -33,16 +34,22 @@ urlpatterns = [
     path("tickets/new/", ticket_views.ticket_create, name="ticket_create"),
     path("tickets/<uuid:pk>/", ticket_views.ticket_detail, name="ticket_detail"),
     path("tickets/<uuid:pk>/comments/", ticket_views.ticket_add_comment, name="ticket_add_comment"),
+    path("tickets/<uuid:pk>/resolve/", ticket_views.ticket_resolve, name="ticket_resolve"),
     path("tickets/<uuid:pk>/time/", ticket_views.ticket_add_time, name="ticket_add_time"),
     path("tickets/<uuid:pk>/timer/start/", ticket_views.ticket_start_timer, name="ticket_start_timer"),
     path("tickets/<uuid:pk>/timer/stop/", ticket_views.ticket_stop_timer, name="ticket_stop_timer"),
     path("organizations/", crm_views.organization_list, name="organization_list"),
     path("organizations/new/", crm_views.organization_create, name="organization_create"),
+    path("organizations/<uuid:pk>/edit/", crm_views.organization_edit, name="organization_edit"),
     path("organizations/<uuid:pk>/", crm_views.organization_detail, name="organization_detail"),
     path("contacts/", crm_views.contact_list, name="contact_list"),
     path("contacts/new/", crm_views.contact_create, name="contact_create"),
     path("contacts/<uuid:pk>/", crm_views.contact_detail, name="contact_detail"),
     path("timesheet/", time_views.timesheet, name="timesheet"),
+    path("time/<uuid:pk>/edit/", time_views.time_entry_edit, name="time_entry_edit"),
+    path("reports/time/", time_views.time_report, name="time_report"),
+    path("settings/team/", crm_views.team_settings, name="team_settings"),
+    path("settings/email/", comm_views.email_plumbing_settings, name="email_plumbing_settings"),
     path("search/", search_views.search_page, name="search"),
     path("portal/tickets/", portal_views.portal_ticket_list, name="portal_ticket_list"),
     path("portal/tickets/new/", portal_views.portal_ticket_create, name="portal_ticket_create"),

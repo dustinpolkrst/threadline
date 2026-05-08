@@ -7,25 +7,47 @@
   <title>Threadline</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <style>
+    :root { --tl-ink: #102033; --tl-muted: #64748b; --tl-line: #dbe4ef; --tl-panel: #ffffff; --tl-accent: #1d4ed8; }
+    body { font-family: Aptos, "Segoe UI", system-ui, sans-serif; background: #f4f7fb; color: var(--tl-ink); }
+    input:not([type="checkbox"]):not([type="radio"]), select, textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0.625rem 0.875rem; font-size: 0.875rem; line-height: 1.35rem; background: #fff; transition: border-color .15s ease, box-shadow .15s ease; }
+    input:not([type="checkbox"]):not([type="radio"]), select { min-height: 2.75rem; }
+    input[type="checkbox"], input[type="radio"] { width: 1rem; height: 1rem; accent-color: var(--tl-accent); vertical-align: middle; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, .12); }
+    textarea { min-height: 7rem; }
+    label { display: block; margin-bottom: 0.375rem; font-size: 0.72rem; font-weight: 700; color: #52657a; text-transform: uppercase; letter-spacing: 0.045em; }
+    form p { margin-bottom: 1rem; }
+    .tl-panel { border: 1px solid var(--tl-line); border-radius: 8px; background: var(--tl-panel); box-shadow: 0 1px 2px rgba(15, 23, 42, .04); }
+    .tl-stat { background: linear-gradient(180deg, #fff 0%, #fbfdff 100%); padding: 1.25rem; }
+    .tl-kicker { font-size: .72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .045em; }
+    .tl-button { border-radius: 7px; background: var(--tl-accent); color: #fff; padding: .65rem .95rem; font-size: .875rem; font-weight: 700; box-shadow: 0 1px 2px rgba(29, 78, 216, .25); }
+    .tl-button-secondary { border: 1px solid #cbd5e1; border-radius: 7px; background: #fff; padding: .55rem .8rem; font-size: .8125rem; font-weight: 650; color: #334155; }
+    .tl-badge { display: inline-flex; min-width: 5.75rem; justify-content: center; border-radius: 999px; padding: .32rem .7rem; font-size: .75rem; font-weight: 700; line-height: 1; }
+    .tl-table th { padding: .9rem 1rem; color: #52657a; font-size: .72rem; text-transform: uppercase; letter-spacing: .045em; background: #f7f9fc; }
+    .tl-table td { padding: 1rem; vertical-align: middle; }
+    .auth-card input { padding-left: 1.25rem !important; padding-right: 1.25rem !important; min-height: 2.9rem; }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
+<body>
   <div class="min-h-screen">
-    <header class="border-b border-slate-200 bg-white">
-      <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        <a href="{% url 'dashboard' %}" class="text-lg font-semibold tracking-tight">Threadline</a>
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div class="mx-auto flex max-w-[1440px] items-center justify-between px-8 py-3">
+        <a href="{% url 'dashboard' %}" class="text-lg font-semibold tracking-tight text-slate-950">Threadline</a>
         {% if user.is_authenticated %}
         <nav class="flex items-center gap-4 text-sm">
-          <a class="hover:text-blue-700" href="{% url 'ticket_list' %}">Tickets</a>
-          <a class="hover:text-blue-700" href="{% url 'organization_list' %}">Organizations</a>
-          <a class="hover:text-blue-700" href="{% url 'contact_list' %}">Contacts</a>
-          <a class="hover:text-blue-700" href="{% url 'timesheet' %}">Timesheet</a>
-          <a class="hover:text-blue-700" href="{% url 'search' %}">Search</a>
+          <a class="border-b-2 px-1 py-3 {% if request.path == '/tickets/' %}border-blue-700 text-blue-700{% else %}border-transparent text-slate-600 hover:text-blue-700{% endif %}" href="{% url 'ticket_list' %}">Tickets</a>
+          <a class="border-b-2 px-1 py-3 {% if request.path == '/organizations/' %}border-blue-700 text-blue-700{% else %}border-transparent text-slate-600 hover:text-blue-700{% endif %}" href="{% url 'organization_list' %}">Organizations</a>
+          <a class="border-b-2 px-1 py-3 {% if request.path == '/contacts/' %}border-blue-700 text-blue-700{% else %}border-transparent text-slate-600 hover:text-blue-700{% endif %}" href="{% url 'contact_list' %}">Contacts</a>
+          <a class="border-b-2 px-1 py-3 {% if request.path == '/timesheet/' %}border-blue-700 text-blue-700{% else %}border-transparent text-slate-600 hover:text-blue-700{% endif %}" href="{% url 'timesheet' %}">Timesheet</a>
+          <a class="border-b-2 px-1 py-3 {% if request.path == '/reports/time/' %}border-blue-700 text-blue-700{% else %}border-transparent text-slate-600 hover:text-blue-700{% endif %}" href="{% url 'time_report' %}">Reports</a>
+          <a class="border-b-2 px-1 py-3 {% if '/settings/' in request.path %}border-blue-700 text-blue-700{% else %}border-transparent text-slate-600 hover:text-blue-700{% endif %}" href="{% url 'team_settings' %}">Settings</a>
+          <a class="border-b-2 px-1 py-3 {% if request.path == '/search/' %}border-blue-700 text-blue-700{% else %}border-transparent text-slate-600 hover:text-blue-700{% endif %}" href="{% url 'search' %}">Search</a>
           <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text-slate-500 hover:text-slate-900">Logout</button></form>
         </nav>
         {% endif %}
       </div>
     </header>
-    <main class="mx-auto max-w-7xl px-6 py-6">
+    <main class="mx-auto max-w-[1440px] px-8 py-8">
       {% block content %}{% endblock %}
     </main>
   </div>

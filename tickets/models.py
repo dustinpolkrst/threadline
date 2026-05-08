@@ -38,6 +38,10 @@ class Ticket(models.Model):
     tags = models.CharField(max_length=300, blank=True)
     source = models.CharField(max_length=20, choices=Source.choices, default=Source.INTERNAL)
     due_date = models.DateField(null=True, blank=True)
+    first_response_due_at = models.DateTimeField(null=True, blank=True)
+    next_response_due_at = models.DateTimeField(null=True, blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    waiting_since = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -49,6 +53,9 @@ class Ticket(models.Model):
             models.Index(fields=["workspace", "created_at"]),
             models.Index(fields=["workspace", "organization"]),
             models.Index(fields=["workspace", "contact"]),
+            models.Index(fields=["workspace", "first_response_due_at"]),
+            models.Index(fields=["workspace", "next_response_due_at"]),
+            models.Index(fields=["workspace", "waiting_since"]),
         ]
 
     def __str__(self):
@@ -65,7 +72,7 @@ class TicketComment(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="ticket_comments")
     body = models.TextField()
-    visibility = models.CharField(max_length=20, choices=Visibility.choices, default=Visibility.PUBLIC)
+    visibility = models.CharField(max_length=20, choices=Visibility.choices, default=Visibility.INTERNAL)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
