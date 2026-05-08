@@ -1,0 +1,15 @@
+services:
+  web:
+    restart: unless-stopped
+    environment:
+      DEBUG: "false"
+    ports:
+      - "127.0.0.1:8000:8000"
+  celery:
+    restart: unless-stopped
+  db:
+    restart: unless-stopped
+    ports: []
+  redis:
+    restart: unless-stopped
+    ports: []

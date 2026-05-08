@@ -1,0 +1,51 @@
+"""
+URL configuration for config project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/6.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.contrib.auth import views as auth_views
+from django.urls import path
+from core import views as core_views
+from crm import views as crm_views
+from customer_portal import views as portal_views
+from search import views as search_views
+from tickets import views as ticket_views
+from time_tracking import views as time_views
+
+urlpatterns = [
+    path("", core_views.dashboard, name="dashboard"),
+    path("login/", auth_views.LoginView.as_view(template_name="registration/login.html"), name="login"),
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("admin/", admin.site.urls),
+    path("tickets/", ticket_views.ticket_list, name="ticket_list"),
+    path("tickets/new/", ticket_views.ticket_create, name="ticket_create"),
+    path("tickets/<uuid:pk>/", ticket_views.ticket_detail, name="ticket_detail"),
+    path("tickets/<uuid:pk>/comments/", ticket_views.ticket_add_comment, name="ticket_add_comment"),
+    path("tickets/<uuid:pk>/time/", ticket_views.ticket_add_time, name="ticket_add_time"),
+    path("tickets/<uuid:pk>/timer/start/", ticket_views.ticket_start_timer, name="ticket_start_timer"),
+    path("tickets/<uuid:pk>/timer/stop/", ticket_views.ticket_stop_timer, name="ticket_stop_timer"),
+    path("organizations/", crm_views.organization_list, name="organization_list"),
+    path("organizations/new/", crm_views.organization_create, name="organization_create"),
+    path("organizations/<uuid:pk>/", crm_views.organization_detail, name="organization_detail"),
+    path("contacts/", crm_views.contact_list, name="contact_list"),
+    path("contacts/new/", crm_views.contact_create, name="contact_create"),
+    path("contacts/<uuid:pk>/", crm_views.contact_detail, name="contact_detail"),
+    path("timesheet/", time_views.timesheet, name="timesheet"),
+    path("search/", search_views.search_page, name="search"),
+    path("portal/tickets/", portal_views.portal_ticket_list, name="portal_ticket_list"),
+    path("portal/tickets/new/", portal_views.portal_ticket_create, name="portal_ticket_create"),
+    path("portal/tickets/<uuid:pk>/", portal_views.portal_ticket_detail, name="portal_ticket_detail"),
+    path("portal/tickets/<uuid:pk>/reply/", portal_views.portal_ticket_reply, name="portal_ticket_reply"),
+]

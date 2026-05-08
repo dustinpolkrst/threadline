@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-4 flex items-center justify-between"><h1 class="text-2xl font-semibold">Organizations</h1><a class="bg-blue-700 px-3 py-2 text-sm text-white" href="{% url 'organization_create' %}">New organization</a></div>
+<div class="border border-slate-200 bg-white divide-y divide-slate-100">{% for org in organizations %}<a class="block p-3 hover:bg-slate-50" href="{% url 'organization_detail' org.pk %}"><div class="font-medium">{{ org.name }}</div><div class="text-sm text-slate-500">{{ org.domain }}</div></a>{% empty %}<div class="p-4 text-slate-500">No organizations.</div>{% endfor %}</div>
+{% endblock %}

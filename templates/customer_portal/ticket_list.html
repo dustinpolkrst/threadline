@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-4 flex items-center justify-between"><h1 class="text-2xl font-semibold">Support requests</h1><a class="bg-blue-700 px-3 py-2 text-sm text-white" href="{% url 'portal_ticket_create' %}">New request</a></div>
+<div class="border border-slate-200 bg-white divide-y divide-slate-100">{% for ticket in tickets %}<a class="block p-3 hover:bg-slate-50" href="{% url 'portal_ticket_detail' ticket.pk %}"><div class="font-medium">{{ ticket.title }}</div><div class="text-sm text-slate-500">{{ ticket.status }} · {{ ticket.created_at }}</div></a>{% empty %}<div class="p-4 text-slate-500">No support requests.</div>{% endfor %}</div>
+{% endblock %}

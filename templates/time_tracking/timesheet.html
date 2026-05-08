@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold">Timesheet</h1><p class="mb-5 text-sm text-slate-500">Last 7 days · {{ total }} minutes</p>
+<div class="border border-slate-200 bg-white"><table class="w-full text-left text-sm"><thead class="bg-slate-100 text-xs uppercase text-slate-600"><tr><th class="p-3">Started</th><th>Ticket</th><th>Customer</th><th>Minutes</th><th>Visibility</th></tr></thead><tbody>{% for entry in entries %}<tr class="border-t border-slate-100"><td class="p-3">{{ entry.started_at }}</td><td>{{ entry.ticket|default:"General" }}</td><td>{{ entry.organization|default:"-" }}</td><td>{{ entry.duration_minutes }}</td><td>{% if entry.customer_visible %}Customer{% else %}Internal{% endif %}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500">No time entries.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

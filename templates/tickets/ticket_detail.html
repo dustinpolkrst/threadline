@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-5">
+  <h1 class="text-2xl font-semibold">{{ ticket.title }}</h1>
+  <p class="text-sm text-slate-500">{{ ticket.organization|default:"No organization" }} - {{ ticket.status }} - {{ ticket.priority }}</p>
+</div>
+<div class="grid gap-6 lg:grid-cols-3">
+  <section class="lg:col-span-2 space-y-6">
+    <div class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-2 font-medium">Description</h2>
+      <p class="whitespace-pre-wrap text-sm">{{ ticket.description }}</p>
+    </div>
+    <div class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-3 font-medium">Comments</h2>
+      {% for comment in comments %}
+        <div class="border-t border-slate-100 py-3 text-sm">
+          <div class="text-xs text-slate-500">{{ comment.visibility }} - {{ comment.author|default:"Unknown" }} - {{ comment.created_at }}</div>
+          <p class="whitespace-pre-wrap">{{ comment.body }}</p>
+        </div>
+      {% endfor %}
+      <form method="post" action="{% url 'ticket_add_comment' ticket.pk %}" class="mt-4 space-y-3">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button class="bg-blue-700 px-3 py-2 text-sm text-white">Add comment</button>
+      </form>
+    </div>
+  </section>
+  <aside class="space-y-6">
+    <div class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-2 font-medium">Time</h2>
+      <div class="mb-3 text-2xl font-semibold">{{ time_total }}m</div>
+      {% if active_timer %}
+        <div class="mb-4 border border-blue-200 bg-blue-50 p-3 text-sm">
+          <div class="font-medium">Timer running</div>
+          <div class="text-slate-600">{{ active_timer.ticket.title }} - started {{ active_timer.started_at }}</div>
+          {% if active_timer.ticket_id == ticket.id %}
+            <form method="post" action="{% url 'ticket_stop_timer' ticket.pk %}" class="mt-3 space-y-2">
+              {% csrf_token %}
+              {{ timer_stop_form.as_p }}
+              <button class="bg-blue-700 px-3 py-2 text-sm text-white">Stop and log billable time</button>
+            </form>
+          {% else %}
+            <a class="mt-3 inline-block text-blue-700" href="{% url 'ticket_detail' active_timer.ticket.pk %}">Open running timer</a>
+          {% endif %}
+        </div>
+      {% else %}
+        <form method="post" action="{% url 'ticket_start_timer' ticket.pk %}" class="mb-4 space-y-3 border border-slate-200 p-3">
+          {% csrf_token %}
+          {{ timer_start_form.as_p }}
+          <button class="bg-blue-700 px-3 py-2 text-sm text-white">Start billable timer</button>
+        </form>
+      {% endif %}
+      {% for entry in time_entries %}
+        <div class="border-t border-slate-100 py-2 text-sm">
+          {{ entry.duration_minutes }}m - {% if entry.billable %}billable{% else %}non-billable{% endif %} - {% if entry.customer_visible %}customer visible{% else %}internal{% endif %}
+        </div>
+      {% endfor %}
+      <form method="post" action="{% url 'ticket_add_time' ticket.pk %}" class="mt-4 space-y-3 border-t border-slate-200 pt-4">
+        {% csrf_token %}
+        {{ time_form.as_p }}
+        <button class="bg-slate-800 px-3 py-2 text-sm text-white">Add manual time</button>
+      </form>
+    </div>
+    <div class="border border-slate-200 bg-white p-4">
+      <h2 class="mb-2 font-medium">Activity</h2>
+      {% for event in activity %}
+        <div class="border-t border-slate-100 py-2 text-sm">{{ event.summary }}<div class="text-xs text-slate-500">{{ event.visibility }}</div></div>
+      {% endfor %}
+    </div>
+  </aside>
+</div>
+{% endblock %}

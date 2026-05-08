@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Threadline</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div class="min-h-screen">
+    <header class="border-b border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+        <a href="{% url 'dashboard' %}" class="text-lg font-semibold tracking-tight">Threadline</a>
+        {% if user.is_authenticated %}
+        <nav class="flex items-center gap-4 text-sm">
+          <a class="hover:text-blue-700" href="{% url 'ticket_list' %}">Tickets</a>
+          <a class="hover:text-blue-700" href="{% url 'organization_list' %}">Organizations</a>
+          <a class="hover:text-blue-700" href="{% url 'contact_list' %}">Contacts</a>
+          <a class="hover:text-blue-700" href="{% url 'timesheet' %}">Timesheet</a>
+          <a class="hover:text-blue-700" href="{% url 'search' %}">Search</a>
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text-slate-500 hover:text-slate-900">Logout</button></form>
+        </nav>
+        {% endif %}
+      </div>
+    </header>
+    <main class="mx-auto max-w-7xl px-6 py-6">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

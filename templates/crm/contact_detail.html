@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold">{{ contact.name }}</h1><p class="mb-5 text-sm text-slate-500">{{ contact.email }} · {{ contact.organization }} · {{ time_total }} tracked minutes</p>
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="border border-slate-200 bg-white p-4"><h2 class="mb-3 font-medium">Related tickets</h2>{% for ticket in tickets %}<a class="block border-t border-slate-100 py-2 text-sm text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a>{% endfor %}</section>
+  <section class="border border-slate-200 bg-white p-4"><h2 class="mb-3 font-medium">Public communication</h2>{% for comment in comments %}<div class="border-t border-slate-100 py-2 text-sm"><a class="text-blue-700" href="{% url 'ticket_detail' comment.ticket.pk %}">{{ comment.ticket.title }}</a><p>{{ comment.body }}</p></div>{% endfor %}</section>
+</div>
+{% endblock %}

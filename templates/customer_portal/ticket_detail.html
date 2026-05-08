@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold">{{ ticket.title }}</h1><p class="mb-5 text-sm text-slate-500">{{ ticket.status }} · visible time {{ time_total }}m</p>
+<div class="grid gap-6 lg:grid-cols-3">
+  <section class="lg:col-span-2 border border-slate-200 bg-white p-4"><h2 class="mb-2 font-medium">Request</h2><p class="mb-4 whitespace-pre-wrap text-sm">{{ ticket.description }}</p><h2 class="mb-2 font-medium">Replies</h2>{% for comment in comments %}<div class="border-t border-slate-100 py-3 text-sm"><div class="text-xs text-slate-500">{{ comment.author|default:"Support" }} · {{ comment.created_at }}</div>{{ comment.body }}</div>{% endfor %}<form method="post" action="{% url 'portal_ticket_reply' ticket.pk %}" class="mt-4 space-y-3">{% csrf_token %}{{ form.as_p }}<button class="bg-blue-700 px-3 py-2 text-sm text-white">Reply</button></form></section>
+  <aside class="border border-slate-200 bg-white p-4"><h2 class="mb-2 font-medium">Timeline</h2>{% for event in activity %}<div class="border-t border-slate-100 py-2 text-sm">{{ event.summary }}</div>{% endfor %}</aside>
+</div>
+{% endblock %}
