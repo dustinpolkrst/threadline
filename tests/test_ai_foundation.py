@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from ai.client import OpenRouterError, build_request_payload, parse_analysis_response
-from ai.context import build_ticket_context
+from ai.context import build_analysis_messages, build_ticket_context
 from ai.models import AIProviderSettings, TicketAIAnalysis
 from ai.services import apply_analysis, run_ticket_analysis
 from crm.models import Contact, Organization
@@ -102,7 +102,7 @@ def test_draft_generation_creates_analysis_without_mutating_ticket(monkeypatch, 
         "choices": [{"message": {"content": json.dumps(_analysis_payload())}}],
         "usage": {"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
     }
-    monkeypatch.setattr("ai.services.send_chat_completion", lambda ai_settings, messages: response)
+    monkeypatch.setattr("ai.services.send_chat_completion", lambda ai_settings, messages, max_tokens=2400: response)
     original_priority = ai_data["ticket"].priority
     run_ticket_analysis(analysis)
     analysis.refresh_from_db()
@@ -132,7 +132,7 @@ def test_malformed_analysis_response_marks_failed_with_preview(monkeypatch, ai_d
     analysis = TicketAIAnalysis.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], requested_by=ai_data["agent"])
     monkeypatch.setattr(
         "ai.services.send_chat_completion",
-        lambda ai_settings, messages: {"model": "openrouter/mock", "choices": [{"message": {"content": "I think this is a staging flag issue."}}]},
+        lambda ai_settings, messages, max_tokens=2400: {"model": "openrouter/mock", "choices": [{"message": {"content": "I think this is a staging flag issue."}}]},
     )
     run_ticket_analysis(analysis)
     analysis.refresh_from_db()
@@ -152,6 +152,64 @@ def test_parser_raises_with_safe_preview_for_non_json():
         parse_analysis_response({"choices": [{"message": {"content": "not json at all"}}]})
     assert exc.value.code == "malformed_json"
     assert "Preview: not json at all" in str(exc.value)
+
+
+def test_parser_reports_truncated_output():
+    with pytest.raises(OpenRouterError) as exc:
+        parse_analysis_response({"choices": [{"finish_reason": "length", "message": {"content": '{"summary":"cut off'}}]})
+    assert exc.value.code == "truncated_output"
+    assert "truncated before valid JSON completed" in str(exc.value)
+
+
+@pytest.mark.django_db
+def test_truncated_analysis_response_marks_failed(monkeypatch, ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
+    analysis = TicketAIAnalysis.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], requested_by=ai_data["agent"])
+    monkeypatch.setattr(
+        "ai.services.send_chat_completion",
+        lambda ai_settings, messages, max_tokens=2400: {"model": "openrouter/mock", "choices": [{"finish_reason": "length", "message": {"content": '{"summary":"cut off'}}]},
+    )
+    run_ticket_analysis(analysis)
+    analysis.refresh_from_db()
+    assert analysis.status == TicketAIAnalysis.Status.FAILED
+    assert analysis.error_code == "truncated_output"
+    assert analysis.completed_at is not None
+
+
+@pytest.mark.django_db
+def test_analysis_context_is_compact_json_and_bounded(ai_data):
+    settings = AIProviderSettings.objects.create(workspace=ai_data["workspace"], max_historical_tickets=5)
+    for index in range(20):
+        TicketComment.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], body=f"comment {index}")
+    messages = build_analysis_messages(ai_data["ticket"], settings)
+    body = messages[1]["content"]
+    assert "Context JSON:" in body
+    assert "'current_ticket'" not in body
+    context_json = body.split("Context JSON:\n", 1)[1]
+    parsed = json.loads(context_json)
+    assert len(parsed["comments"]) == 12
+    assert "secret123" not in context_json
+    assert "[REDACTED]" in context_json
+
+
+@pytest.mark.django_db
+def test_run_ticket_analysis_uses_configured_token_budget(monkeypatch, settings, ai_data):
+    settings.OPENROUTER_ANALYSIS_MAX_TOKENS = 3456
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
+    analysis = TicketAIAnalysis.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], requested_by=ai_data["agent"])
+    seen = {}
+
+    def fake_send(ai_settings, messages, max_tokens):
+        seen["max_tokens"] = max_tokens
+        return {
+            "model": "openrouter/mock",
+            "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(_analysis_payload())}}],
+            "usage": {},
+        }
+
+    monkeypatch.setattr("ai.services.send_chat_completion", fake_send)
+    run_ticket_analysis(analysis)
+    assert seen["max_tokens"] == 3456
 
 
 @pytest.mark.django_db

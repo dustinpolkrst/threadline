@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.conf import settings
 
 from activity.services import record_event
 from tickets.models import TicketComment
@@ -23,7 +24,7 @@ def run_ticket_analysis(analysis):
         return _fail_analysis(analysis, "disabled", "AI is not enabled for this workspace.")
     try:
         messages = build_analysis_messages(analysis.ticket, ai_settings)
-        response = send_chat_completion(ai_settings, messages)
+        response = send_chat_completion(ai_settings, messages, max_tokens=settings.OPENROUTER_ANALYSIS_MAX_TOKENS)
         parsed, usage = parse_analysis_response(response)
     except OpenRouterError as exc:
         return _fail_analysis(analysis, exc.code, str(exc))

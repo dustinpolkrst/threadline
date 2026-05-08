@@ -1,3 +1,4 @@
+import json
 import re
 
 from django.db.models import Sum
@@ -37,7 +38,7 @@ def build_ticket_context(ticket, ai_settings):
             "body": redact_secrets(comment.body),
             "created_at": comment.created_at.isoformat(),
         }
-        for comment in ticket.comments.filter(workspace=workspace).select_related("author")[:30]
+        for comment in ticket.comments.filter(workspace=workspace).select_related("author").order_by("-created_at")[:12]
     ]
     time_total = ticket.time_entries.filter(workspace=workspace).aggregate(total=Sum("duration_minutes"))["total"] or 0
     attachments = [
@@ -51,7 +52,7 @@ def build_ticket_context(ticket, ai_settings):
     ]
     activity = [
         {"id": str(event.pk), "summary": event.summary, "created_at": event.created_at.isoformat()}
-        for event in ActivityEvent.objects.filter(workspace=workspace, ticket=ticket).order_by("-created_at")[:20]
+        for event in ActivityEvent.objects.filter(workspace=workspace, ticket=ticket).order_by("-created_at")[:10]
     ]
     historical = []
     if ticket.organization_id and ai_settings.max_historical_tickets:
@@ -71,7 +72,7 @@ def build_ticket_context(ticket, ai_settings):
             )
     search_refs = []
     if ticket.organization_id:
-        for doc in SearchDocument.objects.filter(workspace=workspace, organization_id=ticket.organization_id).exclude(object_id=ticket.pk).order_by("-updated_at")[:8]:
+        for doc in SearchDocument.objects.filter(workspace=workspace, organization_id=ticket.organization_id).exclude(object_id=ticket.pk).order_by("-updated_at")[:5]:
             search_refs.append({"type": doc.entity_type, "id": str(doc.object_id), "title": doc.title, "snippet": redact_secrets(doc.body[:500])})
     return {
         "current_ticket": current,
@@ -92,11 +93,14 @@ def build_analysis_messages(ticket, ai_settings):
         "Do not claim to have performed actions. "
         "Return only valid JSON matching the provided schema. "
         "No markdown. No code fences. No prose outside JSON. "
+        "Finish the JSON object completely. "
+        "Keep summary to 1-2 sentences, solution_draft concise, risks to at most 5 items, client_context to at most 5 items, and context_refs to at most 8 items. "
         "Drafts are internal suggestions for support agents, never customer-visible."
     )
+    context_json = json.dumps(context, separators=(",", ":"), ensure_ascii=False)
     user = (
         "Analyze this support ticket for triage and likely solution paths. "
         "Suggest priority, tags, useful historical context, risks, and an internal solution draft.\n\n"
-        f"Context:\n{context}"
+        f"Context JSON:\n{context_json}"
     )
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]

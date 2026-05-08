@@ -103,8 +103,17 @@ def send_chat_completion(ai_settings, messages, max_tokens=1200, structured=True
 def parse_analysis_response(response):
     content = ""
     try:
-        message = response["choices"][0]["message"]
+        choice = response["choices"][0]
+        if choice.get("finish_reason") == "length":
+            preview = _safe_preview((choice.get("message") or {}).get("content") or "")
+            raise OpenRouterError(
+                f"The model response was truncated before valid JSON completed. Try a shorter context or increase max output tokens. Preview: {preview}",
+                code="truncated_output",
+            )
+        message = choice["message"]
         parsed = _parse_message_payload(message)
+    except OpenRouterError:
+        raise
     except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
         preview = _safe_preview(content or _message_content_preview(response))
         raise OpenRouterError(f"OpenRouter returned malformed analysis JSON. Preview: {preview}", code="malformed_json") from exc
