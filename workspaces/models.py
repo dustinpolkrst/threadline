@@ -43,6 +43,33 @@ class WorkspaceMembership(models.Model):
         return f"{self.user} in {self.workspace} ({self.role})"
 
 
+class ApplicationStorageSettings(models.Model):
+    class Backend(models.TextChoices):
+        LOCAL = "local", "Local filesystem"
+        S3 = "s3", "S3-compatible"
+
+    workspace = models.OneToOneField(Workspace, on_delete=models.CASCADE, related_name="storage_settings")
+    backend = models.CharField(max_length=20, choices=Backend.choices, default=Backend.LOCAL)
+    bucket_name = models.CharField(max_length=255, blank=True)
+    endpoint_url = models.URLField(blank=True)
+    region_name = models.CharField(max_length=80, blank=True)
+    access_key_id = models.CharField(max_length=255, blank=True)
+    secret_access_key = models.CharField(max_length=255, blank=True)
+    custom_domain = models.CharField(max_length=255, blank=True)
+    addressing_style = models.CharField(max_length=20, default="auto")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "application storage settings"
+
+    @property
+    def is_s3_enabled(self):
+        return self.backend == self.Backend.S3 and bool(self.bucket_name)
+
+    def __str__(self):
+        return f"{self.workspace} storage: {self.get_backend_display()}"
+
+
 class SLAPolicy(models.Model):
     class Priority(models.TextChoices):
         LOW = "low", "Low"

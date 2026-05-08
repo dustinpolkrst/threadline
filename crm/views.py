@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count, Q, Sum
 import csv
@@ -12,8 +13,9 @@ from tickets.models import Ticket, TicketComment
 from time_tracking.models import TimeEntry
 from .forms import CRMImportUploadForm, ContactForm, OrganizationForm
 from .models import CRMImportJob, CRMImportRow, Contact, Organization
-from workspaces.models import BusinessHoursCalendar, Invitation, SLAPolicy, WorkspaceMembership
-from workspaces.forms import BusinessHoursCalendarForm, InvitationForm, SLAPolicyForm, WorkspaceSLAForm
+from search.services import index_contact, index_organization
+from workspaces.models import ApplicationStorageSettings, BusinessHoursCalendar, Invitation, SLAPolicy, WorkspaceMembership
+from workspaces.forms import ApplicationStorageSettingsForm, BusinessHoursCalendarForm, InvitationForm, SLAPolicyForm, WorkspaceSLAForm
 
 
 @login_required
@@ -41,6 +43,7 @@ def organization_create(request):
         organization = form.save(commit=False)
         organization.workspace = workspace
         organization.save()
+        index_organization(organization)
         return redirect("organization_detail", pk=organization.pk)
     return render(request, "crm/form.html", {"form": form, "title": "New organization"})
 
@@ -51,7 +54,8 @@ def organization_edit(request, pk):
     organization = get_object_or_404(Organization, pk=pk, workspace=workspace)
     form = OrganizationForm(request.POST or None, instance=organization)
     if form.is_valid():
-        form.save()
+        organization = form.save()
+        index_organization(organization)
         return redirect("organization_detail", pk=organization.pk)
     return render(request, "crm/form.html", {"form": form, "title": f"Edit {organization.name}"})
 
@@ -93,6 +97,7 @@ def contact_create(request):
         contact = form.save(commit=False)
         contact.workspace = workspace
         contact.save()
+        index_contact(contact)
         return redirect("contact_detail", pk=contact.pk)
     return render(request, "crm/form.html", {"form": form, "title": "New contact"})
 
@@ -144,6 +149,12 @@ def team_settings(request):
                 invite.invited_by = request.user
                 invite.save()
             return redirect("team_settings")
+        if request.POST.get("action") == "storage":
+            storage_settings, _ = ApplicationStorageSettings.objects.get_or_create(workspace=workspace)
+            form = ApplicationStorageSettingsForm(request.POST, instance=storage_settings)
+            if form.is_valid():
+                form.save()
+            return redirect("team_settings")
         target = get_object_or_404(WorkspaceMembership, pk=request.POST.get("membership_id"), workspace=workspace)
         role = request.POST.get("role")
         if role in WorkspaceMembership.Role.values:
@@ -157,6 +168,7 @@ def team_settings(request):
     invitation_form.fields["organization"].queryset = Organization.objects.filter(workspace=workspace)
     invitation_form.fields["contact"].queryset = Contact.objects.filter(workspace=workspace)
     calendar, _ = BusinessHoursCalendar.objects.get_or_create(workspace=workspace)
+    storage_settings, _ = ApplicationStorageSettings.objects.get_or_create(workspace=workspace)
     return render(request, "crm/team_settings.html", {
         "memberships": memberships,
         "customer_profiles": customer_profiles,
@@ -167,6 +179,8 @@ def team_settings(request):
         "calendar_form": BusinessHoursCalendarForm(instance=calendar),
         "invitation_form": invitation_form,
         "invitations": invitations,
+        "storage_form": ApplicationStorageSettingsForm(instance=storage_settings),
+        "storage_settings": storage_settings,
     })
 
 
@@ -181,7 +195,9 @@ def crm_import_upload(request):
         reader = csv.DictReader(io.StringIO(text))
         for index, row in enumerate(reader, start=2):
             errors = _validate_import_row(workspace, job.import_type, row)
-            CRMImportRow.objects.create(job=job, row_number=index, data=dict(row), errors=errors)
+            duplicate, warnings = _detect_duplicate(workspace, job.import_type, row)
+            resolution = CRMImportRow.Resolution.UPDATE if duplicate else CRMImportRow.Resolution.CREATE
+            CRMImportRow.objects.create(job=job, row_number=index, data=dict(row), errors=errors, warnings=warnings, duplicate_object_id=duplicate.pk if duplicate else None, resolution=resolution)
         return redirect("crm_import_preview", pk=job.pk)
     return render(request, "crm/import_upload.html", {"form": form})
 
@@ -190,16 +206,41 @@ def crm_import_upload(request):
 def crm_import_preview(request, pk):
     workspace = require_internal_workspace(request.user)
     job = get_object_or_404(CRMImportJob, pk=pk, workspace=workspace)
-    if request.method == "POST" and not job.rows.exclude(errors=[]).exists():
+    if request.method == "POST" and request.POST.get("action") == "save_resolutions":
+        for row in job.rows.filter(errors=[]):
+            value = request.POST.get(f"resolution_{row.pk}")
+            if value in CRMImportRow.Resolution.values:
+                row.resolution = value
+                row.save(update_fields=["resolution"])
+        return redirect("crm_import_preview", pk=job.pk)
+    if request.method == "POST" and request.POST.get("action", "confirm") == "confirm" and not job.rows.exclude(errors=[]).exists():
         for row in job.rows.all():
-            created = _import_row(workspace, job.import_type, row.data)
-            row.created_object_id = created.pk
-            row.save(update_fields=["created_object_id"])
+            created = _import_row(workspace, job.import_type, row)
+            if created:
+                row.created_object_id = created.pk
+                row.save(update_fields=["created_object_id"])
+                if job.import_type == CRMImportJob.ImportType.ORGANIZATIONS:
+                    index_organization(created)
+                else:
+                    index_contact(created)
         job.status = CRMImportJob.Status.IMPORTED
         job.imported_at = timezone.now()
         job.save(update_fields=["status", "imported_at"])
         return redirect("organization_list")
     return render(request, "crm/import_preview.html", {"job": job, "rows": job.rows.all(), "has_errors": job.rows.exclude(errors=[]).exists()})
+
+
+@login_required
+def crm_import_template(request, import_type):
+    require_internal_workspace(request.user)
+    headers = _template_headers(import_type)
+    if not headers:
+        return HttpResponse("Unknown import template.", status=404)
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="threadline-{import_type}-template.csv"'
+    writer = csv.writer(response)
+    writer.writerow(headers)
+    return response
 
 
 def _validate_import_row(workspace, import_type, row):
@@ -216,20 +257,64 @@ def _validate_import_row(workspace, import_type, row):
     return errors
 
 
-def _import_row(workspace, import_type, row):
+def _detect_duplicate(workspace, import_type, row):
     if import_type == CRMImportJob.ImportType.ORGANIZATIONS:
-        organization, _ = Organization.objects.update_or_create(
-            workspace=workspace,
-            name=row["name"],
-            defaults={"domain": row.get("domain", ""), "website": row.get("website", ""), "phone": row.get("phone", ""), "billing_email": row.get("billing_email", ""), "industry": row.get("industry", "")},
-        )
+        duplicate = None
+        name = row.get("name", "").strip()
+        domain = row.get("domain", "").strip()
+        if name:
+            duplicate = Organization.objects.filter(workspace=workspace, name=name).first()
+        if not duplicate and domain:
+            duplicate = Organization.objects.filter(workspace=workspace, domain=domain).first()
+        return duplicate, [f"Matches existing organization: {duplicate.name}"] if duplicate else []
+    email = row.get("email", "").strip()
+    duplicate = Contact.objects.filter(workspace=workspace, email=email).first() if email else None
+    return duplicate, [f"Matches existing contact: {duplicate.email}"] if duplicate else []
+
+
+def _import_row(workspace, import_type, import_row):
+    if import_row.resolution == CRMImportRow.Resolution.SKIP:
+        return None
+    row = import_row.data
+    if import_type == CRMImportJob.ImportType.ORGANIZATIONS:
+        organization = None
+        if import_row.resolution == CRMImportRow.Resolution.UPDATE and import_row.duplicate_object_id:
+            organization = Organization.objects.filter(workspace=workspace, pk=import_row.duplicate_object_id).first()
+        if not organization:
+            organization = Organization(workspace=workspace, name=row["name"])
+        _apply_organization_row(organization, row)
+        organization.save()
         return organization
     organization = Organization.objects.get(workspace=workspace, name=row["organization"])
-    contact, _ = Contact.objects.update_or_create(
-        workspace=workspace,
-        email=row["email"],
-        defaults={"organization": organization, "name": row.get("name") or row["email"], "phone": row.get("phone", ""), "title": row.get("title", "")},
-    )
+    contact = None
+    if import_row.resolution == CRMImportRow.Resolution.UPDATE and import_row.duplicate_object_id:
+        contact = Contact.objects.filter(workspace=workspace, pk=import_row.duplicate_object_id).first()
+    if not contact:
+        contact = Contact(workspace=workspace, email=row["email"])
+    contact.organization = organization
+    contact.name = row.get("name") or row["email"]
+    contact.phone = row.get("phone", "")
+    contact.title = row.get("title", "")
+    contact.notes = row.get("notes", "")
+    contact.save()
     return contact
+
+
+def _apply_organization_row(organization, row):
+    for field in ["name", "domain", "website", "phone", "billing_email", "account_owner", "status", "tier", "industry", "address", "renewal_date", "notes"]:
+        if row.get(field) is not None:
+            setattr(organization, field, row.get(field) or "")
+    for field in ["employee_count", "annual_revenue", "health_score"]:
+        value = row.get(field)
+        if value not in [None, ""]:
+            setattr(organization, field, value)
+
+
+def _template_headers(import_type):
+    if import_type == CRMImportJob.ImportType.ORGANIZATIONS:
+        return ["name", "domain", "website", "phone", "billing_email", "account_owner", "status", "tier", "industry", "employee_count", "annual_revenue", "address", "renewal_date", "health_score", "notes"]
+    if import_type == CRMImportJob.ImportType.CONTACTS:
+        return ["organization", "name", "email", "phone", "title", "notes"]
+    return None
 
 # Create your views here.

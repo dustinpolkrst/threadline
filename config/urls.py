@@ -59,6 +59,7 @@ urlpatterns = [
     path("reports/time/", time_views.time_report, name="time_report"),
     path("settings/team/", crm_views.team_settings, name="team_settings"),
     path("settings/import/", crm_views.crm_import_upload, name="crm_import_upload"),
+    path("settings/import/template/<str:import_type>/", crm_views.crm_import_template, name="crm_import_template"),
     path("settings/import/<uuid:pk>/", crm_views.crm_import_preview, name="crm_import_preview"),
     path("settings/email/", comm_views.email_plumbing_settings, name="email_plumbing_settings"),
     path("activity/", activity_views.activity_log, name="activity_log"),

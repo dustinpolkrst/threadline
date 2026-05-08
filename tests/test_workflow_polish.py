@@ -1,17 +1,19 @@
 import pytest
 from datetime import timezone as dt_timezone
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 
 from core.templatetags.threadline_markdown import render_markdown
-from crm.models import CRMImportJob, Contact, Organization
+from crm.models import CRMImportJob, CRMImportRow, Contact, Organization
 from customer_portal.models import CustomerProfile
 from communications.models import EmailAttachment, EmailMessage, MailboxChannel
+from search.models import SearchDocument
 from tickets.models import Ticket, TicketAttachment
 from tickets.services import add_business_minutes
-from workspaces.models import BusinessHoursCalendar, Invitation, Workspace, WorkspaceMembership
+from workspaces.models import ApplicationStorageSettings, BusinessHoursCalendar, Invitation, Workspace, WorkspaceMembership
 
 
 @pytest.fixture
@@ -130,6 +132,106 @@ def test_csv_import_preview_and_confirm(client, workflow_data):
     response = client.post(reverse("crm_import_preview", args=[job.pk]))
     assert response.status_code == 302
     assert Organization.objects.filter(workspace=workflow_data["workspace"], name="Northstar").exists()
+
+
+@pytest.mark.django_db
+def test_csv_import_templates_are_downloadable(client, workflow_data):
+    client.login(username="workflow-agent", password="password")
+    response = client.get(reverse("crm_import_template", args=[CRMImportJob.ImportType.ORGANIZATIONS]))
+    assert response.status_code == 200
+    assert "name,domain,website,phone,billing_email" in response.content.decode()
+    response = client.get(reverse("crm_import_template", args=[CRMImportJob.ImportType.CONTACTS]))
+    assert response.status_code == 200
+    assert "organization,name,email,phone,title,notes" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_csv_import_duplicate_update_and_skip(client, workflow_data):
+    client.login(username="workflow-agent", password="password")
+    csv_file = SimpleUploadedFile("orgs.csv", b"name,domain,phone\nAcme,acme-new.example,555-1111\n", content_type="text/csv")
+    response = client.post(reverse("crm_import_upload"), {"import_type": CRMImportJob.ImportType.ORGANIZATIONS, "file": csv_file})
+    assert response.status_code == 302
+    job = CRMImportJob.objects.get(workspace=workflow_data["workspace"], filename="orgs.csv")
+    row = job.rows.get()
+    assert row.duplicate_object_id == workflow_data["org"].pk
+    assert row.resolution == CRMImportRow.Resolution.UPDATE
+    assert row.warnings
+
+    response = client.post(reverse("crm_import_preview", args=[job.pk]), {"action": "confirm"})
+    assert response.status_code == 302
+    workflow_data["org"].refresh_from_db()
+    assert workflow_data["org"].domain == "acme-new.example"
+    assert workflow_data["org"].phone == "555-1111"
+
+    csv_file = SimpleUploadedFile("contacts.csv", b"organization,name,email,phone\nAcme,Pat Updated,pat-workflow@example.com,555-2222\n", content_type="text/csv")
+    client.post(reverse("crm_import_upload"), {"import_type": CRMImportJob.ImportType.CONTACTS, "file": csv_file})
+    job = CRMImportJob.objects.get(workspace=workflow_data["workspace"], filename="contacts.csv")
+    row = job.rows.get()
+    response = client.post(reverse("crm_import_preview", args=[job.pk]), {f"resolution_{row.pk}": CRMImportRow.Resolution.SKIP, "action": "save_resolutions"})
+    assert response.status_code == 302
+    response = client.post(reverse("crm_import_preview", args=[job.pk]), {"action": "confirm"})
+    assert response.status_code == 302
+    workflow_data["contact"].refresh_from_db()
+    assert workflow_data["contact"].name == "Pat"
+    assert Contact.objects.filter(workspace=workflow_data["workspace"], email="pat-workflow@example.com").count() == 1
+
+
+@pytest.mark.django_db
+def test_csv_import_duplicate_detection_is_workspace_scoped(client, workflow_data):
+    Organization.objects.create(workspace=workflow_data["other_workspace"], name="Northstar", domain="northstar.example")
+    client.login(username="workflow-agent", password="password")
+    csv_file = SimpleUploadedFile("orgs.csv", b"name,domain\nNorthstar,northstar.example\n", content_type="text/csv")
+    client.post(reverse("crm_import_upload"), {"import_type": CRMImportJob.ImportType.ORGANIZATIONS, "file": csv_file})
+    row = CRMImportJob.objects.get(workspace=workflow_data["workspace"], filename="orgs.csv").rows.get()
+    assert row.duplicate_object_id is None
+    assert row.resolution == CRMImportRow.Resolution.CREATE
+
+
+@pytest.mark.django_db
+def test_admin_can_configure_s3_storage_settings(client, workflow_data):
+    client.login(username="workflow-admin", password="password")
+    response = client.post(
+        reverse("team_settings"),
+        {
+            "action": "storage",
+            "backend": ApplicationStorageSettings.Backend.S3,
+            "bucket_name": "threadline-media",
+            "endpoint_url": "https://s3.example.com",
+            "region_name": "us-east-1",
+            "access_key_id": "key",
+            "secret_access_key": "secret",
+            "custom_domain": "",
+            "addressing_style": "path",
+        },
+    )
+    assert response.status_code == 302
+    settings = ApplicationStorageSettings.objects.get(workspace=workflow_data["workspace"])
+    assert settings.is_s3_enabled
+    assert settings.bucket_name == "threadline-media"
+
+
+@pytest.mark.django_db
+def test_rebuild_search_index_and_customer_scope(client, workflow_data):
+    Ticket.objects.create(workspace=workflow_data["other_workspace"], title="Other secret")
+    public_comment = workflow_data["ticket"].comments.create(workspace=workflow_data["workspace"], author=workflow_data["agent"], body="Public searchable answer", visibility="public")
+    workflow_data["ticket"].comments.create(workspace=workflow_data["workspace"], author=workflow_data["agent"], body="Internal searchable secret", visibility="internal")
+
+    call_command("rebuild_search_index", "--workspace", workflow_data["workspace"].slug, "--clear")
+    assert SearchDocument.objects.filter(workspace=workflow_data["workspace"], entity_type=SearchDocument.EntityType.TICKET, object_id=workflow_data["ticket"].pk).exists()
+    assert SearchDocument.objects.filter(workspace=workflow_data["workspace"], entity_type=SearchDocument.EntityType.COMMENT, object_id=public_comment.pk, customer_visible=True).exists()
+    assert not SearchDocument.objects.filter(title="Other secret", workspace=workflow_data["workspace"]).exists()
+
+    client.login(username="workflow-agent", password="password")
+    body = client.get(reverse("search") + "?q=searchable").content.decode()
+    assert "Public" in body and "<mark>searchable</mark>" in body and "answer" in body
+    assert "Internal" in body and "<mark>searchable</mark>" in body and "secret" in body
+
+    client.logout()
+    client.login(username="workflow-customer", password="password")
+    body = client.get(reverse("search") + "?q=searchable").content.decode()
+    assert "Public" in body and "<mark>searchable</mark>" in body and "answer" in body
+    assert "Internal searchable secret" not in body
+    assert "Other secret" not in body
 
 
 def test_markdown_renderer_sanitizes_script_tags():

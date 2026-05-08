@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import BusinessHoursCalendar, Invitation, SLAPolicy, Workspace
+from .models import ApplicationStorageSettings, BusinessHoursCalendar, Invitation, SLAPolicy, Workspace
 
 
 class WorkspaceSLAForm(forms.ModelForm):
@@ -29,6 +29,36 @@ class InvitationForm(forms.ModelForm):
         model = Invitation
         fields = ["email", "invite_type", "role", "organization", "contact", "expires_at"]
         widgets = {"expires_at": forms.DateTimeInput(attrs={"type": "datetime-local"})}
+
+
+class ApplicationStorageSettingsForm(forms.ModelForm):
+    secret_access_key = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(render_value=False),
+        help_text="Leave blank to keep the existing secret.",
+    )
+
+    class Meta:
+        model = ApplicationStorageSettings
+        fields = [
+            "backend",
+            "bucket_name",
+            "endpoint_url",
+            "region_name",
+            "access_key_id",
+            "secret_access_key",
+            "custom_domain",
+            "addressing_style",
+        ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        secret = self.cleaned_data.get("secret_access_key")
+        if not secret and instance.pk:
+            instance.secret_access_key = ApplicationStorageSettings.objects.get(pk=instance.pk).secret_access_key
+        if commit:
+            instance.save()
+        return instance
 
 
 class AcceptInvitationForm(forms.Form):

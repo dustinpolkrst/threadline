@@ -6,6 +6,10 @@
   <p class="text-sm text-slate-500">Import organizations or contacts from a UTF-8 CSV file.</p>
 </div>
 <div class="tl-panel max-w-xl p-5">
+  <div class="mb-5 flex flex-wrap gap-2">
+    <a class="tl-button-secondary" href="{% url 'crm_import_template' 'organizations' %}">Organization template</a>
+    <a class="tl-button-secondary" href="{% url 'crm_import_template' 'contacts' %}">Contact template</a>
+  </div>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}

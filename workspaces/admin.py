@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import BusinessHoursCalendar, Invitation, SLAPolicy, Workspace, WorkspaceMembership
+from .models import ApplicationStorageSettings, BusinessHoursCalendar, Invitation, SLAPolicy, Workspace, WorkspaceMembership
 
+admin.site.register(ApplicationStorageSettings)
 admin.site.register(Workspace)
 admin.site.register(WorkspaceMembership)
 admin.site.register(SLAPolicy)

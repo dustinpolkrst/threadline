@@ -5,27 +5,34 @@
   <p class="text-sm text-slate-500">Find tickets, accounts, contacts, and support history.</p>
 </div>
 
-<form method="get" class="tl-panel mb-6 flex max-w-3xl gap-3 p-3">
+<form method="get" class="tl-panel mb-6 grid max-w-4xl gap-3 p-3 md:grid-cols-[1fr_12rem_auto]">
   <input name="q" value="{{ q }}" class="w-full border border-slate-300 px-3 py-2" placeholder="Search by issue, customer, contact, domain, or comment">
+  <select name="type">
+    <option value="all" {% if entity == "all" %}selected{% endif %}>All</option>
+    <option value="tickets" {% if entity == "tickets" %}selected{% endif %}>Tickets</option>
+    <option value="comments" {% if entity == "comments" %}selected{% endif %}>Comments</option>
+    {% if not is_customer %}
+      <option value="organizations" {% if entity == "organizations" %}selected{% endif %}>Organizations</option>
+      <option value="contacts" {% if entity == "contacts" %}selected{% endif %}>Contacts</option>
+    {% endif %}
+  </select>
   <button class="tl-button">Search</button>
 </form>
 
-<div class="grid gap-6 lg:grid-cols-2">
-  <section class="tl-panel overflow-hidden">
-    <div class="border-b border-slate-200 px-5 py-4 font-medium">Tickets</div>
-    <div class="divide-y divide-slate-100">{% for ticket in tickets %}<a class="block p-3 text-sm hover:bg-slate-50" href="{% if is_customer %}{% url 'portal_ticket_detail' ticket.pk %}{% else %}{% url 'ticket_detail' ticket.pk %}{% endif %}"><span class="font-medium text-blue-700">{{ ticket.title }}</span><span class="ml-2 text-xs text-slate-500">{{ ticket.status }}</span></a>{% empty %}<div class="p-4 text-sm text-slate-500">No ticket matches.</div>{% endfor %}</div>
-  </section>
-  <section class="tl-panel overflow-hidden">
-    <div class="border-b border-slate-200 px-5 py-4 font-medium">Comments</div>
-    <div class="divide-y divide-slate-100">{% for comment in comments %}<div class="p-3 text-sm"><div class="text-xs text-slate-500">{{ comment.ticket }}</div><p>{{ comment.body }}</p></div>{% empty %}<div class="p-4 text-sm text-slate-500">No comment matches.</div>{% endfor %}</div>
-  </section>
-  <section class="tl-panel overflow-hidden">
-    <div class="border-b border-slate-200 px-5 py-4 font-medium">Organizations</div>
-    <div class="divide-y divide-slate-100">{% for org in organizations %}<a class="block p-3 text-sm hover:bg-slate-50" href="{% url 'organization_detail' org.pk %}"><span class="font-medium text-blue-700">{{ org.name }}</span><div class="text-xs text-slate-500">{{ org.domain }}</div></a>{% empty %}<div class="p-4 text-sm text-slate-500">No organization matches.</div>{% endfor %}</div>
-  </section>
-  <section class="tl-panel overflow-hidden">
-    <div class="border-b border-slate-200 px-5 py-4 font-medium">Contacts</div>
-    <div class="divide-y divide-slate-100">{% for contact in contacts %}<a class="block p-3 text-sm hover:bg-slate-50" href="{% url 'contact_detail' contact.pk %}"><span class="font-medium text-blue-700">{{ contact.name }}</span><div class="text-xs text-slate-500">{{ contact.email }}</div></a>{% empty %}<div class="p-4 text-sm text-slate-500">No contact matches.</div>{% endfor %}</div>
-  </section>
-</div>
+<section class="tl-panel overflow-hidden">
+  <div class="border-b border-slate-200 px-5 py-4 font-medium">Results</div>
+  <div class="divide-y divide-slate-100">
+    {% for result in results %}
+      <a class="grid gap-2 p-4 text-sm hover:bg-slate-50 md:grid-cols-[8rem_1fr]" href="{{ result.url }}">
+        <span class="tl-badge bg-slate-100 text-slate-700">{{ result.badge }}</span>
+        <span>
+          <span class="block font-medium text-blue-700">{{ result.title }}</span>
+          <span class="block text-slate-600 [&_mark]:bg-yellow-200 [&_mark]:px-1">{{ result.snippet }}</span>
+        </span>
+      </a>
+    {% empty %}
+      <div class="p-4 text-sm text-slate-500">{% if q %}No matches.{% else %}Enter a search query.{% endif %}</div>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

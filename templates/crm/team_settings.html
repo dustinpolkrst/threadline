@@ -8,6 +8,21 @@
 <div class="grid gap-6 lg:grid-cols-2">
   <section class="tl-panel p-5 lg:col-span-2">
     <div class="mb-4">
+      <h2 class="font-medium">Application storage</h2>
+      <p class="text-sm text-slate-500">Configure private local or S3-compatible media storage for ticket and email attachments.</p>
+    </div>
+    <form method="post" class="grid gap-4 md:grid-cols-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="storage">
+      {{ storage_form.as_p }}
+      <div class="flex items-end"><button class="tl-button">Save storage</button></div>
+    </form>
+    <div class="mt-3 text-xs text-slate-500">
+      Current backend: {{ storage_settings.get_backend_display }}{% if storage_settings.is_s3_enabled %} - {{ storage_settings.bucket_name }}{% endif %}
+    </div>
+  </section>
+  <section class="tl-panel p-5 lg:col-span-2">
+    <div class="mb-4">
       <h2 class="font-medium">SLA targets</h2>
       <p class="text-sm text-slate-500">Default targets in minutes. Priority policies and business hours override these when configured.</p>
     </div>

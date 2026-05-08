@@ -55,7 +55,9 @@ We are intentionally avoiding Kubernetes, microservices, a separate SPA, GraphQL
 - Email message attachment metadata for future provider integration.
 - Team settings for role changes, customer portal user review, and copyable invite links.
 - CSV import preview/confirm flow for organizations and contacts.
-- PostgreSQL full-text search ranking polish with a search document abstraction model.
+- CSV import templates and duplicate-resolution controls.
+- PostgreSQL full-text search ranking, highlighting, and rebuildable search documents.
+- Optional local or S3-compatible private attachment storage.
 - Email plumbing models and stub services, without real provider integration.
 - Docker Compose development and production-style deployment.
 - Demo seed data and permission tests.
@@ -99,14 +101,14 @@ Recently completed:
 - [x] CSV import for organizations and contacts.
 - [x] Better audit log filtering.
 - [x] Markdown support for comments.
+- [x] S3-compatible attachment storage option.
+- [x] Search index rebuild command and richer highlighting.
+- [x] Import templates and duplicate-resolution UI.
 
 High-priority next steps:
 
 - [ ] Real inbound email-to-ticket integration.
 - [ ] Outbound ticket replies by email.
-- [ ] S3-compatible attachment storage option.
-- [ ] Search index rebuild command and richer highlighting.
-- [ ] Import templates and duplicate-resolution UI.
 - [ ] SLA escalation notifications after email is configured.
 - [ ] Public API endpoints for integrations where needed.
 
@@ -223,6 +225,7 @@ Edit `.env` and set:
 - PostgreSQL credentials
 - `REDIS_URL`
 - Email placeholders
+- Media storage settings, if using S3-compatible attachment storage
 
 Start services:
 
@@ -233,6 +236,14 @@ docker compose -f compose.yml -f compose.prod.yml up -d --build
 The web container runs migrations and `collectstatic` before Gunicorn starts. In production, put Nginx, Caddy, or another reverse proxy in front of `127.0.0.1:8000` and terminate TLS there.
 
 Persistent volumes are defined for PostgreSQL, Redis, uploaded media, and collected static files.
+
+Attachment storage defaults to local private media. For S3-compatible storage, either set `MEDIA_STORAGE_BACKEND=s3` with the `AWS_*` values in `.env`, or configure a provider from Settings -> Application storage as an owner/admin. Objects remain private and Threadline still streams downloads through Django permission checks. Existing local media is not migrated automatically when switching storage backends.
+
+Rebuild search documents after large data imports or maintenance:
+
+```bash
+uv run python manage.py rebuild_search_index --clear
+```
 
 Health checks:
 

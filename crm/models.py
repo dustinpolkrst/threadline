@@ -98,10 +98,18 @@ class CRMImportJob(models.Model):
 
 
 class CRMImportRow(models.Model):
+    class Resolution(models.TextChoices):
+        CREATE = "create", "Create"
+        UPDATE = "update", "Update existing"
+        SKIP = "skip", "Skip"
+
     job = models.ForeignKey(CRMImportJob, on_delete=models.CASCADE, related_name="rows")
     row_number = models.PositiveIntegerField()
     data = models.JSONField(default=dict)
     errors = models.JSONField(default=list, blank=True)
+    warnings = models.JSONField(default=list, blank=True)
+    duplicate_object_id = models.UUIDField(null=True, blank=True)
+    resolution = models.CharField(max_length=20, choices=Resolution.choices, default=Resolution.CREATE)
     created_object_id = models.UUIDField(null=True, blank=True)
 
     class Meta:

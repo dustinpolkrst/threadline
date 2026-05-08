@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from activity.models import ActivityEvent
 from activity.services import record_event
 from core.permissions import require_customer_profile
+from search.services import index_comment, index_ticket
 from tickets.forms import PortalCommentForm, PortalTicketForm, TicketAttachmentForm
 from tickets.models import Ticket, TicketAttachment, TicketComment
 from time_tracking.models import TimeEntry
@@ -49,6 +50,7 @@ def portal_ticket_create(request):
         ticket.source = Ticket.Source.PORTAL
         apply_initial_sla(ticket)
         ticket.save()
+        index_ticket(ticket)
         record_event(workspace=profile.workspace, actor=request.user, ticket=ticket, event_type="ticket.created", summary=f"Ticket created: {ticket.title}", customer_visible=True)
         return redirect("portal_ticket_detail", pk=ticket.pk)
     return render(request, "customer_portal/form.html", {"form": form, "title": "New support request"})
@@ -78,6 +80,7 @@ def portal_ticket_reply(request, pk):
         comment.author = request.user
         comment.visibility = TicketComment.Visibility.PUBLIC
         comment.save()
+        index_comment(comment)
         mark_customer_reply(ticket)
         record_event(workspace=profile.workspace, actor=request.user, ticket=ticket, event_type="comment.added", summary="Customer reply added", customer_visible=True)
     return redirect("portal_ticket_detail", pk=ticket.pk)

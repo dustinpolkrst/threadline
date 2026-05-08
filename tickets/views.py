@@ -9,6 +9,7 @@ from activity.models import ActivityEvent
 from activity.services import record_event
 from core.permissions import require_internal_workspace
 from crm.models import Contact, Organization
+from search.services import index_comment, index_ticket
 from time_tracking.forms import TimeEntryForm, TimerStartForm, TimerStopForm
 from time_tracking.models import ActiveTimer, TimeEntry
 from .forms import BulkTicketActionForm, CommentForm, SavedTicketFilterForm, TicketAttachmentForm, TicketForm, TicketRelationForm
@@ -65,6 +66,7 @@ def ticket_create(request):
         ticket.requester = request.user
         apply_initial_sla(ticket)
         ticket.save()
+        index_ticket(ticket)
         record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="ticket.created", summary=f"Ticket created: {ticket.title}", customer_visible=False)
         return redirect("ticket_detail", pk=ticket.pk)
     return render(request, "tickets/form.html", {"form": form, "title": "New ticket"})
@@ -120,6 +122,7 @@ def ticket_add_comment(request, pk):
         comment.author = request.user
         comment.visibility = TicketComment.Visibility.INTERNAL
         comment.save()
+        index_comment(comment)
         record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="comment.added", summary="Comment added", customer_visible=False)
         mark_agent_reply(ticket)
     return redirect("ticket_detail", pk=ticket.pk)
