@@ -72,4 +72,39 @@ class Contact(models.Model):
     def __str__(self):
         return self.name
 
+
+class CRMImportJob(models.Model):
+    class ImportType(models.TextChoices):
+        ORGANIZATIONS = "organizations", "Organizations"
+        CONTACTS = "contacts", "Contacts"
+
+    class Status(models.TextChoices):
+        PREVIEW = "preview", "Preview"
+        IMPORTED = "imported", "Imported"
+        FAILED = "failed", "Failed"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="crm_import_jobs")
+    import_type = models.CharField(max_length=20, choices=ImportType.choices)
+    filename = models.CharField(max_length=255)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PREVIEW)
+    created_by = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    imported_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["workspace", "status"]), models.Index(fields=["workspace", "import_type"])]
+
+
+class CRMImportRow(models.Model):
+    job = models.ForeignKey(CRMImportJob, on_delete=models.CASCADE, related_name="rows")
+    row_number = models.PositiveIntegerField()
+    data = models.JSONField(default=dict)
+    errors = models.JSONField(default=list, blank=True)
+    created_object_id = models.UUIDField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["row_number"]
+
 # Create your models here.

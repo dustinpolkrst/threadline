@@ -7,9 +7,20 @@
   </div>
   <a class="bg-blue-700 px-3 py-2 text-sm font-medium text-white" href="{% url 'portal_ticket_create' %}">New request</a>
 </div>
-<div class="border border-slate-200 bg-white">
-  <table class="w-full text-left text-sm">
-    <thead class="bg-slate-100 text-xs uppercase text-slate-600"><tr><th class="p-3">Request</th><th>Status</th><th>Priority</th><th>Created</th></tr></thead>
+<div class="mb-6 grid gap-4 md:grid-cols-3">
+  <div class="tl-panel p-5"><div class="tl-kicker">Open</div><div class="text-2xl font-semibold">{{ summary.open }}</div></div>
+  <div class="tl-panel p-5"><div class="tl-kicker">Closed</div><div class="text-2xl font-semibold">{{ summary.closed }}</div></div>
+  <div class="tl-panel p-5"><div class="tl-kicker">Account</div><a class="font-medium text-blue-700" href="{% url 'portal_account' %}">Manage profile</a></div>
+</div>
+<div class="tl-panel overflow-hidden">
+  <form method="get" class="grid gap-3 border-b border-slate-200 p-5 md:grid-cols-4">
+    <input name="q" value="{{ q }}" placeholder="Search requests">
+    <select name="status"><option value="">Any status</option>{% for value,label in tickets.model.Status.choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select name="priority"><option value="">Any priority</option>{% for value,label in tickets.model.Priority.choices %}<option value="{{ value }}" {% if priority == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <button class="tl-button-secondary">Filter</button>
+  </form>
+  <table class="tl-table w-full text-left text-sm">
+    <thead><tr><th>Request</th><th>Status</th><th>Priority</th><th>Updated</th></tr></thead>
     <tbody>{% for ticket in tickets %}<tr class="border-t border-slate-100 hover:bg-slate-50"><td class="p-3"><a class="font-medium text-blue-700" href="{% url 'portal_ticket_detail' ticket.pk %}">{{ ticket.title }}</a></td><td>{{ ticket.get_status_display }}</td><td>{{ ticket.get_priority_display }}</td><td class="text-slate-500">{{ ticket.created_at|date:"M j, Y" }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="4">No support requests.</td></tr>{% endfor %}</tbody>
   </table>
 </div>

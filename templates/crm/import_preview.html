@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-5">
+  <div class="tl-kicker">CRM import</div>
+  <h1 class="text-2xl font-semibold">{{ job.filename }}</h1>
+  <p class="text-sm text-slate-500">{{ job.get_import_type_display }} - {{ job.rows.count }} rows</p>
+</div>
+<div class="tl-panel overflow-hidden">
+  <table class="tl-table w-full text-left text-sm">
+    <thead><tr><th>Row</th><th>Data</th><th>Validation</th></tr></thead>
+    <tbody>{% for row in rows %}<tr class="border-t border-slate-100"><td>{{ row.row_number }}</td><td><code>{{ row.data }}</code></td><td>{% if row.errors %}<span class="text-rose-700">{{ row.errors|join:", " }}</span>{% else %}<span class="text-emerald-700">Ready</span>{% endif %}</td></tr>{% endfor %}</tbody>
+  </table>
+  <form method="post" class="border-t border-slate-200 p-5">
+    {% csrf_token %}
+    <button class="tl-button" {% if has_errors %}disabled{% endif %}>Confirm import</button>
+  </form>
+</div>
+{% endblock %}

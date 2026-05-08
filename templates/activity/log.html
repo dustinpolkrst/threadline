@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-5">
+  <div class="tl-kicker">Audit</div>
+  <h1 class="text-2xl font-semibold">Activity log</h1>
+  <p class="text-sm text-slate-500">Workspace-scoped operational events.</p>
+</div>
+<div class="tl-panel overflow-hidden">
+  <form method="get" class="grid gap-3 border-b border-slate-200 p-5 md:grid-cols-5">
+    <select name="event_type"><option value="">Any event</option>{% for event_type in event_types %}<option value="{{ event_type }}" {% if filters.event_type == event_type %}selected{% endif %}>{{ event_type }}</option>{% endfor %}</select>
+    <select name="visibility"><option value="">Any visibility</option><option value="internal" {% if filters.visibility == "internal" %}selected{% endif %}>Internal</option><option value="customer" {% if filters.visibility == "customer" %}selected{% endif %}>Customer</option></select>
+    <input name="actor" value="{{ filters.actor }}" placeholder="Actor username">
+    <input type="date" name="date_from" value="{{ filters.date_from }}">
+    <button class="tl-button-secondary">Filter</button>
+  </form>
+  <table class="tl-table w-full text-left text-sm">
+    <thead><tr><th>When</th><th>Event</th><th>Summary</th><th>Actor</th><th>Record</th></tr></thead>
+    <tbody>{% for event in events %}<tr class="border-t border-slate-100"><td class="text-slate-500">{{ event.created_at|date:"M j, g:i A" }}</td><td>{{ event.event_type }}</td><td>{{ event.summary }}</td><td>{{ event.actor|default:"System" }}</td><td>{% if event.ticket %}<a class="text-blue-700" href="{% url 'ticket_detail' event.ticket.pk %}">{{ event.ticket }}</a>{% elif event.organization %}<a class="text-blue-700" href="{% url 'organization_detail' event.organization.pk %}">{{ event.organization }}</a>{% else %}-{% endif %}</td></tr>{% empty %}<tr><td class="p-5 text-slate-500" colspan="5">No activity found.</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
+{% endblock %}

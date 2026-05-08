@@ -42,6 +42,7 @@ class Ticket(models.Model):
     next_response_due_at = models.DateTimeField(null=True, blank=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
     waiting_since = models.DateTimeField(null=True, blank=True)
+    merged_into = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="merged_sources")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -92,8 +93,53 @@ class TicketAttachment(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="attachments")
     comment = models.ForeignKey(TicketComment, on_delete=models.CASCADE, null=True, blank=True, related_name="attachments")
     file = models.FileField(upload_to="ticket-attachments/")
-    is_public = models.BooleanField(default=False)
+    display_name = models.CharField(max_length=255, blank=True)
+    content_type = models.CharField(max_length=120, blank=True)
+    size_bytes = models.PositiveIntegerField(default=0)
+    customer_visible = models.BooleanField(default=False)
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["workspace", "ticket", "customer_visible"]), models.Index(fields=["workspace", "created_at"])]
+
+    def __str__(self):
+        return self.display_name or self.file.name
+
+
+class TicketRelation(models.Model):
+    class RelationType(models.TextChoices):
+        RELATED = "related", "Related"
+        DUPLICATE = "duplicate", "Duplicate"
+        MERGED = "merged", "Merged"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="ticket_relations")
+    source = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="outgoing_relations")
+    target = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="incoming_relations")
+    relation_type = models.CharField(max_length=20, choices=RelationType.choices)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    note = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        unique_together = [("workspace", "source", "target", "relation_type")]
+        indexes = [models.Index(fields=["workspace", "relation_type"]), models.Index(fields=["workspace", "source"]), models.Index(fields=["workspace", "target"])]
+
+
+class SavedTicketFilter(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="saved_ticket_filters")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_ticket_filters")
+    name = models.CharField(max_length=120)
+    query = models.JSONField(default=dict)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+        unique_together = [("workspace", "user", "name")]
+        indexes = [models.Index(fields=["workspace", "user"]), models.Index(fields=["workspace", "is_default"])]
 
 # Create your models here.

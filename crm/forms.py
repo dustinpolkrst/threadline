@@ -1,5 +1,5 @@
 from django import forms
-from .models import Contact, Organization
+from .models import CRMImportJob, Contact, Organization
 
 
 class OrganizationForm(forms.ModelForm):
@@ -38,3 +38,8 @@ class ContactForm(forms.ModelForm):
     class Meta:
         model = Contact
         fields = ["organization", "name", "email", "phone", "title", "notes"]
+
+
+class CRMImportUploadForm(forms.Form):
+    import_type = forms.ChoiceField(choices=CRMImportJob.ImportType.choices)
+    file = forms.FileField()

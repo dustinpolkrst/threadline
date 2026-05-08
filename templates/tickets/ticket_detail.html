@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load threadline_markdown %}
 {% block content %}
 <div class="mb-5 flex items-start justify-between gap-4">
   <div>
@@ -12,13 +13,33 @@
   <section class="space-y-6 lg:col-span-2">
     <div class="tl-panel p-5">
       <h2 class="mb-2 font-medium">Description</h2>
-      <p class="whitespace-pre-wrap text-sm">{{ ticket.description }}</p>
+      <div class="prose prose-sm max-w-none text-sm">{{ ticket.description|render_markdown }}</div>
+    </div>
+    <div class="tl-panel overflow-hidden">
+      <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <div><h2 class="font-medium">Attachments</h2><p class="mt-1 text-sm text-slate-500">Files connected to this ticket.</p></div>
+      </div>
+      <div class="divide-y divide-slate-100">
+        {% for attachment in attachments %}
+          <div class="flex items-center justify-between gap-4 px-5 py-3 text-sm">
+            <div><a class="font-medium text-blue-700" href="{% url 'ticket_download_attachment' ticket.pk attachment.pk %}">{{ attachment.display_name }}</a><div class="text-xs text-slate-500">{{ attachment.size_bytes }} bytes - {{ attachment.uploaded_by|default:"Unknown" }}</div></div>
+            <form method="post" action="{% url 'ticket_delete_attachment' ticket.pk attachment.pk %}">{% csrf_token %}<button class="tl-button-secondary">Delete</button></form>
+          </div>
+        {% empty %}
+          <div class="px-5 py-4 text-sm text-slate-500">No attachments yet.</div>
+        {% endfor %}
+      </div>
+      <form method="post" enctype="multipart/form-data" action="{% url 'ticket_upload_attachment' ticket.pk %}" class="border-t border-slate-200 p-5">
+        {% csrf_token %}
+        {{ attachment_form.as_p }}
+        <button class="tl-button-secondary">Upload attachment</button>
+      </form>
     </div>
     <div class="tl-panel overflow-hidden">
       <div class="border-b border-slate-200 px-5 py-4 font-medium">Comments</div>
       <div class="divide-y divide-slate-100">
         {% for comment in comments %}
-          <div class="p-5 text-sm"><div class="mb-1 text-xs text-slate-500">{{ comment.author|default:"Unknown" }} - {{ comment.created_at|date:"M j, g:i A" }}</div><p class="whitespace-pre-wrap">{{ comment.body }}</p></div>
+          <div class="p-5 text-sm"><div class="mb-1 text-xs text-slate-500">{{ comment.author|default:"Unknown" }} - {{ comment.created_at|date:"M j, g:i A" }}</div><div class="prose prose-sm max-w-none">{{ comment.body|render_markdown }}</div></div>
         {% empty %}
           <div class="p-4 text-sm text-slate-500">No comments yet.</div>
         {% endfor %}
@@ -60,6 +81,35 @@
     </div>
   </section>
   <aside class="space-y-6">
+    <div class="tl-panel p-5">
+      <h2 class="mb-3 font-medium">Related tickets</h2>
+      <div class="space-y-2 text-sm">
+        {% for relation in relations %}
+          <div class="rounded border border-slate-200 p-2">
+            <div class="text-xs uppercase text-slate-500">{{ relation.get_relation_type_display }}</div>
+            {% if relation.source_id == ticket.id %}
+              <a class="font-medium text-blue-700" href="{% url 'ticket_detail' relation.target.pk %}">{{ relation.target.title }}</a>
+            {% else %}
+              <a class="font-medium text-blue-700" href="{% url 'ticket_detail' relation.source.pk %}">{{ relation.source.title }}</a>
+            {% endif %}
+          </div>
+        {% empty %}
+          <div class="text-sm text-slate-500">No related tickets.</div>
+        {% endfor %}
+      </div>
+      <form method="post" action="{% url 'ticket_add_relation' ticket.pk %}" class="mt-4 border-t border-slate-200 pt-4">
+        {% csrf_token %}
+        {{ relation_form.as_p }}
+        <button class="tl-button-secondary">Link ticket</button>
+      </form>
+      <form method="post" action="{% url 'ticket_merge' ticket.pk %}" class="mt-4 border-t border-slate-200 pt-4">
+        {% csrf_token %}
+        <label for="merge-target">Merge into</label>
+        {{ relation_form.target }}
+        <input type="text" name="note" placeholder="Merge note">
+        <button class="tl-button-secondary mt-2">Merge ticket</button>
+      </form>
+    </div>
     <div class="tl-panel p-5">
       <h2 class="mb-2 font-medium">Time</h2>
       <div class="mb-3 text-2xl font-semibold">{{ time_total }}m</div>

@@ -115,4 +115,23 @@ class EmailIngestLog(models.Model):
         ordering = ["-created_at"]
         indexes = [models.Index(fields=["workspace", "status"]), models.Index(fields=["workspace", "message_id"])]
 
+
+class EmailAttachment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="email_attachments")
+    email_message = models.ForeignKey(EmailMessage, on_delete=models.CASCADE, related_name="attachments")
+    file = models.FileField(upload_to="email-attachments/")
+    display_name = models.CharField(max_length=255)
+    content_type = models.CharField(max_length=120, blank=True)
+    size_bytes = models.PositiveIntegerField(default=0)
+    provider_metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["workspace", "email_message"]), models.Index(fields=["workspace", "created_at"])]
+
+    def __str__(self):
+        return self.display_name
+
 # Create your models here.

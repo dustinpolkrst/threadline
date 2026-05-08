@@ -18,12 +18,14 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
 from core import views as core_views
+from activity import views as activity_views
 from crm import views as crm_views
 from customer_portal import views as portal_views
 from communications import views as comm_views
 from search import views as search_views
 from tickets import views as ticket_views
 from time_tracking import views as time_views
+from workspaces import views as workspace_views
 
 urlpatterns = [
     path("", core_views.dashboard, name="dashboard"),
@@ -38,6 +40,13 @@ urlpatterns = [
     path("tickets/<uuid:pk>/time/", ticket_views.ticket_add_time, name="ticket_add_time"),
     path("tickets/<uuid:pk>/timer/start/", ticket_views.ticket_start_timer, name="ticket_start_timer"),
     path("tickets/<uuid:pk>/timer/stop/", ticket_views.ticket_stop_timer, name="ticket_stop_timer"),
+    path("tickets/<uuid:pk>/attachments/", ticket_views.ticket_upload_attachment, name="ticket_upload_attachment"),
+    path("tickets/<uuid:pk>/attachments/<uuid:attachment_id>/", ticket_views.ticket_download_attachment, name="ticket_download_attachment"),
+    path("tickets/<uuid:pk>/attachments/<uuid:attachment_id>/delete/", ticket_views.ticket_delete_attachment, name="ticket_delete_attachment"),
+    path("tickets/<uuid:pk>/relations/", ticket_views.ticket_add_relation, name="ticket_add_relation"),
+    path("tickets/<uuid:pk>/merge/", ticket_views.ticket_merge, name="ticket_merge"),
+    path("tickets/filters/save/", ticket_views.ticket_save_filter, name="ticket_save_filter"),
+    path("tickets/bulk/", ticket_views.ticket_bulk_action, name="ticket_bulk_action"),
     path("organizations/", crm_views.organization_list, name="organization_list"),
     path("organizations/new/", crm_views.organization_create, name="organization_create"),
     path("organizations/<uuid:pk>/edit/", crm_views.organization_edit, name="organization_edit"),
@@ -49,10 +58,17 @@ urlpatterns = [
     path("time/<uuid:pk>/edit/", time_views.time_entry_edit, name="time_entry_edit"),
     path("reports/time/", time_views.time_report, name="time_report"),
     path("settings/team/", crm_views.team_settings, name="team_settings"),
+    path("settings/import/", crm_views.crm_import_upload, name="crm_import_upload"),
+    path("settings/import/<uuid:pk>/", crm_views.crm_import_preview, name="crm_import_preview"),
     path("settings/email/", comm_views.email_plumbing_settings, name="email_plumbing_settings"),
+    path("activity/", activity_views.activity_log, name="activity_log"),
     path("search/", search_views.search_page, name="search"),
     path("portal/tickets/", portal_views.portal_ticket_list, name="portal_ticket_list"),
     path("portal/tickets/new/", portal_views.portal_ticket_create, name="portal_ticket_create"),
     path("portal/tickets/<uuid:pk>/", portal_views.portal_ticket_detail, name="portal_ticket_detail"),
     path("portal/tickets/<uuid:pk>/reply/", portal_views.portal_ticket_reply, name="portal_ticket_reply"),
+    path("portal/tickets/<uuid:pk>/attachments/", portal_views.portal_upload_attachment, name="portal_upload_attachment"),
+    path("portal/tickets/<uuid:pk>/attachments/<uuid:attachment_id>/", portal_views.portal_download_attachment, name="portal_download_attachment"),
+    path("portal/account/", portal_views.portal_account, name="portal_account"),
+    path("invites/<str:token>/", workspace_views.accept_invitation, name="accept_invitation"),
 ]

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mx-auto max-w-lg">
+  <div class="tl-panel p-6">
+    <div class="tl-kicker">Invitation</div>
+    <h1 class="mt-2 text-2xl font-semibold">Join {{ invitation.workspace.name }}</h1>
+    <p class="mt-1 text-sm text-slate-500">{{ invitation.email }}</p>
+    <form method="post" class="mt-6">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="tl-button">Create account</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

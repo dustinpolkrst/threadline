@@ -9,7 +9,7 @@
   <section class="tl-panel p-5 lg:col-span-2">
     <div class="mb-4">
       <h2 class="font-medium">SLA targets</h2>
-      <p class="text-sm text-slate-500">Simple elapsed-time targets in minutes. Business calendars can come later.</p>
+      <p class="text-sm text-slate-500">Default targets in minutes. Priority policies and business hours override these when configured.</p>
     </div>
     <form method="post" class="grid gap-4 md:grid-cols-4">
       {% csrf_token %}
@@ -17,6 +17,44 @@
       {{ sla_form.as_p }}
       <div class="flex items-end"><button class="tl-button">Save SLA targets</button></div>
     </form>
+  </section>
+  <section class="tl-panel p-5 lg:col-span-2">
+    <h2 class="mb-4 font-medium">Priority SLA policies</h2>
+    <div class="mb-4 grid gap-3 md:grid-cols-4">{% for policy in sla_policies %}<div class="rounded border border-slate-200 p-3 text-sm"><div class="font-medium">{{ policy.get_priority_display }}</div><div class="text-slate-500">First {{ policy.first_response_target_minutes }}m - Next {{ policy.next_response_target_minutes }}m - Resolve {{ policy.resolution_target_minutes }}m</div></div>{% endfor %}</div>
+    <form method="post" class="grid gap-4 md:grid-cols-5">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="sla_policy">
+      {{ sla_policy_form.as_p }}
+      <div class="flex items-end"><button class="tl-button-secondary">Save policy</button></div>
+    </form>
+  </section>
+  <section class="tl-panel p-5 lg:col-span-2">
+    <h2 class="mb-4 font-medium">Business hours</h2>
+    <form method="post" class="grid gap-4 md:grid-cols-5">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="calendar">
+      {{ calendar_form.as_p }}
+      <div class="flex items-end"><button class="tl-button-secondary">Save calendar</button></div>
+    </form>
+  </section>
+  <section class="tl-panel p-5 lg:col-span-2">
+    <h2 class="mb-4 font-medium">Invitations</h2>
+    <form method="post" class="grid gap-4 md:grid-cols-6">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="invite">
+      {{ invitation_form.as_p }}
+      <div class="flex items-end"><button class="tl-button">Create invite link</button></div>
+    </form>
+    <div class="mt-5 divide-y divide-slate-100">
+      {% for invitation in invitations %}
+        <div class="py-3 text-sm">
+          <div class="font-medium">{{ invitation.email }} - {{ invitation.get_invite_type_display }}</div>
+          <div class="break-all text-slate-500">{{ request.scheme }}://{{ request.get_host }}{% url 'accept_invitation' invitation.token %}</div>
+        </div>
+      {% empty %}
+        <div class="py-3 text-sm text-slate-500">No invitations yet.</div>
+      {% endfor %}
+    </div>
   </section>
   <section class="tl-panel overflow-hidden">
     <div class="border-b border-slate-200 px-5 py-4 font-medium">Internal users</div>

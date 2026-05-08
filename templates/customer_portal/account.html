@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-5">
+  <div class="tl-kicker">Portal</div>
+  <h1 class="text-2xl font-semibold">Account</h1>
+  <p class="text-sm text-slate-500">{{ profile.organization.name }}</p>
+</div>
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="tl-panel p-5">
+    <h2 class="mb-4 font-medium">Profile</h2>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="profile">
+      <p><label>Name</label><input name="name" value="{{ profile.contact.name }}"></p>
+      <p><label>Phone</label><input name="phone" value="{{ profile.contact.phone }}"></p>
+      <p><label>Title</label><input name="title" value="{{ profile.contact.title }}"></p>
+      <button class="tl-button">Save profile</button>
+    </form>
+  </section>
+  <section class="tl-panel p-5">
+    <h2 class="mb-4 font-medium">Password</h2>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="password">
+      {{ password_form.as_p }}
+      <button class="tl-button-secondary">Change password</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

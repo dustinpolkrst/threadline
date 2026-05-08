@@ -21,6 +21,7 @@ class ActivityEvent(models.Model):
     event_type = models.CharField(max_length=80)
     summary = models.CharField(max_length=255)
     visibility = models.CharField(max_length=20, choices=Visibility.choices, default=Visibility.INTERNAL)
+    metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -30,6 +31,8 @@ class ActivityEvent(models.Model):
             models.Index(fields=["workspace", "ticket", "visibility"]),
             models.Index(fields=["workspace", "organization"]),
             models.Index(fields=["workspace", "contact"]),
+            models.Index(fields=["workspace", "event_type"]),
+            models.Index(fields=["workspace", "actor"]),
         ]
 
     def __str__(self):
