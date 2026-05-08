@@ -19,6 +19,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from core import views as core_views
 from activity import views as activity_views
+from ai import views as ai_views
 from crm import views as crm_views
 from customer_portal import views as portal_views
 from communications import views as comm_views
@@ -35,6 +36,8 @@ urlpatterns = [
     path("tickets/", ticket_views.ticket_list, name="ticket_list"),
     path("tickets/new/", ticket_views.ticket_create, name="ticket_create"),
     path("tickets/<uuid:pk>/", ticket_views.ticket_detail, name="ticket_detail"),
+    path("tickets/<uuid:pk>/ai/analyze/", ai_views.ticket_ai_analyze, name="ticket_ai_analyze"),
+    path("tickets/<uuid:pk>/ai/<uuid:analysis_id>/apply/", ai_views.ticket_ai_apply, name="ticket_ai_apply"),
     path("tickets/<uuid:pk>/comments/", ticket_views.ticket_add_comment, name="ticket_add_comment"),
     path("tickets/<uuid:pk>/resolve/", ticket_views.ticket_resolve, name="ticket_resolve"),
     path("tickets/<uuid:pk>/time/", ticket_views.ticket_add_time, name="ticket_add_time"),

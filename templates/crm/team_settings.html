@@ -15,6 +15,7 @@
   <aside class="tl-panel h-fit overflow-hidden">
     <nav class="tl-settings-nav" aria-label="Settings sections">
       <a class="{% if active_section == 'application' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=application">Application<span>Storage and private media</span></a>
+      <a class="{% if active_section == 'ai' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=ai">AI<span>OpenRouter and triage</span></a>
       <a class="{% if active_section == 'team' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=team">Team<span>Internal and portal overview</span></a>
       <a class="{% if active_section == 'sla' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=sla">SLA<span>Targets and business hours</span></a>
       <a class="{% if active_section == 'invitations' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=invitations">Invitations<span>Invite links and access</span></a>
@@ -86,6 +87,72 @@
           <div class="tl-settings-actionbar">
             <p class="text-sm text-slate-500">Changing storage affects new file operations. Existing files are not migrated automatically.</p>
             <button class="tl-button">Save storage</button>
+          </div>
+        </form>
+      </section>
+    {% endif %}
+
+    {% if active_section == 'ai' %}
+      <section class="tl-settings-card">
+        <div class="tl-settings-card-header">
+          <div>
+            <div class="tl-kicker">AI provider</div>
+            <h2 class="tl-settings-card-title">OpenRouter configuration</h2>
+            <p class="tl-settings-card-subtitle">Enable internal AI triage drafts and keep client ticket history on zero-data-retention routes.</p>
+          </div>
+          <div class="grid min-w-72 gap-2 rounded-lg border border-slate-200 bg-white p-4 text-sm">
+            <div class="flex justify-between gap-6"><span class="text-slate-500">Provider</span><span class="font-semibold text-slate-900">{{ ai_settings.get_provider_display }}</span></div>
+            <div class="flex justify-between gap-6"><span class="text-slate-500">Model</span><span class="font-semibold text-slate-900">{{ ai_settings.model }}</span></div>
+            <div class="flex justify-between gap-6"><span class="text-slate-500">Last test</span><span class="font-semibold {% if ai_settings.last_test_status == 'ok' %}text-emerald-700{% elif ai_settings.last_test_status == 'failed' %}text-rose-700{% else %}text-slate-900{% endif %}">{{ ai_settings.last_test_status|default:"Not run" }}</span></div>
+          </div>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="grid gap-6 p-6">
+            <div class="tl-settings-callout">
+              AI output is internal-only in this version. Draft-only is the default workflow; auto-triage only becomes available when enabled here and still requires an internal user to apply the analysis.
+            </div>
+            <div class="grid gap-5 lg:grid-cols-2">
+              <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <label class="flex items-center gap-2 text-sm normal-case tracking-normal text-slate-800">{{ ai_form.enabled }} Enable AI analysis</label>
+                <p class="mt-2 text-sm text-slate-500">Allows internal agents to generate ticket analysis drafts.</p>
+              </div>
+              <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                <label class="flex items-center gap-2 text-sm normal-case tracking-normal text-emerald-900">{{ ai_form.zdr_only }} Require ZDR routing</label>
+                <p class="mt-2 text-sm text-emerald-800">Locked on by validation so client ticket history fails closed if private routing is unavailable.</p>
+              </div>
+              <div>
+                <label for="{{ ai_form.api_key.id_for_label }}">OpenRouter API key</label>
+                {{ ai_form.api_key }}
+                <p class="mt-2 text-xs text-slate-500">{% if ai_settings.has_api_key %}A key is configured. Leave blank to keep it.{% else %}No key configured yet.{% endif %}</p>
+              </div>
+              <div>
+                <label for="{{ ai_form.model.id_for_label }}">Model</label>
+                {{ ai_form.model }}
+                <p class="mt-2 text-xs text-slate-500">Use openrouter/auto by default, or pin a ZDR-compatible model.</p>
+              </div>
+              <div>
+                <label for="{{ ai_form.max_historical_tickets.id_for_label }}">Historical tickets</label>
+                {{ ai_form.max_historical_tickets }}
+                <p class="mt-2 text-xs text-slate-500">Same-client ticket history included in analysis prompts.</p>
+              </div>
+              <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <label class="flex items-center gap-2 text-sm normal-case tracking-normal text-amber-900">{{ ai_form.auto_triage_enabled }} Allow apply triage</label>
+                <p class="mt-2 text-sm text-amber-800">When enabled, agents can apply suggested priority/tags and add an internal AI comment.</p>
+              </div>
+            </div>
+            {% if ai_settings.last_test_message %}
+              <div class="rounded-lg border {% if ai_settings.last_test_status == 'ok' %}border-emerald-200 bg-emerald-50 text-emerald-800{% else %}border-rose-200 bg-rose-50 text-rose-800{% endif %} p-4 text-sm">
+                {{ ai_settings.last_test_message }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="tl-settings-actionbar">
+            <p class="text-sm text-slate-500">Provider tests send a minimal health prompt, not ticket history.</p>
+            <div class="flex flex-wrap gap-2">
+              <button class="tl-button-secondary" name="action" value="ai_test">Save and test provider</button>
+              <button class="tl-button" name="action" value="ai">Save AI settings</button>
+            </div>
           </div>
         </form>
       </section>

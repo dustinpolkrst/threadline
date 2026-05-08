@@ -82,6 +82,48 @@
   </section>
   <aside class="space-y-6">
     <div class="tl-panel tl-section">
+      <div class="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <h2 class="font-medium">AI analysis</h2>
+          <p class="mt-1 text-sm text-slate-500">Internal triage drafts powered by OpenRouter.</p>
+        </div>
+        {% if ai_settings.enabled %}<span class="tl-badge bg-emerald-50 text-emerald-700">Enabled</span>{% else %}<span class="tl-badge bg-slate-100 text-slate-600">Off</span>{% endif %}
+      </div>
+      {% if ai_settings.enabled %}
+        <form method="post" action="{% url 'ticket_ai_analyze' ticket.pk %}" class="mb-4 flex flex-wrap gap-2">
+          {% csrf_token %}
+          <button class="tl-button" name="mode" value="draft">Generate draft</button>
+          {% if ai_settings.auto_triage_enabled %}<button class="tl-button-secondary" name="mode" value="auto_triage">Generate auto-triage</button>{% endif %}
+        </form>
+      {% else %}
+        <div class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">AI is not enabled for this workspace. Configure it in Settings - AI.</div>
+      {% endif %}
+      <div class="space-y-3">
+        {% for analysis in ai_analyses %}
+          <div class="rounded-lg border border-slate-200 p-3 text-sm">
+            <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <span class="tl-badge {% if analysis.status == 'succeeded' %}bg-emerald-50 text-emerald-700{% elif analysis.status == 'failed' %}bg-rose-50 text-rose-700{% elif analysis.status == 'applied' %}bg-blue-50 text-blue-700{% else %}bg-slate-100 text-slate-600{% endif %}">{{ analysis.get_status_display }}</span>
+              <span class="tl-meta">{{ analysis.created_at|date:"M j, g:i A" }}</span>
+            </div>
+            {% if analysis.status == "failed" %}
+              <div class="text-rose-700">{{ analysis.error_message }}</div>
+            {% else %}
+              <div class="font-semibold text-slate-900">{{ analysis.summary|default:"Analysis pending" }}</div>
+              {% if analysis.suggested_priority or analysis.suggested_tags %}
+                <div class="mt-2 text-slate-600">Priority: {{ analysis.suggested_priority|default:"-" }}{% if analysis.suggested_tags %} - Tags: {{ analysis.suggested_tags|join:", " }}{% endif %}</div>
+              {% endif %}
+              {% if analysis.solution_draft %}<div class="mt-2 whitespace-pre-wrap rounded-md bg-slate-50 p-2 text-slate-700">{{ analysis.solution_draft }}</div>{% endif %}
+              {% if ai_settings.auto_triage_enabled and analysis.status == "succeeded" %}
+                <form method="post" action="{% url 'ticket_ai_apply' ticket.pk analysis.pk %}" class="mt-3">{% csrf_token %}<button class="tl-button-secondary">Apply triage</button></form>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% empty %}
+          <div class="text-sm text-slate-500">No AI analyses yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="tl-panel tl-section">
       <h2 class="mb-3 font-medium">Related tickets</h2>
       <div class="space-y-2 text-sm">
         {% for relation in relations %}

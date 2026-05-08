@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "customer_portal",
     "communications",
     "search",
+    "ai",
 ]
 
 MIDDLEWARE = [
@@ -113,3 +114,6 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="threadline@example.com")
 
 CELERY_BROKER_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = env("REDIS_URL", default="redis://localhost:6379/0")
+OPENROUTER_SITE_URL = env("OPENROUTER_SITE_URL", default="https://threadline.local")
+OPENROUTER_APP_TITLE = env("OPENROUTER_APP_TITLE", default="Threadline")
+OPENROUTER_TIMEOUT_SECONDS = env.int("OPENROUTER_TIMEOUT_SECONDS", default=45)

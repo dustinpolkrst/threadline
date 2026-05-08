@@ -58,6 +58,7 @@ We are intentionally avoiding Kubernetes, microservices, a separate SPA, GraphQL
 - CSV import templates and duplicate-resolution controls.
 - PostgreSQL full-text search ranking, highlighting, and rebuildable search documents.
 - Optional local or S3-compatible private attachment storage.
+- OpenRouter AI settings, internal ticket analysis drafts, and opt-in AI triage application.
 - Email plumbing models and stub services, without real provider integration.
 - Docker Compose development and production-style deployment.
 - Demo seed data and permission tests.
@@ -238,6 +239,12 @@ The web container runs migrations and `collectstatic` before Gunicorn starts. In
 Persistent volumes are defined for PostgreSQL, Redis, uploaded media, and collected static files.
 
 Attachment storage defaults to local private media. For S3-compatible storage, either set `MEDIA_STORAGE_BACKEND=s3` with the `AWS_*` values in `.env`, or configure a provider from Settings -> Application storage as an owner/admin. Objects remain private and Threadline still streams downloads through Django permission checks. Existing local media is not migrated automatically when switching storage backends.
+
+AI analysis is configured from Settings -> AI by an owner/admin. The first provider is OpenRouter, with draft-only analysis by default, ZDR routing required for client ticket history, and opt-in manual application of AI triage suggestions. Provider connectivity can be checked with:
+
+```bash
+uv run python manage.py test_ai_provider --workspace demo
+```
 
 Rebuild search documents after large data imports or maintenance:
 

@@ -7,6 +7,9 @@ from django.urls import reverse
 from django.db.models import Count, Q, Sum
 import csv
 import io
+from ai.client import OpenRouterError, send_chat_completion
+from ai.forms import AIProviderSettingsForm
+from ai.services import get_ai_settings
 from activity.models import ActivityEvent
 from core.permissions import require_internal_workspace
 from customer_portal.models import CustomerProfile
@@ -120,7 +123,7 @@ def team_settings(request):
     if not membership or membership.role not in [WorkspaceMembership.Role.OWNER, WorkspaceMembership.Role.ADMIN]:
         raise PermissionDenied("Workspace admin access required.")
     active_section = request.GET.get("section", "application")
-    if active_section not in ["application", "team", "sla", "invitations", "users"]:
+    if active_section not in ["application", "ai", "team", "sla", "invitations", "users"]:
         active_section = "application"
     if request.method == "POST":
         if request.POST.get("action") == "sla":
@@ -159,6 +162,35 @@ def team_settings(request):
             if form.is_valid():
                 form.save()
             return _settings_redirect("application")
+        if request.POST.get("action") == "ai":
+            ai_settings = get_ai_settings(workspace)
+            form = AIProviderSettingsForm(request.POST, instance=ai_settings)
+            if form.is_valid():
+                form.save()
+            return _settings_redirect("ai")
+        if request.POST.get("action") == "ai_test":
+            ai_settings = get_ai_settings(workspace)
+            form = AIProviderSettingsForm(request.POST, instance=ai_settings)
+            if form.is_valid():
+                ai_settings = form.save()
+            try:
+                response = send_chat_completion(
+                    ai_settings,
+                    [
+                        {"role": "system", "content": "Return a small JSON health response."},
+                        {"role": "user", "content": "Threadline AI provider health check."},
+                    ],
+                    max_tokens=200,
+                    structured=False,
+                )
+                ai_settings.last_test_status = "ok"
+                ai_settings.last_test_message = f"Provider returned {response.get('model', 'unknown model')}"
+            except OpenRouterError as exc:
+                ai_settings.last_test_status = "failed"
+                ai_settings.last_test_message = str(exc)[:500]
+            ai_settings.last_tested_at = timezone.now()
+            ai_settings.save(update_fields=["last_test_status", "last_test_message", "last_tested_at", "updated_at"])
+            return _settings_redirect("ai")
         target = get_object_or_404(WorkspaceMembership, pk=request.POST.get("membership_id"), workspace=workspace)
         role = request.POST.get("role")
         if role in WorkspaceMembership.Role.values:
@@ -173,6 +205,7 @@ def team_settings(request):
     invitation_form.fields["contact"].queryset = Contact.objects.filter(workspace=workspace)
     calendar, _ = BusinessHoursCalendar.objects.get_or_create(workspace=workspace)
     storage_settings, _ = ApplicationStorageSettings.objects.get_or_create(workspace=workspace)
+    ai_settings = get_ai_settings(workspace)
     return render(request, "crm/team_settings.html", {
         "memberships": memberships,
         "customer_profiles": customer_profiles,
@@ -185,6 +218,8 @@ def team_settings(request):
         "invitations": invitations,
         "storage_form": ApplicationStorageSettingsForm(instance=storage_settings),
         "storage_settings": storage_settings,
+        "ai_form": AIProviderSettingsForm(instance=ai_settings),
+        "ai_settings": ai_settings,
         "active_section": active_section,
     })
 
