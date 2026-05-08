@@ -1,26 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5">
-  <div class="tl-kicker">Workspace settings</div>
-  <h1 class="text-2xl font-semibold">Email plumbing</h1>
-  <p class="text-sm text-slate-500">Provider-neutral email records and stub status. Real inbound and outbound email are not connected yet.</p>
+<div class="tl-page-header">
+  <div>
+    <div class="tl-kicker">Workspace settings</div>
+    <h1 class="tl-page-title">Email plumbing</h1>
+    <p class="tl-page-subtitle">Provider-neutral email records and stub status. Real inbound and outbound email are not connected yet.</p>
+  </div>
 </div>
 <div class="grid gap-6 lg:grid-cols-2">
   <section class="tl-panel overflow-hidden">
-    <div class="border-b border-slate-200 px-5 py-4 font-medium">Mailbox channels</div>
-    <div class="divide-y divide-slate-100">{% for mailbox in mailboxes %}<div class="p-4 text-sm"><div class="font-medium">{{ mailbox.name }}</div><div class="text-slate-500">{{ mailbox.address }} - {{ mailbox.get_status_display }}</div></div>{% empty %}<div class="p-4 text-sm text-slate-500">No mailbox placeholders yet. Add them in Django admin for now.</div>{% endfor %}</div>
+    <div class="tl-toolbar"><div class="font-semibold">Mailbox channels</div></div>
+    <div class="divide-y divide-slate-100">{% for mailbox in mailboxes %}<div class="p-4 text-sm"><div class="font-medium">{{ mailbox.name }}</div><div class="tl-meta mt-1">{{ mailbox.address }} - {{ mailbox.get_status_display }}</div></div>{% empty %}<div class="tl-empty">No mailbox placeholders yet. Add them in Django admin for now.</div>{% endfor %}</div>
   </section>
   <section class="tl-panel overflow-hidden">
-    <div class="border-b border-slate-200 px-5 py-4 font-medium">Recent messages</div>
-    <div class="divide-y divide-slate-100">{% for message in messages %}<div class="p-4 text-sm"><div class="font-medium">{{ message.subject }}</div><div class="text-slate-500">{{ message.get_direction_display }} - {{ message.get_status_display }}</div></div>{% empty %}<div class="p-4 text-sm text-slate-500">No email records yet.</div>{% endfor %}</div>
+    <div class="tl-toolbar"><div class="font-semibold">Recent messages</div></div>
+    <div class="divide-y divide-slate-100">{% for message in messages %}<div class="p-4 text-sm"><div class="font-medium">{{ message.subject }}</div><div class="tl-meta mt-1">{{ message.get_direction_display }} - {{ message.get_status_display }}</div></div>{% empty %}<div class="tl-empty">No email records yet.</div>{% endfor %}</div>
   </section>
   <section class="tl-panel overflow-hidden">
-    <div class="border-b border-slate-200 px-5 py-4 font-medium">Delivery attempts</div>
-    <div class="divide-y divide-slate-100">{% for attempt in attempts %}<div class="p-4 text-sm"><div class="font-medium">{{ attempt.get_status_display }}</div><div class="text-slate-500">{{ attempt.response }}</div></div>{% empty %}<div class="p-4 text-sm text-slate-500">No delivery attempts.</div>{% endfor %}</div>
+    <div class="tl-toolbar"><div class="font-semibold">Delivery attempts</div></div>
+    <div class="divide-y divide-slate-100">{% for attempt in attempts %}<div class="p-4 text-sm"><div class="font-medium">{{ attempt.get_status_display }}</div><div class="tl-meta mt-1">{{ attempt.response }}</div></div>{% empty %}<div class="tl-empty">No delivery attempts.</div>{% endfor %}</div>
   </section>
   <section class="tl-panel overflow-hidden">
-    <div class="border-b border-slate-200 px-5 py-4 font-medium">Ingest logs</div>
-    <div class="divide-y divide-slate-100">{% for log in ingest_logs %}<div class="p-4 text-sm"><div class="font-medium">{{ log.message_id }}</div><div class="text-slate-500">{{ log.get_status_display }} - {{ log.detail }}</div></div>{% empty %}<div class="p-4 text-sm text-slate-500">No ingest logs.</div>{% endfor %}</div>
+    <div class="tl-toolbar"><div class="font-semibold">Ingest logs</div></div>
+    <div class="divide-y divide-slate-100">{% for log in ingest_logs %}<div class="p-4 text-sm"><div class="font-medium">{{ log.message_id }}</div><div class="tl-meta mt-1">{{ log.get_status_display }} - {{ log.detail }}</div></div>{% empty %}<div class="tl-empty">No ingest logs.</div>{% endfor %}</div>
   </section>
 </div>
 {% endblock %}

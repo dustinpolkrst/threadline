@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5">
-  <div class="text-xs uppercase text-slate-500">{{ contact.organization }}</div>
-  <h1 class="text-2xl font-semibold">{{ contact.name }}</h1>
-  <p class="text-sm text-slate-500">{{ contact.email }} - {{ contact.title|default:"No title" }} - {{ time_total }} tracked minutes</p>
+<div class="tl-page-header">
+  <div>
+    <div class="tl-kicker">{{ contact.organization }}</div>
+    <h1 class="tl-page-title">{{ contact.name }}</h1>
+    <p class="tl-page-subtitle">{{ contact.email }} - {{ contact.title|default:"No title" }} - {{ time_total }} tracked minutes</p>
+  </div>
 </div>
 
 <div class="grid gap-6 lg:grid-cols-3">
-  <aside class="border border-slate-200 bg-white p-4">
+  <aside class="tl-panel tl-section">
     <h2 class="mb-3 font-medium">Profile</h2>
     <dl class="space-y-3 text-sm">
       <div><dt class="text-xs uppercase text-slate-500">Organization</dt><dd><a class="text-blue-700" href="{% url 'organization_detail' contact.organization.pk %}">{{ contact.organization }}</a></dd></div>
@@ -16,13 +18,13 @@
       <div><dt class="text-xs uppercase text-slate-500">Notes</dt><dd class="whitespace-pre-wrap">{{ contact.notes|default:"No notes yet." }}</dd></div>
     </dl>
   </aside>
-  <section class="border border-slate-200 bg-white lg:col-span-2">
-    <div class="border-b border-slate-200 px-4 py-3 font-medium">Related tickets</div>
-    <table class="w-full text-left text-sm">
-      <thead class="bg-slate-100 text-xs uppercase text-slate-600"><tr><th class="p-3">Ticket</th><th>Status</th><th>Priority</th></tr></thead>
+  <section class="tl-panel overflow-hidden lg:col-span-2">
+    <div class="tl-toolbar"><div class="font-semibold">Related tickets</div></div>
+    <table class="tl-table w-full text-left text-sm">
+      <thead><tr><th>Ticket</th><th>Status</th><th>Priority</th></tr></thead>
       <tbody>{% for ticket in tickets %}<tr class="border-t border-slate-100"><td class="p-3"><a class="font-medium text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a></td><td>{{ ticket.get_status_display }}</td><td>{{ ticket.get_priority_display }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="3">No related tickets.</td></tr>{% endfor %}</tbody>
     </table>
-    <div class="border-t border-slate-200 px-4 py-3 font-medium">Communication history</div>
+    <div class="tl-toolbar border-t"><div class="font-semibold">Communication history</div></div>
     <div class="divide-y divide-slate-100">{% for comment in comments %}<div class="p-3 text-sm"><a class="font-medium text-blue-700" href="{% url 'ticket_detail' comment.ticket.pk %}">{{ comment.ticket.title }}</a><p class="mt-1">{{ comment.body }}</p></div>{% empty %}<div class="p-4 text-sm text-slate-500">No public communication yet.</div>{% endfor %}</div>
   </section>
 </div>

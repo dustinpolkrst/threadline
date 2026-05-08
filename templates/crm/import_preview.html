@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5">
-  <div class="tl-kicker">CRM import</div>
-  <h1 class="text-2xl font-semibold">{{ job.filename }}</h1>
-  <p class="text-sm text-slate-500">{{ job.get_import_type_display }} - {{ job.rows.count }} rows</p>
+<div class="tl-page-header">
+  <div>
+    <div class="tl-kicker">CRM import</div>
+    <h1 class="tl-page-title">{{ job.filename }}</h1>
+    <p class="tl-page-subtitle">{{ job.get_import_type_display }} - {{ job.rows.count }} rows. Review validation and duplicate decisions before confirming.</p>
+  </div>
 </div>
 <div class="tl-panel overflow-hidden">
   <form method="post">
@@ -23,12 +25,12 @@
             </td>
             <td>
               {% if row.errors %}
-                <div class="text-rose-700">{{ row.errors|join:", " }}</div>
+                <div class="rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-rose-700">{{ row.errors|join:", " }}</div>
               {% else %}
-                <div class="text-emerald-700">Ready</div>
+                <span class="tl-badge bg-emerald-50 text-emerald-700">Ready</span>
               {% endif %}
               {% if row.warnings %}
-                <div class="mt-1 text-amber-700">{{ row.warnings|join:", " }}</div>
+                <div class="mt-2 rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-amber-800">{{ row.warnings|join:", " }}</div>
               {% endif %}
             </td>
             <td>
@@ -45,7 +47,7 @@
         {% endfor %}
       </tbody>
     </table>
-    <div class="flex gap-3 border-t border-slate-200 p-5">
+    <div class="flex flex-wrap justify-end gap-3 border-t border-slate-200 bg-slate-50 p-5">
       <button class="tl-button-secondary" name="action" value="save_resolutions">Save resolutions</button>
       <button class="tl-button" name="action" value="confirm" {% if has_errors %}disabled{% endif %}>Confirm import</button>
     </div>

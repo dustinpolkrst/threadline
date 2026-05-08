@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.db.models import Count, Q, Sum
 import csv
 import io
@@ -118,12 +119,15 @@ def team_settings(request):
     membership = WorkspaceMembership.objects.filter(workspace=workspace, user=request.user).first()
     if not membership or membership.role not in [WorkspaceMembership.Role.OWNER, WorkspaceMembership.Role.ADMIN]:
         raise PermissionDenied("Workspace admin access required.")
+    active_section = request.GET.get("section", "application")
+    if active_section not in ["application", "team", "sla", "invitations", "users"]:
+        active_section = "application"
     if request.method == "POST":
         if request.POST.get("action") == "sla":
             form = WorkspaceSLAForm(request.POST, instance=workspace)
             if form.is_valid():
                 form.save()
-            return redirect("team_settings")
+            return _settings_redirect("sla")
         if request.POST.get("action") == "sla_policy":
             form = SLAPolicyForm(request.POST)
             if form.is_valid():
@@ -132,13 +136,13 @@ def team_settings(request):
                     "next_response_target_minutes": form.cleaned_data["next_response_target_minutes"],
                     "resolution_target_minutes": form.cleaned_data["resolution_target_minutes"],
                 })
-            return redirect("team_settings")
+            return _settings_redirect("sla")
         if request.POST.get("action") == "calendar":
             calendar, _ = BusinessHoursCalendar.objects.get_or_create(workspace=workspace)
             form = BusinessHoursCalendarForm(request.POST, instance=calendar)
             if form.is_valid():
                 form.save()
-            return redirect("team_settings")
+            return _settings_redirect("sla")
         if request.POST.get("action") == "invite":
             form = InvitationForm(request.POST)
             form.fields["organization"].queryset = Organization.objects.filter(workspace=workspace)
@@ -148,19 +152,19 @@ def team_settings(request):
                 invite.workspace = workspace
                 invite.invited_by = request.user
                 invite.save()
-            return redirect("team_settings")
+            return _settings_redirect("invitations")
         if request.POST.get("action") == "storage":
             storage_settings, _ = ApplicationStorageSettings.objects.get_or_create(workspace=workspace)
             form = ApplicationStorageSettingsForm(request.POST, instance=storage_settings)
             if form.is_valid():
                 form.save()
-            return redirect("team_settings")
+            return _settings_redirect("application")
         target = get_object_or_404(WorkspaceMembership, pk=request.POST.get("membership_id"), workspace=workspace)
         role = request.POST.get("role")
         if role in WorkspaceMembership.Role.values:
             target.role = role
             target.save(update_fields=["role"])
-        return redirect("team_settings")
+        return _settings_redirect("users")
     memberships = WorkspaceMembership.objects.filter(workspace=workspace).select_related("user")
     customer_profiles = CustomerProfile.objects.filter(workspace=workspace).select_related("user", "organization", "contact")
     invitations = Invitation.objects.filter(workspace=workspace).select_related("organization", "contact", "invited_by")[:25]
@@ -181,6 +185,7 @@ def team_settings(request):
         "invitations": invitations,
         "storage_form": ApplicationStorageSettingsForm(instance=storage_settings),
         "storage_settings": storage_settings,
+        "active_section": active_section,
     })
 
 
@@ -316,5 +321,9 @@ def _template_headers(import_type):
     if import_type == CRMImportJob.ImportType.CONTACTS:
         return ["organization", "name", "email", "phone", "title", "notes"]
     return None
+
+
+def _settings_redirect(section):
+    return redirect(f"{reverse('team_settings')}?section={section}")
 
 # Create your views here.

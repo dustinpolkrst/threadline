@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5">
-  <h1 class="text-2xl font-semibold">Search</h1>
-  <p class="text-sm text-slate-500">Find tickets, accounts, contacts, and support history.</p>
+<div class="tl-page-header">
+  <div>
+    <div class="tl-kicker">Workspace search</div>
+    <h1 class="tl-page-title">Search</h1>
+    <p class="tl-page-subtitle">Find tickets, accounts, contacts, and support history.</p>
+  </div>
 </div>
 
-<form method="get" class="tl-panel mb-6 grid max-w-4xl gap-3 p-3 md:grid-cols-[1fr_12rem_auto]">
+<form method="get" class="tl-panel mb-6 grid max-w-5xl gap-3 p-4 md:grid-cols-[1fr_12rem_auto]">
   <input name="q" value="{{ q }}" class="w-full border border-slate-300 px-3 py-2" placeholder="Search by issue, customer, contact, domain, or comment">
   <select name="type">
     <option value="all" {% if entity == "all" %}selected{% endif %}>All</option>
@@ -20,7 +23,7 @@
 </form>
 
 <section class="tl-panel overflow-hidden">
-  <div class="border-b border-slate-200 px-5 py-4 font-medium">Results</div>
+  <div class="tl-toolbar"><div><div class="font-semibold">Results</div><div class="tl-meta">Ranked by current search scope</div></div></div>
   <div class="divide-y divide-slate-100">
     {% for result in results %}
       <a class="grid gap-2 p-4 text-sm hover:bg-slate-50 md:grid-cols-[8rem_1fr]" href="{{ result.url }}">

@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5">
-  <div class="tl-kicker">Portal</div>
-  <h1 class="text-2xl font-semibold">Account</h1>
-  <p class="text-sm text-slate-500">{{ profile.organization.name }}</p>
+<div class="tl-page-header">
+  <div>
+    <div class="tl-kicker">Portal</div>
+    <h1 class="tl-page-title">Account</h1>
+    <p class="tl-page-subtitle">{{ profile.organization.name }}</p>
+  </div>
 </div>
 <div class="grid gap-6 lg:grid-cols-2">
   <section class="tl-panel p-5">

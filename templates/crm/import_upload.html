@@ -1,19 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5">
-  <div class="tl-kicker">CRM</div>
-  <h1 class="text-2xl font-semibold">CSV import</h1>
-  <p class="text-sm text-slate-500">Import organizations or contacts from a UTF-8 CSV file.</p>
-</div>
-<div class="tl-panel max-w-xl p-5">
-  <div class="mb-5 flex flex-wrap gap-2">
-    <a class="tl-button-secondary" href="{% url 'crm_import_template' 'organizations' %}">Organization template</a>
-    <a class="tl-button-secondary" href="{% url 'crm_import_template' 'contacts' %}">Contact template</a>
+<div class="tl-page-header">
+  <div>
+    <div class="tl-kicker">CRM</div>
+    <h1 class="tl-page-title">CSV import</h1>
+    <p class="tl-page-subtitle">Import organizations or contacts from a UTF-8 CSV file, preview changes, and resolve duplicates before anything is written.</p>
   </div>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="tl-button">Preview import</button>
-  </form>
+</div>
+<div class="grid gap-6 lg:grid-cols-[minmax(0,680px)_1fr]">
+  <section class="tl-panel overflow-hidden">
+    <div class="tl-toolbar">
+      <div>
+        <div class="font-semibold">Upload file</div>
+        <div class="tl-meta mt-1">Use the templates to keep headers predictable.</div>
+      </div>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="tl-section space-y-4">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="flex justify-end border-t border-slate-200 pt-4">
+        <button class="tl-button">Preview import</button>
+      </div>
+    </form>
+  </section>
+  <aside class="tl-panel tl-section">
+    <div class="tl-kicker">Templates</div>
+    <h2 class="mt-2 text-lg font-semibold">Start from a known CSV shape</h2>
+    <p class="mt-2 text-sm text-slate-500">Templates include the supported fields and work with duplicate detection during preview.</p>
+    <div class="mt-5 grid gap-2">
+      <a class="tl-button-secondary" href="{% url 'crm_import_template' 'organizations' %}">Organization template</a>
+      <a class="tl-button-secondary" href="{% url 'crm_import_template' 'contacts' %}">Contact template</a>
+    </div>
+  </aside>
 </div>
 {% endblock %}

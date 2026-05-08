@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5 flex items-start justify-between gap-4">
+<div class="tl-page-header">
   <div>
-    <h1 class="text-2xl font-semibold">Tickets</h1>
-    <p class="text-sm text-slate-500">Agent queue, priority work, ownership, and customer context.</p>
+    <div class="tl-kicker">Agent queue</div>
+    <h1 class="tl-page-title">Tickets</h1>
+    <p class="tl-page-subtitle">Priority work, ownership, SLA risk, and customer context.</p>
   </div>
   <a class="tl-button" href="{% url 'ticket_create' %}">New ticket</a>
 </div>
@@ -16,9 +17,9 @@
 </div>
 
 <div class="tl-panel overflow-hidden">
-  <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-    <div class="font-medium">Queue</div>
-    <div class="flex gap-2 text-xs">
+  <div class="tl-toolbar">
+    <div><div class="font-semibold">Queue</div><div class="tl-meta">Saved support views and filters</div></div>
+    <div class="flex flex-wrap gap-2 text-xs">
       <a class="tl-button-secondary {% if queue == 'all' and not status %}!bg-slate-900 !text-white{% endif %}" href="{% url 'ticket_list' %}">All</a>
       <a class="tl-button-secondary {% if queue == 'my-open' %}!bg-slate-900 !text-white{% endif %}" href="?queue=my-open">My open</a>
       <a class="tl-button-secondary {% if queue == 'unassigned' %}!bg-slate-900 !text-white{% endif %}" href="?queue=unassigned">Unassigned</a>
@@ -27,7 +28,7 @@
       <a class="tl-button-secondary {% if queue == 'waiting-on-customer' %}!bg-slate-900 !text-white{% endif %}" href="?queue=waiting-on-customer">Waiting on customer</a>
     </div>
   </div>
-  <form class="grid gap-3 border-b border-slate-200 px-5 py-4 md:grid-cols-5" method="get">
+  <form class="grid gap-3 border-b border-slate-200 bg-slate-50/70 px-5 py-4 md:grid-cols-[1fr_11rem_11rem_auto]" method="get">
     <input type="hidden" name="queue" value="{{ queue }}">
     <input name="q" value="{{ q }}" placeholder="Search tickets">
     <select name="status"><option value="">Any status</option>{% for value,label in tickets.model.Status.choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
@@ -36,7 +37,7 @@
   </form>
   <form method="post" action="{% url 'ticket_bulk_action' %}" class="border-b border-slate-200 px-5 py-4">
     {% csrf_token %}
-    <div class="grid gap-3 md:grid-cols-6">
+    <div class="grid gap-3 md:grid-cols-[1fr_11rem_11rem_1fr_auto]">
       <input id="bulk-ticket-ids" type="hidden" name="ticket_ids">
       <select name="action"><option value="status">Change status</option><option value="priority">Change priority</option><option value="tag">Add tag</option></select>
       <select name="status"><option value="">Status</option>{% for value,label in tickets.model.Status.choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>

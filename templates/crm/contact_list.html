@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5 flex items-start justify-between gap-4">
+<div class="tl-page-header">
   <div>
-    <h1 class="text-2xl font-semibold">Contacts</h1>
-    <p class="text-sm text-slate-500">People connected to customer accounts and support conversations.</p>
+    <div class="tl-kicker">CRM</div>
+    <h1 class="tl-page-title">Contacts</h1>
+    <p class="tl-page-subtitle">People connected to customer accounts and support conversations.</p>
   </div>
   <a class="tl-button" href="{% url 'contact_create' %}">New contact</a>
 </div>

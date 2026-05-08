@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-5 flex items-start justify-between gap-4">
+<div class="tl-page-header">
   <div>
-    <h1 class="text-2xl font-semibold">Support requests</h1>
-    <p class="text-sm text-slate-500">Open and closed requests for your organization.</p>
+    <div class="tl-kicker">Customer portal</div>
+    <h1 class="tl-page-title">Support requests</h1>
+    <p class="tl-page-subtitle">Open and closed requests for your organization.</p>
   </div>
-  <a class="bg-blue-700 px-3 py-2 text-sm font-medium text-white" href="{% url 'portal_ticket_create' %}">New request</a>
+  <a class="tl-button" href="{% url 'portal_ticket_create' %}">New request</a>
 </div>
 <div class="mb-6 grid gap-4 md:grid-cols-3">
-  <div class="tl-panel p-5"><div class="tl-kicker">Open</div><div class="text-2xl font-semibold">{{ summary.open }}</div></div>
-  <div class="tl-panel p-5"><div class="tl-kicker">Closed</div><div class="text-2xl font-semibold">{{ summary.closed }}</div></div>
-  <div class="tl-panel p-5"><div class="tl-kicker">Account</div><a class="font-medium text-blue-700" href="{% url 'portal_account' %}">Manage profile</a></div>
+  <div class="tl-panel tl-stat"><div class="tl-kicker">Open</div><div class="mt-2 text-2xl font-semibold">{{ summary.open }}</div></div>
+  <div class="tl-panel tl-stat"><div class="tl-kicker">Closed</div><div class="mt-2 text-2xl font-semibold">{{ summary.closed }}</div></div>
+  <div class="tl-panel tl-stat"><div class="tl-kicker">Account</div><a class="mt-2 inline-flex font-medium text-blue-700" href="{% url 'portal_account' %}">Manage profile</a></div>
 </div>
 <div class="tl-panel overflow-hidden">
-  <form method="get" class="grid gap-3 border-b border-slate-200 p-5 md:grid-cols-4">
+  <form method="get" class="grid gap-3 border-b border-slate-200 bg-white p-5 md:grid-cols-[1fr_180px_180px_auto]">
     <input name="q" value="{{ q }}" placeholder="Search requests">
     <select name="status"><option value="">Any status</option>{% for value,label in tickets.model.Status.choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
     <select name="priority"><option value="">Any priority</option>{% for value,label in tickets.model.Priority.choices %}<option value="{{ value }}" {% if priority == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>

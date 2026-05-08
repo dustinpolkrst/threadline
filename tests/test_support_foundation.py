@@ -109,6 +109,36 @@ def test_customer_and_agent_cannot_access_admin_settings(client, support_data):
 
 
 @pytest.mark.django_db
+def test_settings_application_storage_tab_exposes_s3_setup(client, support_data):
+    client.login(username="admin", password="password")
+    response = client.get(reverse("team_settings"))
+    body = response.content.decode()
+    assert response.status_code == 200
+    assert "Application storage" in body
+    assert "S3-compatible provider" in body
+    assert "bucket_name" in body
+    assert "endpoint_url" in body
+    assert "secret_access_key" in body
+
+    response = client.post(
+        reverse("team_settings"),
+        {
+            "action": "storage",
+            "backend": "s3",
+            "bucket_name": "threadline-media",
+            "endpoint_url": "https://s3.example.com",
+            "region_name": "us-east-1",
+            "access_key_id": "key",
+            "secret_access_key": "secret",
+            "custom_domain": "",
+            "addressing_style": "path",
+        },
+    )
+    assert response.status_code == 302
+    assert response["Location"].endswith("?section=application")
+
+
+@pytest.mark.django_db
 def test_admin_can_update_workspace_sla_targets(client, support_data):
     client.login(username="admin", password="password")
     response = client.post(
