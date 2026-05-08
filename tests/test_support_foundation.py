@@ -8,7 +8,7 @@ from crm.models import Contact, Organization
 from customer_portal.models import CustomerProfile
 from tickets.models import Ticket
 from time_tracking.models import TimeEntry
-from workspaces.models import Workspace, WorkspaceMembership
+from workspaces.models import BusinessHoursCalendar, Invitation, Workspace, WorkspaceMembership
 
 
 @pytest.fixture
@@ -114,8 +114,10 @@ def test_settings_application_storage_tab_exposes_s3_setup(client, support_data)
     response = client.get(reverse("team_settings"))
     body = response.content.decode()
     assert response.status_code == 200
-    assert "Application storage" in body
+    assert "Attachment storage" in body
     assert "S3-compatible provider" in body
+    assert "Bucket and endpoint" in body
+    assert "Private objects stay behind Django permission checks" in body
     assert "bucket_name" in body
     assert "endpoint_url" in body
     assert "secret_access_key" in body
@@ -139,6 +141,23 @@ def test_settings_application_storage_tab_exposes_s3_setup(client, support_data)
 
 
 @pytest.mark.django_db
+def test_settings_sections_render_redesigned_admin_panels(client, support_data):
+    client.login(username="admin", password="password")
+    sections = {
+        "team": ["Internal members", "Customer portal users", "Open invites"],
+        "sla": ["Default response targets", "Priority policies", "Business hours"],
+        "invitations": ["Create invite link", "Recent invitations", "Links expire based on the date above"],
+        "users": ["Access management", "Current role", "Portal users"],
+    }
+    for section, expected in sections.items():
+        response = client.get(f"{reverse('team_settings')}?section={section}")
+        body = response.content.decode()
+        assert response.status_code == 200
+        for text in expected:
+            assert text in body
+
+
+@pytest.mark.django_db
 def test_admin_can_update_workspace_sla_targets(client, support_data):
     client.login(username="admin", password="password")
     response = client.post(
@@ -155,6 +174,55 @@ def test_admin_can_update_workspace_sla_targets(client, support_data):
     assert support_data["workspace"].first_response_target_minutes == 30
     assert support_data["workspace"].next_response_target_minutes == 60
     assert support_data["workspace"].resolution_target_minutes == 240
+
+
+@pytest.mark.django_db
+def test_settings_post_actions_redirect_to_active_sections(client, support_data):
+    client.login(username="admin", password="password")
+    response = client.post(
+        reverse("team_settings"),
+        {
+            "action": "calendar",
+            "timezone": "UTC",
+            "monday": "on",
+            "tuesday": "on",
+            "wednesday": "on",
+            "thursday": "on",
+            "friday": "on",
+            "starts_at": "08:30",
+            "ends_at": "17:30",
+            "closed_dates": "[]",
+        },
+    )
+    assert response.status_code == 302
+    assert response["Location"].endswith("?section=sla")
+    assert BusinessHoursCalendar.objects.filter(workspace=support_data["workspace"], starts_at="08:30").exists()
+
+    response = client.post(
+        reverse("team_settings"),
+        {
+            "action": "invite",
+            "email": "new-agent@example.com",
+            "invite_type": Invitation.InviteType.INTERNAL,
+            "role": WorkspaceMembership.Role.AGENT,
+            "organization": "",
+            "contact": "",
+            "expires_at": (timezone.now() + timezone.timedelta(days=3)).strftime("%Y-%m-%dT%H:%M"),
+            "username": "",
+        },
+    )
+    assert response.status_code == 302
+    assert response["Location"].endswith("?section=invitations")
+
+    membership = WorkspaceMembership.objects.get(workspace=support_data["workspace"], user=support_data["agent"])
+    response = client.post(
+        reverse("team_settings"),
+        {"membership_id": str(membership.pk), "role": WorkspaceMembership.Role.VIEWER},
+    )
+    assert response.status_code == 302
+    assert response["Location"].endswith("?section=users")
+    membership.refresh_from_db()
+    assert membership.role == WorkspaceMembership.Role.VIEWER
 
 
 @pytest.mark.django_db

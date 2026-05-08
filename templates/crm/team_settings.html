@@ -1,96 +1,89 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="mb-7 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+<div class="tl-page-header">
   <div>
     <div class="tl-kicker">Workspace administration</div>
-    <h1 class="mt-1 text-3xl font-semibold tracking-tight text-slate-950">Settings</h1>
-    <p class="mt-2 max-w-2xl text-sm text-slate-500">Configure storage, service levels, invitations, and account access for this workspace.</p>
+    <h1 class="tl-page-title">Settings</h1>
+    <p class="tl-page-subtitle">Configure storage, service levels, invitations, and account access for this workspace.</p>
   </div>
-  <div class="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
-    <span class="h-2 w-2 rounded-full {% if storage_settings.is_s3_enabled %}bg-emerald-500{% else %}bg-slate-400{% endif %}"></span>
+  <div class="tl-settings-status {% if storage_settings.is_s3_enabled %}text-emerald-700 bg-emerald-50 border-emerald-200{% endif %}">
     {{ storage_settings.get_backend_display }}
   </div>
 </div>
 
-<div class="grid gap-6 xl:grid-cols-[15rem_1fr]">
+<div class="tl-settings-shell">
   <aside class="tl-panel h-fit overflow-hidden">
-    <nav class="grid p-2 text-sm font-semibold text-slate-600">
-      <a class="rounded-md px-3 py-2.5 {% if active_section == 'application' %}bg-blue-50 text-blue-700{% else %}hover:bg-slate-50 hover:text-slate-950{% endif %}" href="{% url 'team_settings' %}?section=application">Application</a>
-      <a class="rounded-md px-3 py-2.5 {% if active_section == 'team' %}bg-blue-50 text-blue-700{% else %}hover:bg-slate-50 hover:text-slate-950{% endif %}" href="{% url 'team_settings' %}?section=team">Team</a>
-      <a class="rounded-md px-3 py-2.5 {% if active_section == 'sla' %}bg-blue-50 text-blue-700{% else %}hover:bg-slate-50 hover:text-slate-950{% endif %}" href="{% url 'team_settings' %}?section=sla">SLA</a>
-      <a class="rounded-md px-3 py-2.5 {% if active_section == 'invitations' %}bg-blue-50 text-blue-700{% else %}hover:bg-slate-50 hover:text-slate-950{% endif %}" href="{% url 'team_settings' %}?section=invitations">Invitations</a>
-      <a class="rounded-md px-3 py-2.5 {% if active_section == 'users' %}bg-blue-50 text-blue-700{% else %}hover:bg-slate-50 hover:text-slate-950{% endif %}" href="{% url 'team_settings' %}?section=users">Users</a>
+    <nav class="tl-settings-nav" aria-label="Settings sections">
+      <a class="{% if active_section == 'application' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=application">Application<span>Storage and private media</span></a>
+      <a class="{% if active_section == 'team' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=team">Team<span>Internal and portal overview</span></a>
+      <a class="{% if active_section == 'sla' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=sla">SLA<span>Targets and business hours</span></a>
+      <a class="{% if active_section == 'invitations' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=invitations">Invitations<span>Invite links and access</span></a>
+      <a class="{% if active_section == 'users' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=users">Users<span>Roles and portal accounts</span></a>
     </nav>
   </aside>
 
   <div class="space-y-6">
     {% if active_section == 'application' %}
-      <section class="tl-panel overflow-hidden">
-        <div class="border-b border-slate-200 bg-slate-50/70 px-6 py-5">
-          <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h2 class="text-lg font-semibold text-slate-950">Application storage</h2>
-              <p class="mt-1 text-sm text-slate-500">Choose where Threadline stores private ticket and email attachments.</p>
-            </div>
-            <div class="grid gap-1 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm lg:min-w-72">
-              <div class="flex justify-between gap-5"><span class="text-slate-500">Backend</span><span class="font-semibold text-slate-900">{{ storage_settings.get_backend_display }}</span></div>
-              <div class="flex justify-between gap-5"><span class="text-slate-500">Bucket</span><span class="font-semibold text-slate-900">{{ storage_settings.bucket_name|default:"Not configured" }}</span></div>
-              <div class="flex justify-between gap-5"><span class="text-slate-500">Updated</span><span class="font-semibold text-slate-900">{{ storage_settings.updated_at|date:"M j, Y g:i A" }}</span></div>
-            </div>
+      <section class="tl-settings-card">
+        <div class="tl-settings-card-header">
+          <div>
+            <div class="tl-kicker">Application</div>
+            <h2 class="tl-settings-card-title">Attachment storage</h2>
+            <p class="tl-settings-card-subtitle">Choose where Threadline stores private ticket and email attachments.</p>
+          </div>
+          <div class="grid min-w-72 gap-2 rounded-lg border border-slate-200 bg-white p-4 text-sm">
+            <div class="flex justify-between gap-6"><span class="text-slate-500">Backend</span><span class="font-semibold text-slate-900">{{ storage_settings.get_backend_display }}</span></div>
+            <div class="flex justify-between gap-6"><span class="text-slate-500">Bucket</span><span class="font-semibold text-slate-900">{{ storage_settings.bucket_name|default:"Not configured" }}</span></div>
+            <div class="flex justify-between gap-6"><span class="text-slate-500">Updated</span><span class="font-semibold text-slate-900">{{ storage_settings.updated_at|date:"M j, Y g:i A" }}</span></div>
           </div>
         </div>
         <form method="post">
           {% csrf_token %}
           <input type="hidden" name="action" value="storage">
-          <div class="grid gap-8 p-6">
-            <div>
-              <label for="{{ storage_form.backend.id_for_label }}">Storage backend</label>
-              <div class="mt-2 max-w-md">{{ storage_form.backend }}</div>
-              <p class="mt-2 text-sm text-slate-500">Local filesystem is best for simple VPS installs. S3-compatible storage supports providers such as MinIO, R2, Backblaze, and AWS S3.</p>
+          <div class="grid gap-6 p-6">
+            <div class="grid gap-4 lg:grid-cols-[minmax(0,26rem)_1fr]">
+              <div>
+                <label for="{{ storage_form.backend.id_for_label }}">Storage backend</label>
+                {{ storage_form.backend }}
+              </div>
+              <div class="tl-settings-callout">
+                Private objects stay behind Django permission checks. Users never receive raw public object URLs in this version.
+              </div>
             </div>
 
-            <div class="rounded-md border border-slate-200 bg-white p-5">
-              <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+            <div class="rounded-lg border border-slate-200 bg-white">
+              <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-slate-50 px-5 py-4">
                 <div>
                   <h3 class="font-semibold text-slate-950">S3-compatible provider</h3>
-                  <p class="mt-1 max-w-2xl text-sm text-slate-500">Objects stay private. Users still download through Django after Threadline checks workspace, ticket, and portal visibility permissions.</p>
+                  <p class="mt-1 text-sm text-slate-500">Works with AWS S3, MinIO, Cloudflare R2, Backblaze, and compatible endpoints.</p>
                 </div>
-                <span class="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Private media</span>
+                <span class="tl-badge bg-slate-100 text-slate-600">Private media</span>
               </div>
-              <div class="grid gap-5 lg:grid-cols-2">
+              <div class="grid gap-6 p-5">
                 <div>
-                  <label for="{{ storage_form.bucket_name.id_for_label }}">Bucket name</label>
-                  {{ storage_form.bucket_name }}
+                  <div class="mb-3 text-sm font-semibold text-slate-800">Bucket and endpoint</div>
+                  <div class="tl-settings-field-grid">
+                    <div><label for="{{ storage_form.bucket_name.id_for_label }}">Bucket name</label>{{ storage_form.bucket_name }}</div>
+                    <div><label for="{{ storage_form.endpoint_url.id_for_label }}">Endpoint URL</label>{{ storage_form.endpoint_url }}</div>
+                    <div><label for="{{ storage_form.region_name.id_for_label }}">Region</label>{{ storage_form.region_name }}</div>
+                    <div><label for="{{ storage_form.addressing_style.id_for_label }}">Addressing style</label>{{ storage_form.addressing_style }}</div>
+                  </div>
                 </div>
-                <div>
-                  <label for="{{ storage_form.endpoint_url.id_for_label }}">Endpoint URL</label>
-                  {{ storage_form.endpoint_url }}
+                <div class="border-t border-slate-200 pt-5">
+                  <div class="mb-3 text-sm font-semibold text-slate-800">Credentials</div>
+                  <div class="tl-settings-field-grid">
+                    <div><label for="{{ storage_form.access_key_id.id_for_label }}">Access key ID</label>{{ storage_form.access_key_id }}</div>
+                    <div><label for="{{ storage_form.secret_access_key.id_for_label }}">Secret access key</label>{{ storage_form.secret_access_key }}<p class="mt-2 text-xs text-slate-500">Leave blank to keep the current secret.</p></div>
+                  </div>
                 </div>
-                <div>
-                  <label for="{{ storage_form.region_name.id_for_label }}">Region</label>
-                  {{ storage_form.region_name }}
-                </div>
-                <div>
-                  <label for="{{ storage_form.addressing_style.id_for_label }}">Addressing style</label>
-                  {{ storage_form.addressing_style }}
-                </div>
-                <div>
-                  <label for="{{ storage_form.access_key_id.id_for_label }}">Access key ID</label>
-                  {{ storage_form.access_key_id }}
-                </div>
-                <div>
-                  <label for="{{ storage_form.secret_access_key.id_for_label }}">Secret access key</label>
-                  {{ storage_form.secret_access_key }}
-                  <p class="mt-2 text-xs text-slate-500">Leave blank to keep the current secret.</p>
-                </div>
-                <div class="lg:col-span-2">
-                  <label for="{{ storage_form.custom_domain.id_for_label }}">Custom domain</label>
-                  {{ storage_form.custom_domain }}
+                <div class="border-t border-slate-200 pt-5">
+                  <div class="mb-3 text-sm font-semibold text-slate-800">Routing</div>
+                  <div><label for="{{ storage_form.custom_domain.id_for_label }}">Custom domain</label>{{ storage_form.custom_domain }}</div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4">
+          <div class="tl-settings-actionbar">
             <p class="text-sm text-slate-500">Changing storage affects new file operations. Existing files are not migrated automatically.</p>
             <button class="tl-button">Save storage</button>
           </div>
@@ -99,120 +92,160 @@
     {% endif %}
 
     {% if active_section == 'team' %}
-      <section class="tl-panel overflow-hidden">
-        <div class="border-b border-slate-200 px-6 py-5">
-          <h2 class="text-lg font-semibold">Team settings</h2>
-          <p class="mt-1 text-sm text-slate-500">Review internal workspace members and customer portal profiles.</p>
-        </div>
-        <div class="grid gap-6 p-6 lg:grid-cols-2">
-          <div>
-            <h3 class="mb-3 font-semibold">Internal users</h3>
-            <div class="overflow-hidden rounded-md border border-slate-200">
-              <table class="tl-table w-full text-left text-sm">
-                <thead><tr><th>User</th><th>Joined</th><th>Role</th><th></th></tr></thead>
-                <tbody>{% for membership in memberships %}<tr class="border-t border-slate-100"><td>{{ membership.user }}</td><td>{{ membership.created_at|date:"M j, Y" }}</td><td><form method="post" class="flex items-center gap-2">{% csrf_token %}<input type="hidden" name="membership_id" value="{{ membership.pk }}"><select name="role">{% for value,label in roles %}<option value="{{ value }}" {% if membership.role == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></td><td><button class="tl-button-secondary">Update</button></form></td></tr>{% endfor %}</tbody>
-              </table>
-            </div>
+      <section class="grid gap-4 md:grid-cols-3">
+        <div class="tl-panel tl-stat"><div class="tl-kicker">Internal members</div><div class="mt-2 text-2xl font-semibold">{{ memberships|length }}</div></div>
+        <div class="tl-panel tl-stat"><div class="tl-kicker">Portal users</div><div class="mt-2 text-2xl font-semibold">{{ customer_profiles|length }}</div></div>
+        <div class="tl-panel tl-stat"><div class="tl-kicker">Open invites</div><div class="mt-2 text-2xl font-semibold">{{ invitations|length }}</div></div>
+      </section>
+      <section class="grid gap-6 xl:grid-cols-2">
+        <div class="tl-settings-card">
+          <div class="tl-settings-card-header"><div><h2 class="tl-settings-card-title">Internal members</h2><p class="tl-settings-card-subtitle">Workspace staff and their current access level.</p></div></div>
+          <div class="overflow-x-auto">
+            <table class="tl-table w-full text-left text-sm">
+              <thead><tr><th>User</th><th>Joined</th><th>Role</th><th>Action</th></tr></thead>
+              <tbody>
+                {% for membership in memberships %}
+                  <tr class="border-t border-slate-100">
+                    <td><div class="font-semibold text-slate-900">{{ membership.user }}</div></td>
+                    <td class="text-slate-500">{{ membership.created_at|date:"M j, Y" }}</td>
+                    <td><form method="post" class="flex min-w-56 items-center gap-2">{% csrf_token %}<input type="hidden" name="membership_id" value="{{ membership.pk }}"><select name="role">{% for value,label in roles %}<option value="{{ value }}" {% if membership.role == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></td>
+                    <td><button class="tl-button-secondary">Update</button></form></td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
-          <div>
-            <h3 class="mb-3 font-semibold">Customer portal users</h3>
-            <div class="overflow-hidden rounded-md border border-slate-200">
-              <table class="tl-table w-full text-left text-sm">
-                <thead><tr><th>User</th><th>Organization</th><th>Contact</th></tr></thead>
-                <tbody>{% for profile in customer_profiles %}<tr class="border-t border-slate-100"><td>{{ profile.user }}</td><td>{{ profile.organization }}</td><td>{{ profile.contact }}</td></tr>{% empty %}<tr><td class="p-5 text-slate-500" colspan="3">No customer portal users.</td></tr>{% endfor %}</tbody>
-              </table>
-            </div>
+        </div>
+        <div class="tl-settings-card">
+          <div class="tl-settings-card-header"><div><h2 class="tl-settings-card-title">Customer portal users</h2><p class="tl-settings-card-subtitle">External users scoped to their organization and contact.</p></div></div>
+          <div class="overflow-x-auto">
+            <table class="tl-table w-full text-left text-sm">
+              <thead><tr><th>User</th><th>Organization</th><th>Contact</th></tr></thead>
+              <tbody>{% for profile in customer_profiles %}<tr class="border-t border-slate-100"><td class="font-semibold text-slate-900">{{ profile.user }}</td><td>{{ profile.organization }}</td><td>{{ profile.contact }}</td></tr>{% empty %}<tr><td class="tl-empty" colspan="3">No customer portal users.</td></tr>{% endfor %}</tbody>
+            </table>
           </div>
         </div>
       </section>
     {% endif %}
 
     {% if active_section == 'sla' %}
-      <section class="tl-panel p-6">
-        <div class="mb-6">
-          <h2 class="text-lg font-semibold">SLA targets</h2>
-          <p class="mt-1 text-sm text-slate-500">Default targets in minutes. Priority policies and business hours override these when configured.</p>
-        </div>
-        <form method="post" class="grid gap-5 md:grid-cols-3">
+      <section class="tl-settings-card">
+        <div class="tl-settings-card-header"><div><div class="tl-kicker">SLA</div><h2 class="tl-settings-card-title">Default response targets</h2><p class="tl-settings-card-subtitle">Base targets in minutes. Priority policies and business hours can override them.</p></div></div>
+        <form method="post">
           {% csrf_token %}
           <input type="hidden" name="action" value="sla">
-          {% for field in sla_form %}<div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
-          <div class="md:col-span-3"><button class="tl-button">Save SLA targets</button></div>
+          <div class="grid gap-4 p-6 md:grid-cols-3">
+            {% for field in sla_form %}<div class="rounded-lg border border-slate-200 bg-slate-50 p-4"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+          </div>
+          <div class="tl-settings-actionbar"><p class="text-sm text-slate-500">These targets drive due dates and at-risk queue behavior.</p><button class="tl-button">Save SLA targets</button></div>
         </form>
       </section>
-      <section class="tl-panel p-6">
-        <h2 class="mb-4 text-lg font-semibold">Priority SLA policies</h2>
-        <div class="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">{% for policy in sla_policies %}<div class="rounded-md border border-slate-200 p-4 text-sm"><div class="font-semibold">{{ policy.get_priority_display }}</div><div class="mt-1 text-slate-500">First {{ policy.first_response_target_minutes }}m / Next {{ policy.next_response_target_minutes }}m / Resolve {{ policy.resolution_target_minutes }}m</div></div>{% empty %}<div class="text-sm text-slate-500">No priority policies yet.</div>{% endfor %}</div>
-        <form method="post" class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+
+      <section class="tl-settings-card">
+        <div class="tl-settings-card-header"><div><h2 class="tl-settings-card-title">Priority policies</h2><p class="tl-settings-card-subtitle">Priority-specific first response, next response, and resolution targets.</p></div></div>
+        <div class="grid gap-3 p-6 md:grid-cols-2 xl:grid-cols-4">
+          {% for policy in sla_policies %}
+            <div class="rounded-lg border border-slate-200 bg-white p-4 text-sm">
+              <div class="font-semibold text-slate-950">{{ policy.get_priority_display }}</div>
+              <div class="mt-2 grid gap-1 text-slate-500"><span>First {{ policy.first_response_target_minutes }}m</span><span>Next {{ policy.next_response_target_minutes }}m</span><span>Resolve {{ policy.resolution_target_minutes }}m</span></div>
+            </div>
+          {% empty %}
+            <div class="tl-settings-callout md:col-span-2 xl:col-span-4">No priority policies yet. Add one below to override the default targets for a ticket priority.</div>
+          {% endfor %}
+        </div>
+        <form method="post">
           {% csrf_token %}
           <input type="hidden" name="action" value="sla_policy">
-          {% for field in sla_policy_form %}<div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
-          <div class="xl:col-span-4"><button class="tl-button-secondary">Save policy</button></div>
+          <div class="grid gap-4 border-t border-slate-200 p-6 md:grid-cols-2 xl:grid-cols-4">
+            {% for field in sla_policy_form %}<div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+          </div>
+          <div class="tl-settings-actionbar"><p class="text-sm text-slate-500">Saving a priority updates that priority policy for this workspace.</p><button class="tl-button-secondary">Save policy</button></div>
         </form>
       </section>
-      <section class="tl-panel p-6">
-        <h2 class="mb-4 text-lg font-semibold">Business hours</h2>
-        <form method="post" class="grid gap-5">
+
+      <section class="tl-settings-card">
+        <div class="tl-settings-card-header"><div><h2 class="tl-settings-card-title">Business hours</h2><p class="tl-settings-card-subtitle">Define the schedule used for SLA calculations and closed dates.</p></div></div>
+        <form method="post">
           {% csrf_token %}
           <input type="hidden" name="action" value="calendar">
-          <div class="grid gap-5 md:grid-cols-3">
-            <div><label for="{{ calendar_form.timezone.id_for_label }}">Timezone</label>{{ calendar_form.timezone }}</div>
-            <div><label for="{{ calendar_form.starts_at.id_for_label }}">Starts at</label>{{ calendar_form.starts_at }}</div>
-            <div><label for="{{ calendar_form.ends_at.id_for_label }}">Ends at</label>{{ calendar_form.ends_at }}</div>
+          <div class="grid gap-5 p-6">
+            <div class="grid gap-4 md:grid-cols-3">
+              <div><label for="{{ calendar_form.timezone.id_for_label }}">Timezone</label>{{ calendar_form.timezone }}</div>
+              <div><label for="{{ calendar_form.starts_at.id_for_label }}">Starts at</label>{{ calendar_form.starts_at }}</div>
+              <div><label for="{{ calendar_form.ends_at.id_for_label }}">Ends at</label>{{ calendar_form.ends_at }}</div>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div class="mb-3 text-sm font-semibold text-slate-800">Operating days</div>
+              <div class="grid gap-3 md:grid-cols-4 xl:grid-cols-7">
+                {% for field in calendar_form %}{% if field.name != 'timezone' and field.name != 'starts_at' and field.name != 'ends_at' and field.name != 'closed_dates' %}<label class="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm normal-case tracking-normal text-slate-700">{{ field }} {{ field.label }}</label>{% endif %}{% endfor %}
+              </div>
+            </div>
+            <div><label for="{{ calendar_form.closed_dates.id_for_label }}">Closed dates</label>{{ calendar_form.closed_dates }}</div>
           </div>
-          <div class="grid gap-3 rounded-md border border-slate-200 p-4 md:grid-cols-7">
-            {% for field in calendar_form %}{% if field.name != 'timezone' and field.name != 'starts_at' and field.name != 'ends_at' and field.name != 'closed_dates' %}<label class="flex items-center gap-2 text-sm normal-case tracking-normal text-slate-700">{{ field }} {{ field.label }}</label>{% endif %}{% endfor %}
-          </div>
-          <div><label for="{{ calendar_form.closed_dates.id_for_label }}">Closed dates</label>{{ calendar_form.closed_dates }}</div>
-          <div><button class="tl-button-secondary">Save calendar</button></div>
+          <div class="tl-settings-actionbar"><p class="text-sm text-slate-500">Closed dates are excluded from business-hour calculations.</p><button class="tl-button-secondary">Save calendar</button></div>
         </form>
       </section>
     {% endif %}
 
     {% if active_section == 'invitations' %}
-      <section class="tl-panel p-6">
-        <h2 class="mb-4 text-lg font-semibold">Create invite link</h2>
-        <form method="post" class="grid gap-5 lg:grid-cols-3">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="invite">
-          {% for field in invitation_form %}<div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
-          <div class="lg:col-span-3"><button class="tl-button">Create invite link</button></div>
-        </form>
-      </section>
-      <section class="tl-panel overflow-hidden">
-        <div class="border-b border-slate-200 px-6 py-5 font-semibold">Recent invitations</div>
-        <div class="divide-y divide-slate-100">
-          {% for invitation in invitations %}
-            <div class="grid gap-1 px-6 py-4 text-sm">
-              <div class="font-semibold">{{ invitation.email }} - {{ invitation.get_invite_type_display }}</div>
-              <div class="break-all text-slate-500">{{ request.scheme }}://{{ request.get_host }}{% url 'accept_invitation' invitation.token %}</div>
+      <div class="grid gap-6 xl:grid-cols-[minmax(0,30rem)_1fr]">
+        <section class="tl-settings-card">
+          <div class="tl-settings-card-header"><div><div class="tl-kicker">Invitations</div><h2 class="tl-settings-card-title">Create invite link</h2><p class="tl-settings-card-subtitle">Generate a workspace or customer portal invitation.</p></div></div>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="invite">
+            <div class="grid gap-4 p-6">
+              {% for field in invitation_form %}<div><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
             </div>
-          {% empty %}
-            <div class="px-6 py-4 text-sm text-slate-500">No invitations yet.</div>
-          {% endfor %}
-        </div>
-      </section>
+            <div class="tl-settings-actionbar"><p class="text-sm text-slate-500">Links expire based on the date above.</p><button class="tl-button">Create invite link</button></div>
+          </form>
+        </section>
+        <section class="tl-settings-card">
+          <div class="tl-settings-card-header"><div><h2 class="tl-settings-card-title">Recent invitations</h2><p class="tl-settings-card-subtitle">Shareable invite links generated for this workspace.</p></div></div>
+          <div class="divide-y divide-slate-100">
+            {% for invitation in invitations %}
+              <div class="grid gap-2 px-6 py-4 text-sm">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="font-semibold text-slate-950">{{ invitation.email }}</div>
+                  <span class="tl-badge bg-blue-50 text-blue-700">{{ invitation.get_invite_type_display }}</span>
+                </div>
+                <div class="break-all rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-slate-600">{{ request.scheme }}://{{ request.get_host }}{% url 'accept_invitation' invitation.token %}</div>
+              </div>
+            {% empty %}
+              <div class="tl-empty">No invitations yet.</div>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
     {% endif %}
 
     {% if active_section == 'users' %}
-      <section class="tl-panel overflow-hidden">
-        <div class="border-b border-slate-200 px-6 py-5">
-          <h2 class="text-lg font-semibold">Users</h2>
-          <p class="mt-1 text-sm text-slate-500">Manage internal roles and review customer portal access.</p>
+      <section class="tl-settings-card">
+        <div class="tl-settings-card-header"><div><div class="tl-kicker">Access management</div><h2 class="tl-settings-card-title">Internal users</h2><p class="tl-settings-card-subtitle">Adjust workspace member roles without changing customer portal access.</p></div></div>
+        <div class="overflow-x-auto">
+          <table class="tl-table w-full text-left text-sm">
+            <thead><tr><th>User</th><th>Joined</th><th>Current role</th><th>Change role</th><th>Action</th></tr></thead>
+            <tbody>
+              {% for membership in memberships %}
+                <tr class="border-t border-slate-100">
+                  <td><div class="font-semibold text-slate-950">{{ membership.user }}</div><div class="tl-meta">Workspace member</div></td>
+                  <td class="text-slate-500">{{ membership.created_at|date:"M j, Y" }}</td>
+                  <td><span class="tl-badge bg-slate-100 text-slate-700">{{ membership.get_role_display }}</span></td>
+                  <td><form method="post" class="flex min-w-56 items-center gap-2">{% csrf_token %}<input type="hidden" name="membership_id" value="{{ membership.pk }}"><select name="role">{% for value,label in roles %}<option value="{{ value }}" {% if membership.role == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></td>
+                  <td><button class="tl-button-secondary">Update role</button></form></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-        <div class="grid gap-6 p-6">
-          <div class="overflow-hidden rounded-md border border-slate-200">
-            <table class="tl-table w-full text-left text-sm">
-              <thead><tr><th>User</th><th>Joined</th><th>Role</th><th></th></tr></thead>
-              <tbody>{% for membership in memberships %}<tr class="border-t border-slate-100"><td>{{ membership.user }}</td><td>{{ membership.created_at|date:"M j, Y" }}</td><td><form method="post" class="flex items-center gap-2">{% csrf_token %}<input type="hidden" name="membership_id" value="{{ membership.pk }}"><select name="role">{% for value,label in roles %}<option value="{{ value }}" {% if membership.role == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></td><td><button class="tl-button-secondary">Update</button></form></td></tr>{% endfor %}</tbody>
-            </table>
-          </div>
-          <div class="overflow-hidden rounded-md border border-slate-200">
-            <table class="tl-table w-full text-left text-sm">
-              <thead><tr><th>Portal user</th><th>Organization</th><th>Contact</th></tr></thead>
-              <tbody>{% for profile in customer_profiles %}<tr class="border-t border-slate-100"><td>{{ profile.user }}</td><td>{{ profile.organization }}</td><td>{{ profile.contact }}</td></tr>{% empty %}<tr><td class="p-5 text-slate-500" colspan="3">No customer portal users.</td></tr>{% endfor %}</tbody>
-            </table>
-          </div>
+      </section>
+      <section class="tl-settings-card">
+        <div class="tl-settings-card-header"><div><h2 class="tl-settings-card-title">Portal users</h2><p class="tl-settings-card-subtitle">Customer accounts are listed for visibility only and remain scoped by organization/contact.</p></div></div>
+        <div class="overflow-x-auto">
+          <table class="tl-table w-full text-left text-sm">
+            <thead><tr><th>Portal user</th><th>Organization</th><th>Contact</th></tr></thead>
+            <tbody>{% for profile in customer_profiles %}<tr class="border-t border-slate-100"><td class="font-semibold text-slate-950">{{ profile.user }}</td><td>{{ profile.organization }}</td><td>{{ profile.contact }}</td></tr>{% empty %}<tr><td class="tl-empty" colspan="3">No customer portal users.</td></tr>{% endfor %}</tbody>
+          </table>
         </div>
       </section>
     {% endif %}
