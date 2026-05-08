@@ -1,4 +1,5 @@
 import json
+import re
 import urllib.error
 import urllib.request
 
@@ -65,7 +66,7 @@ def build_request_payload(ai_settings, messages, max_tokens=1200, structured=Tru
     payload = {
         "model": ai_settings.model or "openrouter/auto",
         "messages": messages,
-        "temperature": 0.2,
+        "temperature": 0,
         "max_tokens": max_tokens,
         "metadata": {"workspace_id": str(ai_settings.workspace_id)},
     }
@@ -100,12 +101,13 @@ def send_chat_completion(ai_settings, messages, max_tokens=1200, structured=True
 
 
 def parse_analysis_response(response):
+    content = ""
     try:
         message = response["choices"][0]["message"]
-        content = message.get("content") or "{}"
-        parsed = json.loads(content)
+        parsed = _parse_message_payload(message)
     except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
-        raise OpenRouterError("OpenRouter returned malformed analysis JSON.", code="malformed_json") from exc
+        preview = _safe_preview(content or _message_content_preview(response))
+        raise OpenRouterError(f"OpenRouter returned malformed analysis JSON. Preview: {preview}", code="malformed_json") from exc
     usage = response.get("usage") or {}
     return parsed, {
         "raw_model": response.get("model", ""),
@@ -113,6 +115,63 @@ def parse_analysis_response(response):
         "completion_tokens": int(usage.get("completion_tokens") or 0),
         "total_tokens": int(usage.get("total_tokens") or 0),
     }
+
+
+def _parse_message_payload(message):
+    for key in ["parsed", "structured", "json"]:
+        value = message.get(key)
+        if isinstance(value, dict):
+            return value
+    content = message.get("content") or ""
+    if isinstance(content, list):
+        content = "".join(part.get("text", "") if isinstance(part, dict) else str(part) for part in content)
+    if isinstance(content, dict):
+        return content
+    return json.loads(_extract_json_object(str(content)))
+
+
+def _extract_json_object(content):
+    cleaned = content.strip()
+    fenced = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", cleaned, flags=re.IGNORECASE | re.DOTALL)
+    if fenced:
+        return fenced.group(1)
+    start = cleaned.find("{")
+    if start < 0:
+        return cleaned
+    depth = 0
+    in_string = False
+    escaped = False
+    for index in range(start, len(cleaned)):
+        char = cleaned[index]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+        if char == '"':
+            in_string = True
+        elif char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return cleaned[start : index + 1]
+    return cleaned[start:]
+
+
+def _message_content_preview(response):
+    try:
+        return response["choices"][0]["message"].get("content") or ""
+    except (KeyError, IndexError, TypeError, AttributeError):
+        return ""
+
+
+def _safe_preview(content):
+    text = str(content).replace("\n", " ").strip()
+    return text[:300] or "empty response"
 
 
 def _code_for_status(status_code):

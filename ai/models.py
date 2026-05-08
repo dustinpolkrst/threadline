@@ -77,8 +77,8 @@ class TicketAIAnalysis(models.Model):
     class Meta:
         ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=["workspace", "ticket", "created_at"]),
-            models.Index(fields=["workspace", "status"]),
+            models.Index(fields=["workspace", "ticket", "created_at"], name="ai_ticketai_workspa_7db50d_idx"),
+            models.Index(fields=["workspace", "status"], name="ai_ticketai_workspa_de143a_idx"),
         ]
 
     def __str__(self):

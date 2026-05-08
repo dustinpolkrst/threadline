@@ -5,7 +5,7 @@ from django.http import FileResponse, Http404
 from django.db.models import Sum
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
-from ai.services import get_ai_settings
+from ai.views import ai_panel_context
 from activity.models import ActivityEvent
 from activity.services import record_event
 from core.permissions import require_internal_workspace
@@ -88,30 +88,28 @@ def ticket_detail(request, pk):
     time_total = time_entries.aggregate(total=Sum("duration_minutes"))["total"] or 0
     active_timer = ActiveTimer.objects.filter(workspace=workspace, user=request.user).select_related("ticket").first()
     activity = ticket.activity_events.filter(workspace=workspace).select_related("actor")
-    ai_settings = get_ai_settings(workspace)
-    ai_analyses = ticket.ai_analyses.filter(workspace=workspace).select_related("requested_by", "applied_by")[:5]
     ticket.sla_state = sla_state(ticket)
+    context = {
+        "ticket": ticket,
+        "comments": comments,
+        "comment_form": comment_form,
+        "time_form": time_form,
+        "timer_start_form": timer_start_form,
+        "timer_stop_form": timer_stop_form,
+        "active_timer": active_timer,
+        "time_entries": time_entries,
+        "time_total": time_total,
+        "activity": activity,
+        "attachments": attachments,
+        "attachment_form": TicketAttachmentForm(),
+        "relation_form": _relation_form(workspace, ticket),
+        "relations": relations.select_related("source", "target", "created_by"),
+    }
+    context.update(ai_panel_context(ticket, workspace))
     return render(
         request,
         "tickets/ticket_detail.html",
-        {
-            "ticket": ticket,
-            "comments": comments,
-            "comment_form": comment_form,
-            "time_form": time_form,
-            "timer_start_form": timer_start_form,
-            "timer_stop_form": timer_stop_form,
-            "active_timer": active_timer,
-            "time_entries": time_entries,
-            "time_total": time_total,
-            "activity": activity,
-            "attachments": attachments,
-            "attachment_form": TicketAttachmentForm(),
-            "relation_form": _relation_form(workspace, ticket),
-            "relations": relations.select_related("source", "target", "created_by"),
-            "ai_settings": ai_settings,
-            "ai_analyses": ai_analyses,
-        },
+        context,
     )
 
 

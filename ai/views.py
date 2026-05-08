@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 
 from core.permissions import require_internal_workspace
 from tickets.models import Ticket
@@ -8,6 +8,14 @@ from tickets.models import Ticket
 from .models import AIProviderSettings, TicketAIAnalysis
 from .services import apply_analysis, create_queued_analysis, get_ai_settings, run_ticket_analysis
 from .tasks import analyze_ticket_with_ai
+
+
+def ai_panel_context(ticket, workspace):
+    return {
+        "ticket": ticket,
+        "ai_settings": get_ai_settings(workspace),
+        "ai_analyses": ticket.ai_analyses.filter(workspace=workspace).select_related("requested_by", "applied_by")[:5],
+    }
 
 
 @login_required
@@ -29,6 +37,13 @@ def ticket_ai_analyze(request, pk):
         run_ticket_analysis(analysis)
         messages.info(request, "AI analysis completed.")
     return redirect("ticket_detail", pk=ticket.pk)
+
+
+@login_required
+def ticket_ai_panel(request, pk):
+    workspace = require_internal_workspace(request.user)
+    ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
+    return render(request, "tickets/_ai_panel.html", ai_panel_context(ticket, workspace))
 
 
 @login_required

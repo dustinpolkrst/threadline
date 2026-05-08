@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
-from ai.client import build_request_payload, parse_analysis_response
+from ai.client import OpenRouterError, build_request_payload, parse_analysis_response
 from ai.context import build_ticket_context
 from ai.models import AIProviderSettings, TicketAIAnalysis
 from ai.services import apply_analysis, run_ticket_analysis
@@ -115,6 +115,46 @@ def test_draft_generation_creates_analysis_without_mutating_ticket(monkeypatch, 
 
 
 @pytest.mark.django_db
+def test_analysis_parser_accepts_fenced_json(ai_data):
+    response = {
+        "model": "openrouter/mock",
+        "choices": [{"message": {"content": f"```json\n{json.dumps(_analysis_payload())}\n```"}}],
+        "usage": {},
+    }
+    parsed, usage = parse_analysis_response(response)
+    assert parsed["summary"] == "Likely SSO configuration issue."
+    assert usage["raw_model"] == "openrouter/mock"
+
+
+@pytest.mark.django_db
+def test_malformed_analysis_response_marks_failed_with_preview(monkeypatch, ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
+    analysis = TicketAIAnalysis.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], requested_by=ai_data["agent"])
+    monkeypatch.setattr(
+        "ai.services.send_chat_completion",
+        lambda ai_settings, messages: {"model": "openrouter/mock", "choices": [{"message": {"content": "I think this is a staging flag issue."}}]},
+    )
+    run_ticket_analysis(analysis)
+    analysis.refresh_from_db()
+    assert analysis.status == TicketAIAnalysis.Status.FAILED
+    assert analysis.error_code == "malformed_json"
+    assert "Preview:" in analysis.error_message
+    assert analysis.completed_at is not None
+
+
+def test_parser_reads_provider_structured_fields():
+    parsed, _ = parse_analysis_response({"model": "m", "choices": [{"message": {"parsed": _analysis_payload()}}]})
+    assert parsed["triage"]["priority"] == "high"
+
+
+def test_parser_raises_with_safe_preview_for_non_json():
+    with pytest.raises(OpenRouterError) as exc:
+        parse_analysis_response({"choices": [{"message": {"content": "not json at all"}}]})
+    assert exc.value.code == "malformed_json"
+    assert "Preview: not json at all" in str(exc.value)
+
+
+@pytest.mark.django_db
 def test_auto_triage_requires_setting_and_apply_updates_ticket(ai_data):
     settings = AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
     analysis = TicketAIAnalysis.objects.create(
@@ -138,6 +178,39 @@ def test_auto_triage_requires_setting_and_apply_updates_ticket(ai_data):
     assert "sso" in ai_data["ticket"].tags
     assert analysis.status == TicketAIAnalysis.Status.APPLIED
     assert TicketComment.objects.filter(ticket=ai_data["ticket"], body__contains="AI triage applied").exists()
+
+
+@pytest.mark.django_db
+def test_ai_panel_polls_for_running_analysis_and_blocks_customers(client, ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
+    TicketAIAnalysis.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], requested_by=ai_data["agent"], status=TicketAIAnalysis.Status.RUNNING)
+    client.login(username="ai-customer", password="password")
+    assert client.get(reverse("ticket_ai_panel", args=[ai_data["ticket"].pk])).status_code == 403
+    client.logout()
+    client.login(username="ai-agent", password="password")
+    response = client.get(reverse("ticket_ai_panel", args=[ai_data["ticket"].pk]))
+    body = response.content.decode()
+    assert response.status_code == 200
+    assert 'hx-trigger="every 3s"' in body
+    assert "Running" in body
+
+
+@pytest.mark.django_db
+def test_ai_panel_terminal_states_do_not_poll(client, ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
+    TicketAIAnalysis.objects.create(
+        workspace=ai_data["workspace"],
+        ticket=ai_data["ticket"],
+        requested_by=ai_data["agent"],
+        status=TicketAIAnalysis.Status.SUCCEEDED,
+        summary="Solved by refreshing flag cache.",
+        solution_draft="Ask engineering to refresh the flag cache.",
+    )
+    client.login(username="ai-agent", password="password")
+    body = client.get(reverse("ticket_ai_panel", args=[ai_data["ticket"].pk])).content.decode()
+    assert 'hx-trigger="every 3s"' not in body
+    assert "Solved by refreshing flag cache." in body
+    assert "Ask engineering to refresh the flag cache." in body
 
 
 def _analysis_payload():

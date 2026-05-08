@@ -90,7 +90,8 @@ def build_analysis_messages(ticket, ai_settings):
         "You are Threadline's internal support triage agent. "
         "Use only the provided workspace-scoped context. "
         "Do not claim to have performed actions. "
-        "Return JSON matching the provided schema. "
+        "Return only valid JSON matching the provided schema. "
+        "No markdown. No code fences. No prose outside JSON. "
         "Drafts are internal suggestions for support agents, never customer-visible."
     )
     user = (
