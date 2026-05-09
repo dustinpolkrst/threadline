@@ -36,7 +36,7 @@
       "source_file": "activity/admin.py",
       "source_location": "L1",
       "id": "activity_admin_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "admin.py"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "activity/models.py",
       "source_location": "L1",
       "id": "activity_models_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "models.py"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "activity/services.py",
       "source_location": "L1",
       "id": "activity_services_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "services.py"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "activity/views.py",
       "source_location": "L1",
       "id": "activity_views_py",
-      "community": 1,
+      "community": 4,
       "norm_label": "views.py"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "activity/views.py",
       "source_location": "L9",
       "id": "activity_views_activity_log",
-      "community": 1,
+      "community": 4,
       "norm_label": "activity_log()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "activity/__init__.py",
       "source_location": "L1",
       "id": "activity_init_py",
-      "community": 38,
+      "community": 40,
       "norm_label": "__init__.py"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "activity/migrations/__init__.py",
       "source_location": "L1",
       "id": "activity_migrations_init_py",
-      "community": 39,
+      "community": 41,
       "norm_label": "__init__.py"
     },
     {
@@ -288,7 +288,7 @@
       "source_file": "ai/client.py",
       "source_location": "L1",
       "id": "ai_client_py",
-      "community": 5,
+      "community": 3,
       "norm_label": "client.py"
     },
     {
@@ -297,7 +297,7 @@
       "source_file": "ai/client.py",
       "source_location": "L12",
       "id": "ai_client_openroutererror",
-      "community": 5,
+      "community": 3,
       "norm_label": "openroutererror"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "",
       "source_location": "",
       "id": "exception",
-      "community": 5,
+      "community": 3,
       "norm_label": "exception"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "ai/client.py",
       "source_location": "L13",
       "id": "ai_client_openroutererror_init",
-      "community": 5,
+      "community": 3,
       "norm_label": ".__init__()"
     },
     {
@@ -324,88 +324,142 @@
       "source_file": "ai/client.py",
       "source_location": "L19",
       "id": "ai_client_ticket_analysis_schema",
-      "community": 5,
+      "community": 3,
       "norm_label": "ticket_analysis_schema()"
+    },
+    {
+      "label": "reply_schema()",
+      "file_type": "code",
+      "source_file": "ai/client.py",
+      "source_location": "L84",
+      "id": "ai_client_reply_schema",
+      "community": 3,
+      "norm_label": "reply_schema()"
+    },
+    {
+      "label": "crm_insight_schema()",
+      "file_type": "code",
+      "source_file": "ai/client.py",
+      "source_location": "L96",
+      "id": "ai_client_crm_insight_schema",
+      "community": 3,
+      "norm_label": "crm_insight_schema()"
+    },
+    {
+      "label": "time_suggestion_schema()",
+      "file_type": "code",
+      "source_file": "ai/client.py",
+      "source_location": "L117",
+      "id": "ai_client_time_suggestion_schema",
+      "community": 3,
+      "norm_label": "time_suggestion_schema()"
+    },
+    {
+      "label": "solution_snippet_schema()",
+      "file_type": "code",
+      "source_file": "ai/client.py",
+      "source_location": "L134",
+      "id": "ai_client_solution_snippet_schema",
+      "community": 3,
+      "norm_label": "solution_snippet_schema()"
+    },
+    {
+      "label": "_schema()",
+      "file_type": "code",
+      "source_file": "ai/client.py",
+      "source_location": "L146",
+      "id": "ai_client_schema",
+      "community": 3,
+      "norm_label": "_schema()"
     },
     {
       "label": "build_request_payload()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L72",
+      "source_location": "L150",
       "id": "ai_client_build_request_payload",
-      "community": 5,
+      "community": 3,
       "norm_label": "build_request_payload()"
     },
     {
       "label": "send_chat_completion()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L87",
+      "source_location": "L165",
       "id": "ai_client_send_chat_completion",
-      "community": 5,
+      "community": 3,
       "norm_label": "send_chat_completion()"
     },
     {
       "label": "parse_analysis_response()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L111",
+      "source_location": "L189",
       "id": "ai_client_parse_analysis_response",
-      "community": 5,
+      "community": 3,
       "norm_label": "parse_analysis_response()"
+    },
+    {
+      "label": "parse_structured_response()",
+      "file_type": "code",
+      "source_file": "ai/client.py",
+      "source_location": "L195",
+      "id": "ai_client_parse_structured_response",
+      "community": 3,
+      "norm_label": "parse_structured_response()"
     },
     {
       "label": "_validate_analysis_payload()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L138",
+      "source_location": "L222",
       "id": "ai_client_validate_analysis_payload",
-      "community": 5,
+      "community": 3,
       "norm_label": "_validate_analysis_payload()"
     },
     {
       "label": "_parse_message_payload()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L153",
+      "source_location": "L237",
       "id": "ai_client_parse_message_payload",
-      "community": 5,
+      "community": 3,
       "norm_label": "_parse_message_payload()"
     },
     {
       "label": "_extract_json_object()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L166",
+      "source_location": "L250",
       "id": "ai_client_extract_json_object",
-      "community": 5,
+      "community": 3,
       "norm_label": "_extract_json_object()"
     },
     {
       "label": "_message_content_preview()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L198",
+      "source_location": "L282",
       "id": "ai_client_message_content_preview",
-      "community": 5,
+      "community": 3,
       "norm_label": "_message_content_preview()"
     },
     {
       "label": "_safe_preview()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L205",
+      "source_location": "L289",
       "id": "ai_client_safe_preview",
-      "community": 5,
+      "community": 3,
       "norm_label": "_safe_preview()"
     },
     {
       "label": "_code_for_status()",
       "file_type": "code",
       "source_file": "ai/client.py",
-      "source_location": "L210",
+      "source_location": "L294",
       "id": "ai_client_code_for_status",
-      "community": 5,
+      "community": 3,
       "norm_label": "_code_for_status()"
     },
     {
@@ -414,35 +468,98 @@
       "source_file": "ai/context.py",
       "source_location": "L1",
       "id": "ai_context_py",
-      "community": 2,
+      "community": 3,
       "norm_label": "context.py"
     },
     {
       "label": "redact_secrets()",
       "file_type": "code",
       "source_file": "ai/context.py",
-      "source_location": "L16",
+      "source_location": "L17",
       "id": "ai_context_redact_secrets",
-      "community": 2,
+      "community": 3,
       "norm_label": "redact_secrets()"
     },
     {
       "label": "build_ticket_context()",
       "file_type": "code",
       "source_file": "ai/context.py",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "ai_context_build_ticket_context",
-      "community": 2,
+      "community": 3,
       "norm_label": "build_ticket_context()"
     },
     {
       "label": "build_analysis_messages()",
       "file_type": "code",
       "source_file": "ai/context.py",
-      "source_location": "L89",
+      "source_location": "L97",
       "id": "ai_context_build_analysis_messages",
-      "community": 2,
+      "community": 3,
       "norm_label": "build_analysis_messages()"
+    },
+    {
+      "label": "build_reply_messages()",
+      "file_type": "code",
+      "source_file": "ai/context.py",
+      "source_location": "L119",
+      "id": "ai_context_build_reply_messages",
+      "community": 3,
+      "norm_label": "build_reply_messages()"
+    },
+    {
+      "label": "build_crm_context()",
+      "file_type": "code",
+      "source_file": "ai/context.py",
+      "source_location": "L136",
+      "id": "ai_context_build_crm_context",
+      "community": 3,
+      "norm_label": "build_crm_context()"
+    },
+    {
+      "label": "build_crm_messages()",
+      "file_type": "code",
+      "source_file": "ai/context.py",
+      "source_location": "L176",
+      "id": "ai_context_build_crm_messages",
+      "community": 3,
+      "norm_label": "build_crm_messages()"
+    },
+    {
+      "label": "build_time_context()",
+      "file_type": "code",
+      "source_file": "ai/context.py",
+      "source_location": "L186",
+      "id": "ai_context_build_time_context",
+      "community": 3,
+      "norm_label": "build_time_context()"
+    },
+    {
+      "label": "build_time_messages()",
+      "file_type": "code",
+      "source_file": "ai/context.py",
+      "source_location": "L212",
+      "id": "ai_context_build_time_messages",
+      "community": 3,
+      "norm_label": "build_time_messages()"
+    },
+    {
+      "label": "build_solution_messages()",
+      "file_type": "code",
+      "source_file": "ai/context.py",
+      "source_location": "L219",
+      "id": "ai_context_build_solution_messages",
+      "community": 3,
+      "norm_label": "build_solution_messages()"
+    },
+    {
+      "label": "find_unlogged_work()",
+      "file_type": "code",
+      "source_file": "ai/context.py",
+      "source_location": "L226",
+      "id": "ai_context_find_unlogged_work",
+      "community": 2,
+      "norm_label": "find_unlogged_work()"
     },
     {
       "label": "crypto.py",
@@ -513,7 +630,7 @@
       "source_file": "ai/forms.py",
       "source_location": "L1",
       "id": "ai_forms_py",
-      "community": 4,
+      "community": 0,
       "norm_label": "forms.py"
     },
     {
@@ -522,7 +639,7 @@
       "source_file": "ai/forms.py",
       "source_location": "L6",
       "id": "ai_forms_aiprovidersettingsform",
-      "community": 4,
+      "community": 5,
       "norm_label": "aiprovidersettingsform"
     },
     {
@@ -531,34 +648,34 @@
       "source_file": "ai/forms.py",
       "source_location": "L13",
       "id": "ai_forms_meta",
-      "community": 4,
+      "community": 0,
       "norm_label": "meta"
     },
     {
       "label": ".clean_zdr_only()",
       "file_type": "code",
       "source_file": "ai/forms.py",
-      "source_location": "L26",
+      "source_location": "L43",
       "id": "ai_forms_aiprovidersettingsform_clean_zdr_only",
-      "community": 4,
+      "community": 5,
       "norm_label": ".clean_zdr_only()"
     },
     {
       "label": ".clean_max_historical_tickets()",
       "file_type": "code",
       "source_file": "ai/forms.py",
-      "source_location": "L29",
+      "source_location": "L46",
       "id": "ai_forms_aiprovidersettingsform_clean_max_historical_tickets",
-      "community": 4,
+      "community": 5,
       "norm_label": ".clean_max_historical_tickets()"
     },
     {
       "label": ".save()",
       "file_type": "code",
       "source_file": "ai/forms.py",
-      "source_location": "L33",
+      "source_location": "L50",
       "id": "ai_forms_aiprovidersettingsform_save",
-      "community": 4,
+      "community": 5,
       "norm_label": ".save()"
     },
     {
@@ -592,7 +709,7 @@
       "label": "Meta",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L36",
+      "source_location": "L39",
       "id": "ai_models_meta",
       "community": 0,
       "norm_label": "meta"
@@ -601,7 +718,7 @@
       "label": "has_api_key()",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L40",
+      "source_location": "L43",
       "id": "ai_models_has_api_key",
       "community": 0,
       "norm_label": "has_api_key()"
@@ -610,7 +727,7 @@
       "label": ".get_api_key()",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L43",
+      "source_location": "L46",
       "id": "ai_models_aiprovidersettings_get_api_key",
       "community": 11,
       "norm_label": ".get_api_key()"
@@ -619,7 +736,7 @@
       "label": ".set_api_key()",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L46",
+      "source_location": "L49",
       "id": "ai_models_aiprovidersettings_set_api_key",
       "community": 11,
       "norm_label": ".set_api_key()"
@@ -628,7 +745,7 @@
       "label": ".save()",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L50",
+      "source_location": "L53",
       "id": "ai_models_aiprovidersettings_save",
       "community": 11,
       "norm_label": ".save()"
@@ -637,7 +754,7 @@
       "label": ".__str__()",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L57",
+      "source_location": "L60",
       "id": "ai_models_aiprovidersettings_str",
       "community": 0,
       "norm_label": ".__str__()"
@@ -646,7 +763,7 @@
       "label": "TicketAIAnalysis",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L61",
+      "source_location": "L64",
       "id": "ai_models_ticketaianalysis",
       "community": 0,
       "norm_label": "ticketaianalysis"
@@ -655,7 +772,7 @@
       "label": "Status",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L62",
+      "source_location": "L65",
       "id": "ai_models_status",
       "community": 0,
       "norm_label": "status"
@@ -664,7 +781,7 @@
       "label": "Mode",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L69",
+      "source_location": "L72",
       "id": "ai_models_mode",
       "community": 0,
       "norm_label": "mode"
@@ -673,7 +790,7 @@
       "label": ".__str__()",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L114",
+      "source_location": "L121",
       "id": "ai_models_ticketaianalysis_str",
       "community": 0,
       "norm_label": ".__str__()"
@@ -682,7 +799,7 @@
       "label": "AIRun",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L118",
+      "source_location": "L125",
       "id": "ai_models_airun",
       "community": 0,
       "norm_label": "airun"
@@ -691,7 +808,7 @@
       "label": "Workflow",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L119",
+      "source_location": "L126",
       "id": "ai_models_workflow",
       "community": 0,
       "norm_label": "workflow"
@@ -700,7 +817,7 @@
       "label": ".__str__()",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L163",
+      "source_location": "L174",
       "id": "ai_models_airun_str",
       "community": 0,
       "norm_label": ".__str__()"
@@ -709,7 +826,7 @@
       "label": "AISuggestedAction",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L167",
+      "source_location": "L178",
       "id": "ai_models_aisuggestedaction",
       "community": 0,
       "norm_label": "aisuggestedaction"
@@ -718,7 +835,7 @@
       "label": "TicketReplyDraft",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L190",
+      "source_location": "L201",
       "id": "ai_models_ticketreplydraft",
       "community": 0,
       "norm_label": "ticketreplydraft"
@@ -727,7 +844,7 @@
       "label": "Audience",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L191",
+      "source_location": "L202",
       "id": "ai_models_audience",
       "community": 0,
       "norm_label": "audience"
@@ -736,7 +853,7 @@
       "label": "CRMInsight",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L217",
+      "source_location": "L229",
       "id": "ai_models_crminsight",
       "community": 0,
       "norm_label": "crminsight"
@@ -745,7 +862,7 @@
       "label": "TimeEntrySuggestion",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L235",
+      "source_location": "L250",
       "id": "ai_models_timeentrysuggestion",
       "community": 0,
       "norm_label": "timeentrysuggestion"
@@ -754,7 +871,7 @@
       "label": "WorkspaceDigest",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L258",
+      "source_location": "L274",
       "id": "ai_models_workspacedigest",
       "community": 0,
       "norm_label": "workspacedigest"
@@ -763,10 +880,19 @@
       "label": "SolutionSnippet",
       "file_type": "code",
       "source_file": "ai/models.py",
-      "source_location": "L276",
+      "source_location": "L292",
       "id": "ai_models_solutionsnippet",
       "community": 0,
       "norm_label": "solutionsnippet"
+    },
+    {
+      "label": "QueueIntelligenceSnapshot",
+      "file_type": "code",
+      "source_file": "ai/models.py",
+      "source_location": "L308",
+      "id": "ai_models_queueintelligencesnapshot",
+      "community": 0,
+      "norm_label": "queueintelligencesnapshot"
     },
     {
       "label": "services.py",
@@ -781,7 +907,7 @@
       "label": "get_ai_settings()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L15",
+      "source_location": "L18",
       "id": "ai_services_get_ai_settings",
       "community": 2,
       "norm_label": "get_ai_settings()"
@@ -790,16 +916,16 @@
       "label": "run_ticket_analysis()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L20",
+      "source_location": "L23",
       "id": "ai_services_run_ticket_analysis",
-      "community": 2,
+      "community": 3,
       "norm_label": "run_ticket_analysis()"
     },
     {
       "label": "create_queued_analysis()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L62",
+      "source_location": "L69",
       "id": "ai_services_create_queued_analysis",
       "community": 2,
       "norm_label": "create_queued_analysis()"
@@ -808,7 +934,7 @@
       "label": "apply_analysis()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L72",
+      "source_location": "L79",
       "id": "ai_services_apply_analysis",
       "community": 2,
       "norm_label": "apply_analysis()"
@@ -817,16 +943,34 @@
       "label": "apply_selected_ticket_suggestions()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L106",
+      "source_location": "L113",
       "id": "ai_services_apply_selected_ticket_suggestions",
       "community": 2,
       "norm_label": "apply_selected_ticket_suggestions()"
     },
     {
+      "label": "generate_reply_draft()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L165",
+      "id": "ai_services_generate_reply_draft",
+      "community": 2,
+      "norm_label": "generate_reply_draft()"
+    },
+    {
+      "label": "approve_reply_draft()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L190",
+      "id": "ai_services_approve_reply_draft",
+      "community": 2,
+      "norm_label": "approve_reply_draft()"
+    },
+    {
       "label": "record_analysis_feedback()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L156",
+      "source_location": "L204",
       "id": "ai_services_record_analysis_feedback",
       "community": 2,
       "norm_label": "record_analysis_feedback()"
@@ -835,16 +979,25 @@
       "label": "generate_crm_insight()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L164",
+      "source_location": "L212",
       "id": "ai_services_generate_crm_insight",
       "community": 2,
       "norm_label": "generate_crm_insight()"
     },
     {
+      "label": "_heuristic_crm_insight()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L241",
+      "id": "ai_services_heuristic_crm_insight",
+      "community": 2,
+      "norm_label": "_heuristic_crm_insight()"
+    },
+    {
       "label": "suggest_time_entry()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L182",
+      "source_location": "L263",
       "id": "ai_services_suggest_time_entry",
       "community": 2,
       "norm_label": "suggest_time_entry()"
@@ -853,7 +1006,7 @@
       "label": "approve_time_suggestion()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L191",
+      "source_location": "L285",
       "id": "ai_services_approve_time_suggestion",
       "community": 2,
       "norm_label": "approve_time_suggestion()"
@@ -862,7 +1015,7 @@
       "label": "generate_workspace_digest()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L211",
+      "source_location": "L305",
       "id": "ai_services_generate_workspace_digest",
       "community": 2,
       "norm_label": "generate_workspace_digest()"
@@ -871,34 +1024,70 @@
       "label": "create_solution_snippet()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L225",
+      "source_location": "L319",
       "id": "ai_services_create_solution_snippet",
       "community": 2,
       "norm_label": "create_solution_snippet()"
     },
     {
+      "label": "approve_solution_snippet()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L341",
+      "id": "ai_services_approve_solution_snippet",
+      "community": 2,
+      "norm_label": "approve_solution_snippet()"
+    },
+    {
+      "label": "reject_solution_snippet()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L350",
+      "id": "ai_services_reject_solution_snippet",
+      "community": 2,
+      "norm_label": "reject_solution_snippet()"
+    },
+    {
+      "label": "build_queue_intelligence()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L357",
+      "id": "ai_services_build_queue_intelligence",
+      "community": 2,
+      "norm_label": "build_queue_intelligence()"
+    },
+    {
+      "label": "time_cleanup_context()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L384",
+      "id": "ai_services_time_cleanup_context",
+      "community": 2,
+      "norm_label": "time_cleanup_context()"
+    },
+    {
       "label": "fail_analysis()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L235",
+      "source_location": "L391",
       "id": "ai_services_fail_analysis",
-      "community": 2,
+      "community": 3,
       "norm_label": "fail_analysis()"
     },
     {
       "label": "_sync_ticket_workbench_artifacts()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L244",
+      "source_location": "L400",
       "id": "ai_services_sync_ticket_workbench_artifacts",
-      "community": 2,
+      "community": 3,
       "norm_label": "_sync_ticket_workbench_artifacts()"
     },
     {
       "label": "_start_run()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L286",
+      "source_location": "L447",
       "id": "ai_services_start_run",
       "community": 2,
       "norm_label": "_start_run()"
@@ -907,16 +1096,43 @@
       "label": "_finish_run()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L290",
+      "source_location": "L451",
       "id": "ai_services_finish_run",
       "community": 2,
       "norm_label": "_finish_run()"
     },
     {
+      "label": "_fail_run()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L466",
+      "id": "ai_services_fail_run",
+      "community": 2,
+      "norm_label": "_fail_run()"
+    },
+    {
+      "label": "_elapsed_ms()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L475",
+      "id": "ai_services_elapsed_ms",
+      "community": 2,
+      "norm_label": "_elapsed_ms()"
+    },
+    {
+      "label": "_ticket_card()",
+      "file_type": "code",
+      "source_file": "ai/services.py",
+      "source_location": "L479",
+      "id": "ai_services_ticket_card",
+      "community": 2,
+      "norm_label": "_ticket_card()"
+    },
+    {
       "label": "_internal_comment_body()",
       "file_type": "code",
       "source_file": "ai/services.py",
-      "source_location": "L298",
+      "source_location": "L483",
       "id": "ai_services_internal_comment_body",
       "community": 2,
       "norm_label": "_internal_comment_body()"
@@ -952,7 +1168,7 @@
       "label": "suggest_time_entry_with_ai()",
       "file_type": "code",
       "source_file": "ai/tasks.py",
-      "source_location": "L26",
+      "source_location": "L29",
       "id": "ai_tasks_suggest_time_entry_with_ai",
       "community": 2,
       "norm_label": "suggest_time_entry_with_ai()"
@@ -961,7 +1177,7 @@
       "label": "generate_workspace_digest_with_ai()",
       "file_type": "code",
       "source_file": "ai/tasks.py",
-      "source_location": "L36",
+      "source_location": "L39",
       "id": "ai_tasks_generate_workspace_digest_with_ai",
       "community": 2,
       "norm_label": "generate_workspace_digest_with_ai()"
@@ -970,10 +1186,28 @@
       "label": "create_solution_snippet_with_ai()",
       "file_type": "code",
       "source_file": "ai/tasks.py",
-      "source_location": "L43",
+      "source_location": "L49",
       "id": "ai_tasks_create_solution_snippet_with_ai",
       "community": 2,
       "norm_label": "create_solution_snippet_with_ai()"
+    },
+    {
+      "label": "generate_reply_draft_with_ai()",
+      "file_type": "code",
+      "source_file": "ai/tasks.py",
+      "source_location": "L59",
+      "id": "ai_tasks_generate_reply_draft_with_ai",
+      "community": 2,
+      "norm_label": "generate_reply_draft_with_ai()"
+    },
+    {
+      "label": "build_queue_intelligence_with_ai()",
+      "file_type": "code",
+      "source_file": "ai/tasks.py",
+      "source_location": "L69",
+      "id": "ai_tasks_build_queue_intelligence_with_ai",
+      "community": 2,
+      "norm_label": "build_queue_intelligence_with_ai()"
     },
     {
       "label": "views.py",
@@ -997,7 +1231,7 @@
       "label": "ticket_ai_analyze()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L26",
+      "source_location": "L27",
       "id": "ai_views_ticket_ai_analyze",
       "community": 2,
       "norm_label": "ticket_ai_analyze()"
@@ -1006,7 +1240,7 @@
       "label": "ticket_ai_panel()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L47",
+      "source_location": "L48",
       "id": "ai_views_ticket_ai_panel",
       "community": 2,
       "norm_label": "ticket_ai_panel()"
@@ -1015,7 +1249,7 @@
       "label": "ticket_ai_apply()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L54",
+      "source_location": "L55",
       "id": "ai_views_ticket_ai_apply",
       "community": 2,
       "norm_label": "ticket_ai_apply()"
@@ -1024,7 +1258,7 @@
       "label": "ticket_ai_apply_selected()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L67",
+      "source_location": "L68",
       "id": "ai_views_ticket_ai_apply_selected",
       "community": 2,
       "norm_label": "ticket_ai_apply_selected()"
@@ -1033,7 +1267,7 @@
       "label": "ticket_ai_feedback()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L81",
+      "source_location": "L82",
       "id": "ai_views_ticket_ai_feedback",
       "community": 2,
       "norm_label": "ticket_ai_feedback()"
@@ -1042,7 +1276,7 @@
       "label": "ticket_ai_time_suggestion()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L91",
+      "source_location": "L92",
       "id": "ai_views_ticket_ai_time_suggestion",
       "community": 2,
       "norm_label": "ticket_ai_time_suggestion()"
@@ -1051,25 +1285,52 @@
       "label": "ticket_ai_time_approve()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L103",
+      "source_location": "L104",
       "id": "ai_views_ticket_ai_time_approve",
       "community": 2,
       "norm_label": "ticket_ai_time_approve()"
     },
     {
+      "label": "ticket_ai_reply_draft()",
+      "file_type": "code",
+      "source_file": "ai/views.py",
+      "source_location": "L114",
+      "id": "ai_views_ticket_ai_reply_draft",
+      "community": 2,
+      "norm_label": "ticket_ai_reply_draft()"
+    },
+    {
+      "label": "ticket_ai_reply_approve()",
+      "file_type": "code",
+      "source_file": "ai/views.py",
+      "source_location": "L131",
+      "id": "ai_views_ticket_ai_reply_approve",
+      "community": 2,
+      "norm_label": "ticket_ai_reply_approve()"
+    },
+    {
       "label": "ticket_ai_solution_memory()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L113",
+      "source_location": "L141",
       "id": "ai_views_ticket_ai_solution_memory",
       "community": 2,
       "norm_label": "ticket_ai_solution_memory()"
     },
     {
+      "label": "ticket_ai_solution_decision()",
+      "file_type": "code",
+      "source_file": "ai/views.py",
+      "source_location": "L150",
+      "id": "ai_views_ticket_ai_solution_decision",
+      "community": 2,
+      "norm_label": "ticket_ai_solution_decision()"
+    },
+    {
       "label": "organization_ai_briefing()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L122",
+      "source_location": "L164",
       "id": "ai_views_organization_ai_briefing",
       "community": 2,
       "norm_label": "organization_ai_briefing()"
@@ -1078,7 +1339,7 @@
       "label": "ai_audit()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L134",
+      "source_location": "L179",
       "id": "ai_views_ai_audit",
       "community": 2,
       "norm_label": "ai_audit()"
@@ -1087,10 +1348,28 @@
       "label": "workspace_ai_digest()",
       "file_type": "code",
       "source_file": "ai/views.py",
-      "source_location": "L142",
+      "source_location": "L189",
       "id": "ai_views_workspace_ai_digest",
       "community": 2,
       "norm_label": "workspace_ai_digest()"
+    },
+    {
+      "label": "workspace_ai_queue_intelligence()",
+      "file_type": "code",
+      "source_file": "ai/views.py",
+      "source_location": "L200",
+      "id": "ai_views_workspace_ai_queue_intelligence",
+      "community": 2,
+      "norm_label": "workspace_ai_queue_intelligence()"
+    },
+    {
+      "label": "time_ai_cleanup()",
+      "file_type": "code",
+      "source_file": "ai/views.py",
+      "source_location": "L214",
+      "id": "ai_views_time_ai_cleanup",
+      "community": 2,
+      "norm_label": "time_ai_cleanup()"
     },
     {
       "label": "__init__.py",
@@ -1098,7 +1377,7 @@
       "source_file": "ai/__init__.py",
       "source_location": "L1",
       "id": "ai_init_py",
-      "community": 40,
+      "community": 42,
       "norm_label": "__init__.py"
     },
     {
@@ -1107,7 +1386,7 @@
       "source_file": "ai/management/__init__.py",
       "source_location": "L1",
       "id": "ai_management_init_py",
-      "community": 41,
+      "community": 43,
       "norm_label": "__init__.py"
     },
     {
@@ -1116,7 +1395,7 @@
       "source_file": "ai/management/commands/test_ai_provider.py",
       "source_location": "L1",
       "id": "ai_management_commands_test_ai_provider_py",
-      "community": 5,
+      "community": 3,
       "norm_label": "test_ai_provider.py"
     },
     {
@@ -1125,7 +1404,7 @@
       "source_file": "ai/management/commands/test_ai_provider.py",
       "source_location": "L10",
       "id": "commands_test_ai_provider_command",
-      "community": 5,
+      "community": 3,
       "norm_label": "command"
     },
     {
@@ -1134,7 +1413,7 @@
       "source_file": "",
       "source_location": "",
       "id": "basecommand",
-      "community": 5,
+      "community": 3,
       "norm_label": "basecommand"
     },
     {
@@ -1143,7 +1422,7 @@
       "source_file": "ai/management/commands/test_ai_provider.py",
       "source_location": "L13",
       "id": "commands_test_ai_provider_command_add_arguments",
-      "community": 5,
+      "community": 3,
       "norm_label": ".add_arguments()"
     },
     {
@@ -1152,7 +1431,7 @@
       "source_file": "ai/management/commands/test_ai_provider.py",
       "source_location": "L16",
       "id": "commands_test_ai_provider_command_handle",
-      "community": 5,
+      "community": 3,
       "norm_label": ".handle()"
     },
     {
@@ -1161,7 +1440,7 @@
       "source_file": "ai/management/commands/__init__.py",
       "source_location": "L1",
       "id": "ai_management_commands_init_py",
-      "community": 42,
+      "community": 44,
       "norm_label": "__init__.py"
     },
     {
@@ -1219,12 +1498,30 @@
       "norm_label": "migration"
     },
     {
+      "label": "0004_aiprovidersettings_queue_intelligence_enabled_and_more.py",
+      "file_type": "code",
+      "source_file": "ai/migrations/0004_aiprovidersettings_queue_intelligence_enabled_and_more.py",
+      "source_location": "L1",
+      "id": "ai_migrations_0004_aiprovidersettings_queue_intelligence_enabled_and_more_py",
+      "community": 22,
+      "norm_label": "0004_aiprovidersettings_queue_intelligence_enabled_and_more.py"
+    },
+    {
+      "label": "Migration",
+      "file_type": "code",
+      "source_file": "ai/migrations/0004_aiprovidersettings_queue_intelligence_enabled_and_more.py",
+      "source_location": "L8",
+      "id": "migrations_0004_aiprovidersettings_queue_intelligence_enabled_and_more_migration",
+      "community": 22,
+      "norm_label": "migration"
+    },
+    {
       "label": "__init__.py",
       "file_type": "code",
       "source_file": "ai/migrations/__init__.py",
       "source_location": "L1",
       "id": "ai_migrations_init_py",
-      "community": 43,
+      "community": 45,
       "norm_label": "__init__.py"
     },
     {
@@ -1467,7 +1764,7 @@
       "source_file": "communications/__init__.py",
       "source_location": "L1",
       "id": "communications_init_py",
-      "community": 44,
+      "community": 46,
       "norm_label": "__init__.py"
     },
     {
@@ -1485,7 +1782,7 @@
       "source_file": "communications/migrations/0002_emailattachment.py",
       "source_location": "L1",
       "id": "communications_migrations_0002_emailattachment_py",
-      "community": 22,
+      "community": 23,
       "norm_label": "0002_emailattachment.py"
     },
     {
@@ -1494,7 +1791,7 @@
       "source_file": "communications/migrations/0002_emailattachment.py",
       "source_location": "L8",
       "id": "migrations_0002_emailattachment_migration",
-      "community": 22,
+      "community": 23,
       "norm_label": "migration"
     },
     {
@@ -1503,7 +1800,7 @@
       "source_file": "communications/migrations/__init__.py",
       "source_location": "L1",
       "id": "communications_migrations_init_py",
-      "community": 45,
+      "community": 47,
       "norm_label": "__init__.py"
     },
     {
@@ -1512,7 +1809,7 @@
       "source_file": "config/asgi.py",
       "source_location": "L1",
       "id": "config_asgi_py",
-      "community": 23,
+      "community": 24,
       "norm_label": "asgi.py"
     },
     {
@@ -1521,7 +1818,7 @@
       "source_file": "config/asgi.py",
       "source_location": "L1",
       "id": "config_asgi_rationale_1",
-      "community": 23,
+      "community": 24,
       "norm_label": "asgi config for config project.  it exposes the asgi callable as a module-leve"
     },
     {
@@ -1530,7 +1827,7 @@
       "source_file": "config/celery.py",
       "source_location": "L1",
       "id": "config_celery_py",
-      "community": 26,
+      "community": 25,
       "norm_label": "celery.py"
     },
     {
@@ -1539,7 +1836,7 @@
       "source_file": "config/settings.py",
       "source_location": "L1",
       "id": "config_settings_py",
-      "community": 46,
+      "community": 48,
       "norm_label": "settings.py"
     },
     {
@@ -1548,7 +1845,7 @@
       "source_file": "config/urls.py",
       "source_location": "L1",
       "id": "config_urls_py",
-      "community": 24,
+      "community": 26,
       "norm_label": "urls.py"
     },
     {
@@ -1557,7 +1854,7 @@
       "source_file": "config/urls.py",
       "source_location": "L1",
       "id": "config_urls_rationale_1",
-      "community": 24,
+      "community": 26,
       "norm_label": "url configuration for config project.  the `urlpatterns` list routes urls to v"
     },
     {
@@ -1566,7 +1863,7 @@
       "source_file": "config/wsgi.py",
       "source_location": "L1",
       "id": "config_wsgi_py",
-      "community": 25,
+      "community": 27,
       "norm_label": "wsgi.py"
     },
     {
@@ -1575,7 +1872,7 @@
       "source_file": "config/wsgi.py",
       "source_location": "L1",
       "id": "config_wsgi_rationale_1",
-      "community": 25,
+      "community": 27,
       "norm_label": "wsgi config for config project.  it exposes the wsgi callable as a module-leve"
     },
     {
@@ -1584,7 +1881,7 @@
       "source_file": "config/__init__.py",
       "source_location": "L1",
       "id": "config_init_py",
-      "community": 26,
+      "community": 25,
       "norm_label": "__init__.py"
     },
     {
@@ -1593,7 +1890,7 @@
       "source_file": "core/admin.py",
       "source_location": "L1",
       "id": "core_admin_py",
-      "community": 47,
+      "community": 49,
       "norm_label": "admin.py"
     },
     {
@@ -1620,7 +1917,7 @@
       "source_file": "core/pagination.py",
       "source_location": "L1",
       "id": "core_pagination_py",
-      "community": 1,
+      "community": 4,
       "norm_label": "pagination.py"
     },
     {
@@ -1629,7 +1926,7 @@
       "source_file": "core/pagination.py",
       "source_location": "L4",
       "id": "core_pagination_paginate",
-      "community": 1,
+      "community": 4,
       "norm_label": "paginate()"
     },
     {
@@ -1638,7 +1935,7 @@
       "source_file": "core/permissions.py",
       "source_location": "L1",
       "id": "core_permissions_py",
-      "community": 1,
+      "community": 4,
       "norm_label": "permissions.py"
     },
     {
@@ -1647,7 +1944,7 @@
       "source_file": "core/permissions.py",
       "source_location": "L5",
       "id": "core_permissions_require_internal_workspace",
-      "community": 1,
+      "community": 2,
       "norm_label": "require_internal_workspace()"
     },
     {
@@ -1656,7 +1953,7 @@
       "source_file": "core/permissions.py",
       "source_location": "L12",
       "id": "core_permissions_customer_profile_for",
-      "community": 1,
+      "community": 4,
       "norm_label": "customer_profile_for()"
     },
     {
@@ -1791,16 +2088,16 @@
       "source_file": "core/views.py",
       "source_location": "L1",
       "id": "core_views_py",
-      "community": 1,
+      "community": 2,
       "norm_label": "views.py"
     },
     {
       "label": "dashboard()",
       "file_type": "code",
       "source_file": "core/views.py",
-      "source_location": "L11",
+      "source_location": "L13",
       "id": "core_views_dashboard",
-      "community": 1,
+      "community": 2,
       "norm_label": "dashboard()"
     },
     {
@@ -1809,7 +2106,7 @@
       "source_file": "core/__init__.py",
       "source_location": "L1",
       "id": "core_init_py",
-      "community": 48,
+      "community": 50,
       "norm_label": "__init__.py"
     },
     {
@@ -1818,7 +2115,7 @@
       "source_file": "core/migrations/__init__.py",
       "source_location": "L1",
       "id": "core_migrations_init_py",
-      "community": 49,
+      "community": 51,
       "norm_label": "__init__.py"
     },
     {
@@ -1845,7 +2142,7 @@
       "source_file": "core/templatetags/__init__.py",
       "source_location": "L1",
       "id": "core_templatetags_init_py",
-      "community": 50,
+      "community": 52,
       "norm_label": "__init__.py"
     },
     {
@@ -1854,7 +2151,7 @@
       "source_file": "crm/admin.py",
       "source_location": "L1",
       "id": "crm_admin_py",
-      "community": 3,
+      "community": 0,
       "norm_label": "admin.py"
     },
     {
@@ -1881,7 +2178,7 @@
       "source_file": "crm/forms.py",
       "source_location": "L1",
       "id": "crm_forms_py",
-      "community": 3,
+      "community": 0,
       "norm_label": "forms.py"
     },
     {
@@ -1890,7 +2187,7 @@
       "source_file": "crm/forms.py",
       "source_location": "L5",
       "id": "crm_forms_organizationform",
-      "community": 3,
+      "community": 4,
       "norm_label": "organizationform"
     },
     {
@@ -1899,7 +2196,7 @@
       "source_file": "crm/forms.py",
       "source_location": "L6",
       "id": "crm_forms_meta",
-      "community": 3,
+      "community": 0,
       "norm_label": "meta"
     },
     {
@@ -1908,7 +2205,7 @@
       "source_file": "crm/forms.py",
       "source_location": "L27",
       "id": "crm_forms_organizationform_init",
-      "community": 3,
+      "community": 4,
       "norm_label": ".__init__()"
     },
     {
@@ -1917,7 +2214,7 @@
       "source_file": "crm/forms.py",
       "source_location": "L37",
       "id": "crm_forms_contactform",
-      "community": 3,
+      "community": 0,
       "norm_label": "contactform"
     },
     {
@@ -1926,7 +2223,7 @@
       "source_file": "crm/forms.py",
       "source_location": "L43",
       "id": "crm_forms_crmimportuploadform",
-      "community": 3,
+      "community": 0,
       "norm_label": "crmimportuploadform"
     },
     {
@@ -1935,7 +2232,7 @@
       "source_file": "crm/imports.py",
       "source_location": "L1",
       "id": "crm_imports_py",
-      "community": 3,
+      "community": 4,
       "norm_label": "imports.py"
     },
     {
@@ -1944,7 +2241,7 @@
       "source_file": "crm/imports.py",
       "source_location": "L11",
       "id": "crm_imports_create_import_job",
-      "community": 3,
+      "community": 4,
       "norm_label": "create_import_job()"
     },
     {
@@ -1953,7 +2250,7 @@
       "source_file": "crm/imports.py",
       "source_location": "L23",
       "id": "crm_imports_save_import_resolutions",
-      "community": 3,
+      "community": 4,
       "norm_label": "save_import_resolutions()"
     },
     {
@@ -1962,7 +2259,7 @@
       "source_file": "crm/imports.py",
       "source_location": "L31",
       "id": "crm_imports_confirm_import_job",
-      "community": 3,
+      "community": 4,
       "norm_label": "confirm_import_job()"
     },
     {
@@ -1971,7 +2268,7 @@
       "source_file": "crm/imports.py",
       "source_location": "L49",
       "id": "crm_imports_validate_import_row",
-      "community": 3,
+      "community": 4,
       "norm_label": "validate_import_row()"
     },
     {
@@ -1980,7 +2277,7 @@
       "source_file": "crm/imports.py",
       "source_location": "L63",
       "id": "crm_imports_detect_duplicate",
-      "community": 3,
+      "community": 4,
       "norm_label": "detect_duplicate()"
     },
     {
@@ -1989,7 +2286,7 @@
       "source_file": "crm/imports.py",
       "source_location": "L78",
       "id": "crm_imports_import_row",
-      "community": 3,
+      "community": 4,
       "norm_label": "import_row()"
     },
     {
@@ -1998,7 +2295,7 @@
       "source_file": "crm/imports.py",
       "source_location": "L106",
       "id": "crm_imports_apply_organization_row",
-      "community": 3,
+      "community": 4,
       "norm_label": "apply_organization_row()"
     },
     {
@@ -2007,7 +2304,7 @@
       "source_file": "crm/models.py",
       "source_location": "L1",
       "id": "crm_models_py",
-      "community": 3,
+      "community": 0,
       "norm_label": "models.py"
     },
     {
@@ -2025,7 +2322,7 @@
       "source_file": "crm/models.py",
       "source_location": "L8",
       "id": "crm_models_status",
-      "community": 3,
+      "community": 0,
       "norm_label": "status"
     },
     {
@@ -2034,7 +2331,7 @@
       "source_file": "crm/models.py",
       "source_location": "L14",
       "id": "crm_models_tier",
-      "community": 3,
+      "community": 0,
       "norm_label": "tier"
     },
     {
@@ -2043,7 +2340,7 @@
       "source_file": "crm/models.py",
       "source_location": "L39",
       "id": "crm_models_meta",
-      "community": 3,
+      "community": 0,
       "norm_label": "meta"
     },
     {
@@ -2079,7 +2376,7 @@
       "source_file": "crm/models.py",
       "source_location": "L76",
       "id": "crm_models_crmimportjob",
-      "community": 3,
+      "community": 0,
       "norm_label": "crmimportjob"
     },
     {
@@ -2088,7 +2385,7 @@
       "source_file": "crm/models.py",
       "source_location": "L77",
       "id": "crm_models_importtype",
-      "community": 3,
+      "community": 0,
       "norm_label": "importtype"
     },
     {
@@ -2097,7 +2394,7 @@
       "source_file": "crm/models.py",
       "source_location": "L100",
       "id": "crm_models_crmimportrow",
-      "community": 3,
+      "community": 0,
       "norm_label": "crmimportrow"
     },
     {
@@ -2106,7 +2403,7 @@
       "source_file": "crm/models.py",
       "source_location": "L101",
       "id": "crm_models_resolution",
-      "community": 3,
+      "community": 0,
       "norm_label": "resolution"
     },
     {
@@ -2115,7 +2412,7 @@
       "source_file": "crm/settings_handlers.py",
       "source_location": "L1",
       "id": "crm_settings_handlers_py",
-      "community": 4,
+      "community": 5,
       "norm_label": "settings_handlers.py"
     },
     {
@@ -2124,7 +2421,7 @@
       "source_file": "crm/settings_handlers.py",
       "source_location": "L17",
       "id": "crm_settings_handlers_normalize_settings_section",
-      "community": 4,
+      "community": 5,
       "norm_label": "normalize_settings_section()"
     },
     {
@@ -2133,7 +2430,7 @@
       "source_file": "crm/settings_handlers.py",
       "source_location": "L21",
       "id": "crm_settings_handlers_handle_settings_post",
-      "community": 4,
+      "community": 5,
       "norm_label": "handle_settings_post()"
     },
     {
@@ -2142,7 +2439,7 @@
       "source_file": "crm/settings_handlers.py",
       "source_location": "L78",
       "id": "crm_settings_handlers_build_settings_context",
-      "community": 4,
+      "community": 5,
       "norm_label": "build_settings_context()"
     },
     {
@@ -2151,7 +2448,7 @@
       "source_file": "crm/settings_handlers.py",
       "source_location": "L101",
       "id": "crm_settings_handlers_settings_redirect",
-      "community": 4,
+      "community": 5,
       "norm_label": "settings_redirect()"
     },
     {
@@ -2160,7 +2457,7 @@
       "source_file": "crm/settings_handlers.py",
       "source_location": "L105",
       "id": "crm_settings_handlers_scope_invitation_form",
-      "community": 4,
+      "community": 5,
       "norm_label": "_scope_invitation_form()"
     },
     {
@@ -2169,7 +2466,7 @@
       "source_file": "crm/settings_handlers.py",
       "source_location": "L110",
       "id": "crm_settings_handlers_handle_ai_test",
-      "community": 4,
+      "community": 5,
       "norm_label": "_handle_ai_test()"
     },
     {
@@ -2178,7 +2475,7 @@
       "source_file": "crm/views.py",
       "source_location": "L1",
       "id": "crm_views_py",
-      "community": 3,
+      "community": 4,
       "norm_label": "views.py"
     },
     {
@@ -2187,7 +2484,7 @@
       "source_file": "crm/views.py",
       "source_location": "L22",
       "id": "crm_views_organization_list",
-      "community": 1,
+      "community": 4,
       "norm_label": "organization_list()"
     },
     {
@@ -2196,7 +2493,7 @@
       "source_file": "crm/views.py",
       "source_location": "L40",
       "id": "crm_views_organization_create",
-      "community": 3,
+      "community": 4,
       "norm_label": "organization_create()"
     },
     {
@@ -2205,7 +2502,7 @@
       "source_file": "crm/views.py",
       "source_location": "L53",
       "id": "crm_views_organization_edit",
-      "community": 3,
+      "community": 4,
       "norm_label": "organization_edit()"
     },
     {
@@ -2214,7 +2511,7 @@
       "source_file": "crm/views.py",
       "source_location": "L65",
       "id": "crm_views_organization_detail",
-      "community": 3,
+      "community": 4,
       "norm_label": "organization_detail()"
     },
     {
@@ -2223,7 +2520,7 @@
       "source_file": "crm/views.py",
       "source_location": "L82",
       "id": "crm_views_contact_list",
-      "community": 1,
+      "community": 4,
       "norm_label": "contact_list()"
     },
     {
@@ -2232,7 +2529,7 @@
       "source_file": "crm/views.py",
       "source_location": "L95",
       "id": "crm_views_contact_create",
-      "community": 3,
+      "community": 4,
       "norm_label": "contact_create()"
     },
     {
@@ -2241,7 +2538,7 @@
       "source_file": "crm/views.py",
       "source_location": "L109",
       "id": "crm_views_contact_detail",
-      "community": 3,
+      "community": 4,
       "norm_label": "contact_detail()"
     },
     {
@@ -2250,7 +2547,7 @@
       "source_file": "crm/views.py",
       "source_location": "L119",
       "id": "crm_views_team_settings",
-      "community": 4,
+      "community": 5,
       "norm_label": "team_settings()"
     },
     {
@@ -2259,7 +2556,7 @@
       "source_file": "crm/views.py",
       "source_location": "L133",
       "id": "crm_views_crm_import_upload",
-      "community": 3,
+      "community": 4,
       "norm_label": "crm_import_upload()"
     },
     {
@@ -2268,7 +2565,7 @@
       "source_file": "crm/views.py",
       "source_location": "L143",
       "id": "crm_views_crm_import_preview",
-      "community": 3,
+      "community": 4,
       "norm_label": "crm_import_preview()"
     },
     {
@@ -2277,7 +2574,7 @@
       "source_file": "crm/views.py",
       "source_location": "L156",
       "id": "crm_views_crm_import_template",
-      "community": 3,
+      "community": 4,
       "norm_label": "crm_import_template()"
     },
     {
@@ -2286,7 +2583,7 @@
       "source_file": "crm/views.py",
       "source_location": "L168",
       "id": "crm_views_template_headers",
-      "community": 3,
+      "community": 4,
       "norm_label": "_template_headers()"
     },
     {
@@ -2295,7 +2592,7 @@
       "source_file": "crm/__init__.py",
       "source_location": "L1",
       "id": "crm_init_py",
-      "community": 51,
+      "community": 53,
       "norm_label": "__init__.py"
     },
     {
@@ -2313,7 +2610,7 @@
       "source_file": "crm/migrations/0002_organization_account_owner_organization_address_and_more.py",
       "source_location": "L1",
       "id": "crm_migrations_0002_organization_account_owner_organization_address_and_more_py",
-      "community": 27,
+      "community": 28,
       "norm_label": "0002_organization_account_owner_organization_address_and_more.py"
     },
     {
@@ -2322,7 +2619,7 @@
       "source_file": "crm/migrations/0002_organization_account_owner_organization_address_and_more.py",
       "source_location": "L6",
       "id": "migrations_0002_organization_account_owner_organization_address_and_more_migration",
-      "community": 27,
+      "community": 28,
       "norm_label": "migration"
     },
     {
@@ -2331,7 +2628,7 @@
       "source_file": "crm/migrations/0003_crmimportjob_crmimportrow_and_more.py",
       "source_location": "L1",
       "id": "crm_migrations_0003_crmimportjob_crmimportrow_and_more_py",
-      "community": 28,
+      "community": 29,
       "norm_label": "0003_crmimportjob_crmimportrow_and_more.py"
     },
     {
@@ -2340,7 +2637,7 @@
       "source_file": "crm/migrations/0003_crmimportjob_crmimportrow_and_more.py",
       "source_location": "L9",
       "id": "migrations_0003_crmimportjob_crmimportrow_and_more_migration",
-      "community": 28,
+      "community": 29,
       "norm_label": "migration"
     },
     {
@@ -2349,7 +2646,7 @@
       "source_file": "crm/migrations/0004_crmimportrow_duplicate_resolution.py",
       "source_location": "L1",
       "id": "crm_migrations_0004_crmimportrow_duplicate_resolution_py",
-      "community": 29,
+      "community": 30,
       "norm_label": "0004_crmimportrow_duplicate_resolution.py"
     },
     {
@@ -2358,7 +2655,7 @@
       "source_file": "crm/migrations/0004_crmimportrow_duplicate_resolution.py",
       "source_location": "L4",
       "id": "migrations_0004_crmimportrow_duplicate_resolution_migration",
-      "community": 29,
+      "community": 30,
       "norm_label": "migration"
     },
     {
@@ -2367,7 +2664,7 @@
       "source_file": "crm/migrations/__init__.py",
       "source_location": "L1",
       "id": "crm_migrations_init_py",
-      "community": 52,
+      "community": 54,
       "norm_label": "__init__.py"
     },
     {
@@ -2511,7 +2808,7 @@
       "source_file": "customer_portal/__init__.py",
       "source_location": "L1",
       "id": "customer_portal_init_py",
-      "community": 53,
+      "community": 55,
       "norm_label": "__init__.py"
     },
     {
@@ -2529,7 +2826,7 @@
       "source_file": "customer_portal/migrations/__init__.py",
       "source_location": "L1",
       "id": "customer_portal_migrations_init_py",
-      "community": 54,
+      "community": 56,
       "norm_label": "__init__.py"
     },
     {
@@ -2599,7 +2896,7 @@
       "label": "Meta",
       "file_type": "code",
       "source_file": "search/models.py",
-      "source_location": "L26",
+      "source_location": "L27",
       "id": "search_models_meta",
       "community": 14,
       "norm_label": "meta"
@@ -2608,7 +2905,7 @@
       "label": ".__str__()",
       "file_type": "code",
       "source_file": "search/models.py",
-      "source_location": "L33",
+      "source_location": "L34",
       "id": "search_models_searchdocument_str",
       "community": 14,
       "norm_label": ".__str__()"
@@ -2619,7 +2916,7 @@
       "source_file": "search/services.py",
       "source_location": "L1",
       "id": "search_services_py",
-      "community": 3,
+      "community": 4,
       "norm_label": "services.py"
     },
     {
@@ -2628,7 +2925,7 @@
       "source_file": "search/services.py",
       "source_location": "L17",
       "id": "search_services_uses_postgres",
-      "community": 3,
+      "community": 4,
       "norm_label": "uses_postgres()"
     },
     {
@@ -2637,115 +2934,124 @@
       "source_file": "search/services.py",
       "source_location": "L21",
       "id": "search_services_rebuild_workspace_index",
-      "community": 3,
+      "community": 4,
       "norm_label": "rebuild_workspace_index()"
     },
     {
       "label": "index_ticket()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L47",
+      "source_location": "L56",
       "id": "search_services_index_ticket",
-      "community": 3,
+      "community": 4,
       "norm_label": "index_ticket()"
     },
     {
       "label": "index_comment()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L70",
+      "source_location": "L79",
       "id": "search_services_index_comment",
-      "community": 3,
+      "community": 4,
       "norm_label": "index_comment()"
     },
     {
       "label": "index_organization()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L87",
+      "source_location": "L96",
       "id": "search_services_index_organization",
-      "community": 3,
+      "community": 4,
       "norm_label": "index_organization()"
     },
     {
       "label": "index_contact()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L116",
+      "source_location": "L125",
       "id": "search_services_index_contact",
-      "community": 3,
+      "community": 4,
       "norm_label": "index_contact()"
+    },
+    {
+      "label": "index_solution_snippet()",
+      "file_type": "code",
+      "source_file": "search/services.py",
+      "source_location": "L141",
+      "id": "search_services_index_solution_snippet",
+      "community": 4,
+      "norm_label": "index_solution_snippet()"
     },
     {
       "label": "search_documents_for_user()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L132",
+      "source_location": "L157",
       "id": "search_services_search_documents_for_user",
-      "community": 3,
+      "community": 4,
       "norm_label": "search_documents_for_user()"
     },
     {
       "label": "refresh_search_vectors()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L179",
+      "source_location": "L205",
       "id": "search_services_refresh_search_vectors",
-      "community": 3,
+      "community": 4,
       "norm_label": "refresh_search_vectors()"
     },
     {
       "label": "_upsert_document()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L188",
+      "source_location": "L214",
       "id": "search_services_upsert_document",
-      "community": 3,
+      "community": 4,
       "norm_label": "_upsert_document()"
     },
     {
       "label": "_refresh_document_vector()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L203",
+      "source_location": "L229",
       "id": "search_services_refresh_document_vector",
-      "community": 3,
+      "community": 4,
       "norm_label": "_refresh_document_vector()"
     },
     {
       "label": "_plain_snippet()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L208",
+      "source_location": "L234",
       "id": "search_services_plain_snippet",
-      "community": 3,
+      "community": 4,
       "norm_label": "_plain_snippet()"
     },
     {
       "label": "_document_result()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L225",
+      "source_location": "L251",
       "id": "search_services_document_result",
-      "community": 3,
+      "community": 4,
       "norm_label": "_document_result()"
     },
     {
       "label": "_document_url()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L235",
+      "source_location": "L261",
       "id": "search_services_document_url",
-      "community": 3,
+      "community": 4,
       "norm_label": "_document_url()"
     },
     {
       "label": "_comment_ticket_map()",
       "file_type": "code",
       "source_file": "search/services.py",
-      "source_location": "L249",
+      "source_location": "L277",
       "id": "search_services_comment_ticket_map",
-      "community": 3,
+      "community": 4,
       "norm_label": "_comment_ticket_map()"
     },
     {
@@ -2772,7 +3078,7 @@
       "source_file": "search/views.py",
       "source_location": "L1",
       "id": "search_views_py",
-      "community": 3,
+      "community": 4,
       "norm_label": "views.py"
     },
     {
@@ -2781,7 +3087,7 @@
       "source_file": "search/views.py",
       "source_location": "L7",
       "id": "search_views_search_page",
-      "community": 3,
+      "community": 4,
       "norm_label": "search_page()"
     },
     {
@@ -2790,7 +3096,7 @@
       "source_file": "search/__init__.py",
       "source_location": "L1",
       "id": "search_init_py",
-      "community": 55,
+      "community": 57,
       "norm_label": "__init__.py"
     },
     {
@@ -2799,7 +3105,7 @@
       "source_file": "search/management/__init__.py",
       "source_location": "L1",
       "id": "search_management_init_py",
-      "community": 56,
+      "community": 58,
       "norm_label": "__init__.py"
     },
     {
@@ -2808,7 +3114,7 @@
       "source_file": "search/management/commands/rebuild_search_index.py",
       "source_location": "L1",
       "id": "search_management_commands_rebuild_search_index_py",
-      "community": 5,
+      "community": 3,
       "norm_label": "rebuild_search_index.py"
     },
     {
@@ -2817,7 +3123,7 @@
       "source_file": "search/management/commands/rebuild_search_index.py",
       "source_location": "L7",
       "id": "commands_rebuild_search_index_command",
-      "community": 5,
+      "community": 3,
       "norm_label": "command"
     },
     {
@@ -2826,7 +3132,7 @@
       "source_file": "search/management/commands/rebuild_search_index.py",
       "source_location": "L10",
       "id": "commands_rebuild_search_index_command_add_arguments",
-      "community": 5,
+      "community": 3,
       "norm_label": ".add_arguments()"
     },
     {
@@ -2835,7 +3141,7 @@
       "source_file": "search/management/commands/rebuild_search_index.py",
       "source_location": "L14",
       "id": "commands_rebuild_search_index_command_handle",
-      "community": 5,
+      "community": 3,
       "norm_label": ".handle()"
     },
     {
@@ -2844,7 +3150,7 @@
       "source_file": "search/management/commands/__init__.py",
       "source_location": "L1",
       "id": "search_management_commands_init_py",
-      "community": 57,
+      "community": 59,
       "norm_label": "__init__.py"
     },
     {
@@ -2857,12 +3163,30 @@
       "norm_label": "0001_initial.py"
     },
     {
+      "label": "0002_alter_searchdocument_entity_type.py",
+      "file_type": "code",
+      "source_file": "search/migrations/0002_alter_searchdocument_entity_type.py",
+      "source_location": "L1",
+      "id": "search_migrations_0002_alter_searchdocument_entity_type_py",
+      "community": 31,
+      "norm_label": "0002_alter_searchdocument_entity_type.py"
+    },
+    {
+      "label": "Migration",
+      "file_type": "code",
+      "source_file": "search/migrations/0002_alter_searchdocument_entity_type.py",
+      "source_location": "L6",
+      "id": "migrations_0002_alter_searchdocument_entity_type_migration",
+      "community": 31,
+      "norm_label": "migration"
+    },
+    {
       "label": "__init__.py",
       "file_type": "code",
       "source_file": "search/migrations/__init__.py",
       "source_location": "L1",
       "id": "search_migrations_init_py",
-      "community": 58,
+      "community": 60,
       "norm_label": "__init__.py"
     },
     {
@@ -2871,7 +3195,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L1",
       "id": "tests_test_ai_foundation_py",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_ai_foundation.py"
     },
     {
@@ -2880,7 +3204,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L20",
       "id": "tests_test_ai_foundation_ai_data",
-      "community": 2,
+      "community": 3,
       "norm_label": "ai_data()"
     },
     {
@@ -2889,7 +3213,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L51",
       "id": "tests_test_ai_foundation_test_openrouter_request_enforces_zdr_and_schema",
-      "community": 5,
+      "community": 3,
       "norm_label": "test_openrouter_request_enforces_zdr_and_schema()"
     },
     {
@@ -2898,7 +3222,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L60",
       "id": "tests_test_ai_foundation_test_ai_settings_preserves_api_key_and_blocks_customer",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_ai_settings_preserves_api_key_and_blocks_customer()"
     },
     {
@@ -2907,7 +3231,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L90",
       "id": "tests_test_ai_foundation_test_ticket_context_is_workspace_and_client_scoped",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_ticket_context_is_workspace_and_client_scoped()"
     },
     {
@@ -2916,7 +3240,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L100",
       "id": "tests_test_ai_foundation_test_draft_generation_creates_analysis_without_mutating_ticket",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_draft_generation_creates_analysis_without_mutating_ticket()"
     },
     {
@@ -2925,7 +3249,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L126",
       "id": "tests_test_ai_foundation_test_analysis_parser_accepts_fenced_json",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_analysis_parser_accepts_fenced_json()"
     },
     {
@@ -2934,7 +3258,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L138",
       "id": "tests_test_ai_foundation_test_malformed_analysis_response_marks_failed_with_preview",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_malformed_analysis_response_marks_failed_with_preview()"
     },
     {
@@ -2943,7 +3267,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L153",
       "id": "tests_test_ai_foundation_test_parser_reads_provider_structured_fields",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_parser_reads_provider_structured_fields()"
     },
     {
@@ -2952,7 +3276,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L158",
       "id": "tests_test_ai_foundation_test_parser_raises_with_safe_preview_for_non_json",
-      "community": 5,
+      "community": 3,
       "norm_label": "test_parser_raises_with_safe_preview_for_non_json()"
     },
     {
@@ -2961,7 +3285,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L165",
       "id": "tests_test_ai_foundation_test_parser_rejects_missing_required_fields",
-      "community": 5,
+      "community": 3,
       "norm_label": "test_parser_rejects_missing_required_fields()"
     },
     {
@@ -2970,7 +3294,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L172",
       "id": "tests_test_ai_foundation_test_parser_reports_truncated_output",
-      "community": 5,
+      "community": 3,
       "norm_label": "test_parser_reports_truncated_output()"
     },
     {
@@ -2979,7 +3303,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L180",
       "id": "tests_test_ai_foundation_test_truncated_analysis_response_marks_failed",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_truncated_analysis_response_marks_failed()"
     },
     {
@@ -2988,7 +3312,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L195",
       "id": "tests_test_ai_foundation_test_analysis_context_is_compact_json_and_bounded",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_analysis_context_is_compact_json_and_bounded()"
     },
     {
@@ -2997,7 +3321,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L211",
       "id": "tests_test_ai_foundation_test_run_ticket_analysis_uses_configured_token_budget",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_run_ticket_analysis_uses_configured_token_budget()"
     },
     {
@@ -3015,7 +3339,7 @@
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L258",
       "id": "tests_test_ai_foundation_test_apply_selected_ticket_suggestions_are_human_approved",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_apply_selected_ticket_suggestions_are_human_approved()"
     },
     {
@@ -3028,39 +3352,75 @@
       "norm_label": "test_crm_time_and_digest_ai_artifacts_are_workspace_scoped()"
     },
     {
-      "label": "test_ai_enqueue_failure_does_not_run_synchronously()",
+      "label": "test_reply_composer_creates_draft_and_approval_posts_public_comment()",
       "file_type": "code",
       "source_file": "tests/test_ai_foundation.py",
       "source_location": "L292",
-      "id": "tests_test_ai_foundation_test_ai_enqueue_failure_does_not_run_synchronously",
+      "id": "tests_test_ai_foundation_test_reply_composer_creates_draft_and_approval_posts_public_comment",
       "community": 2,
+      "norm_label": "test_reply_composer_creates_draft_and_approval_posts_public_comment()"
+    },
+    {
+      "label": "test_solution_memory_approval_indexes_internal_snippet()",
+      "file_type": "code",
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L315",
+      "id": "tests_test_ai_foundation_test_solution_memory_approval_indexes_internal_snippet",
+      "community": 2,
+      "norm_label": "test_solution_memory_approval_indexes_internal_snippet()"
+    },
+    {
+      "label": "test_openrouter_backed_crm_insight_uses_structured_output()",
+      "file_type": "code",
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L324",
+      "id": "tests_test_ai_foundation_test_openrouter_backed_crm_insight_uses_structured_output",
+      "community": 2,
+      "norm_label": "test_openrouter_backed_crm_insight_uses_structured_output()"
+    },
+    {
+      "label": "test_queue_intelligence_and_time_cleanup_are_workspace_scoped()",
+      "file_type": "code",
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L360",
+      "id": "tests_test_ai_foundation_test_queue_intelligence_and_time_cleanup_are_workspace_scoped",
+      "community": 2,
+      "norm_label": "test_queue_intelligence_and_time_cleanup_are_workspace_scoped()"
+    },
+    {
+      "label": "test_ai_enqueue_failure_does_not_run_synchronously()",
+      "file_type": "code",
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L371",
+      "id": "tests_test_ai_foundation_test_ai_enqueue_failure_does_not_run_synchronously",
+      "community": 3,
       "norm_label": "test_ai_enqueue_failure_does_not_run_synchronously()"
     },
     {
       "label": "test_ai_panel_polls_for_running_analysis_and_blocks_customers()",
       "file_type": "code",
       "source_file": "tests/test_ai_foundation.py",
-      "source_location": "L312",
+      "source_location": "L391",
       "id": "tests_test_ai_foundation_test_ai_panel_polls_for_running_analysis_and_blocks_customers",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_ai_panel_polls_for_running_analysis_and_blocks_customers()"
     },
     {
       "label": "test_ai_panel_terminal_states_do_not_poll()",
       "file_type": "code",
       "source_file": "tests/test_ai_foundation.py",
-      "source_location": "L327",
+      "source_location": "L406",
       "id": "tests_test_ai_foundation_test_ai_panel_terminal_states_do_not_poll",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_ai_panel_terminal_states_do_not_poll()"
     },
     {
       "label": "_analysis_payload()",
       "file_type": "code",
       "source_file": "tests/test_ai_foundation.py",
-      "source_location": "L344",
+      "source_location": "L423",
       "id": "tests_test_ai_foundation_analysis_payload",
-      "community": 2,
+      "community": 3,
       "norm_label": "_analysis_payload()"
     },
     {
@@ -3384,7 +3744,7 @@
       "source_file": "tickets/admin.py",
       "source_location": "L1",
       "id": "tickets_admin_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "admin.py"
     },
     {
@@ -3438,7 +3798,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L1",
       "id": "tickets_forms_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "forms.py"
     },
     {
@@ -3447,7 +3807,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L5",
       "id": "tickets_forms_ticketform",
-      "community": 0,
+      "community": 1,
       "norm_label": "ticketform"
     },
     {
@@ -3456,7 +3816,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L6",
       "id": "tickets_forms_meta",
-      "community": 0,
+      "community": 1,
       "norm_label": "meta"
     },
     {
@@ -3465,7 +3825,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L12",
       "id": "tickets_forms_portalticketform",
-      "community": 0,
+      "community": 1,
       "norm_label": "portalticketform"
     },
     {
@@ -3474,7 +3834,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L18",
       "id": "tickets_forms_commentform",
-      "community": 0,
+      "community": 1,
       "norm_label": "commentform"
     },
     {
@@ -3483,7 +3843,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L24",
       "id": "tickets_forms_portalcommentform",
-      "community": 0,
+      "community": 1,
       "norm_label": "portalcommentform"
     },
     {
@@ -3492,7 +3852,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L30",
       "id": "tickets_forms_ticketattachmentform",
-      "community": 0,
+      "community": 1,
       "norm_label": "ticketattachmentform"
     },
     {
@@ -3501,7 +3861,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L36",
       "id": "tickets_forms_ticketrelationform",
-      "community": 0,
+      "community": 1,
       "norm_label": "ticketrelationform"
     },
     {
@@ -3510,7 +3870,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L42",
       "id": "tickets_forms_savedticketfilterform",
-      "community": 0,
+      "community": 1,
       "norm_label": "savedticketfilterform"
     },
     {
@@ -3519,7 +3879,7 @@
       "source_file": "tickets/forms.py",
       "source_location": "L48",
       "id": "tickets_forms_bulkticketactionform",
-      "community": 0,
+      "community": 1,
       "norm_label": "bulkticketactionform"
     },
     {
@@ -3528,7 +3888,7 @@
       "source_file": "tickets/models.py",
       "source_location": "L1",
       "id": "tickets_models_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "models.py"
     },
     {
@@ -3591,7 +3951,7 @@
       "source_file": "tickets/models.py",
       "source_location": "L66",
       "id": "tickets_models_ticketcomment",
-      "community": 0,
+      "community": 1,
       "norm_label": "ticketcomment"
     },
     {
@@ -3609,7 +3969,7 @@
       "source_file": "tickets/models.py",
       "source_location": "L86",
       "id": "tickets_models_ticketcomment_str",
-      "community": 0,
+      "community": 1,
       "norm_label": ".__str__()"
     },
     {
@@ -3618,7 +3978,7 @@
       "source_file": "tickets/models.py",
       "source_location": "L90",
       "id": "tickets_models_ticketattachment",
-      "community": 0,
+      "community": 1,
       "norm_label": "ticketattachment"
     },
     {
@@ -3627,7 +3987,7 @@
       "source_file": "tickets/models.py",
       "source_location": "L107",
       "id": "tickets_models_ticketattachment_str",
-      "community": 0,
+      "community": 1,
       "norm_label": ".__str__()"
     },
     {
@@ -3636,7 +3996,7 @@
       "source_file": "tickets/models.py",
       "source_location": "L111",
       "id": "tickets_models_ticketrelation",
-      "community": 0,
+      "community": 1,
       "norm_label": "ticketrelation"
     },
     {
@@ -3654,7 +4014,7 @@
       "source_file": "tickets/models.py",
       "source_location": "L131",
       "id": "tickets_models_savedticketfilter",
-      "community": 0,
+      "community": 1,
       "norm_label": "savedticketfilter"
     },
     {
@@ -3843,7 +4203,7 @@
       "source_file": "tickets/views.py",
       "source_location": "L170",
       "id": "tickets_views_ticket_merge",
-      "community": 1,
+      "community": 2,
       "norm_label": "ticket_merge()"
     },
     {
@@ -3861,7 +4221,7 @@
       "source_file": "tickets/views.py",
       "source_location": "L197",
       "id": "tickets_views_ticket_bulk_action",
-      "community": 1,
+      "community": 4,
       "norm_label": "ticket_bulk_action()"
     },
     {
@@ -3906,7 +4266,7 @@
       "source_file": "tickets/__init__.py",
       "source_location": "L1",
       "id": "tickets_init_py",
-      "community": 59,
+      "community": 61,
       "norm_label": "__init__.py"
     },
     {
@@ -3924,7 +4284,7 @@
       "source_file": "tickets/migrations/0002_alter_ticketcomment_visibility.py",
       "source_location": "L1",
       "id": "tickets_migrations_0002_alter_ticketcomment_visibility_py",
-      "community": 30,
+      "community": 32,
       "norm_label": "0002_alter_ticketcomment_visibility.py"
     },
     {
@@ -3933,7 +4293,7 @@
       "source_file": "tickets/migrations/0002_alter_ticketcomment_visibility.py",
       "source_location": "L6",
       "id": "migrations_0002_alter_ticketcomment_visibility_migration",
-      "community": 30,
+      "community": 32,
       "norm_label": "migration"
     },
     {
@@ -3942,7 +4302,7 @@
       "source_file": "tickets/migrations/0003_ticket_first_response_due_at_and_more.py",
       "source_location": "L1",
       "id": "tickets_migrations_0003_ticket_first_response_due_at_and_more_py",
-      "community": 31,
+      "community": 33,
       "norm_label": "0003_ticket_first_response_due_at_and_more.py"
     },
     {
@@ -3951,7 +4311,7 @@
       "source_file": "tickets/migrations/0003_ticket_first_response_due_at_and_more.py",
       "source_location": "L7",
       "id": "migrations_0003_ticket_first_response_due_at_and_more_migration",
-      "community": 31,
+      "community": 33,
       "norm_label": "migration"
     },
     {
@@ -3960,7 +4320,7 @@
       "source_file": "tickets/migrations/0004_savedticketfilter_ticketrelation_and_more.py",
       "source_location": "L1",
       "id": "tickets_migrations_0004_savedticketfilter_ticketrelation_and_more_py",
-      "community": 32,
+      "community": 34,
       "norm_label": "0004_savedticketfilter_ticketrelation_and_more.py"
     },
     {
@@ -3969,7 +4329,7 @@
       "source_file": "tickets/migrations/0004_savedticketfilter_ticketrelation_and_more.py",
       "source_location": "L9",
       "id": "migrations_0004_savedticketfilter_ticketrelation_and_more_migration",
-      "community": 32,
+      "community": 34,
       "norm_label": "migration"
     },
     {
@@ -3978,7 +4338,7 @@
       "source_file": "tickets/migrations/__init__.py",
       "source_location": "L1",
       "id": "tickets_migrations_init_py",
-      "community": 60,
+      "community": 62,
       "norm_label": "__init__.py"
     },
     {
@@ -3987,7 +4347,7 @@
       "source_file": "time_tracking/admin.py",
       "source_location": "L1",
       "id": "time_tracking_admin_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "admin.py"
     },
     {
@@ -4068,7 +4428,7 @@
       "source_file": "time_tracking/models.py",
       "source_location": "L1",
       "id": "time_tracking_models_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "models.py"
     },
     {
@@ -4122,7 +4482,7 @@
       "source_file": "time_tracking/views.py",
       "source_location": "L1",
       "id": "time_tracking_views_py",
-      "community": 1,
+      "community": 4,
       "norm_label": "views.py"
     },
     {
@@ -4131,7 +4491,7 @@
       "source_file": "time_tracking/views.py",
       "source_location": "L16",
       "id": "time_tracking_views_timesheet",
-      "community": 1,
+      "community": 4,
       "norm_label": "timesheet()"
     },
     {
@@ -4149,7 +4509,7 @@
       "source_file": "time_tracking/views.py",
       "source_location": "L46",
       "id": "time_tracking_views_time_report",
-      "community": 1,
+      "community": 4,
       "norm_label": "time_report()"
     },
     {
@@ -4158,7 +4518,7 @@
       "source_file": "time_tracking/views.py",
       "source_location": "L74",
       "id": "time_tracking_views_with_non_billable",
-      "community": 1,
+      "community": 4,
       "norm_label": "_with_non_billable()"
     },
     {
@@ -4167,7 +4527,7 @@
       "source_file": "time_tracking/__init__.py",
       "source_location": "L1",
       "id": "time_tracking_init_py",
-      "community": 61,
+      "community": 63,
       "norm_label": "__init__.py"
     },
     {
@@ -4185,7 +4545,7 @@
       "source_file": "time_tracking/migrations/0002_activetimer.py",
       "source_location": "L1",
       "id": "time_tracking_migrations_0002_activetimer_py",
-      "community": 33,
+      "community": 35,
       "norm_label": "0002_activetimer.py"
     },
     {
@@ -4194,7 +4554,7 @@
       "source_file": "time_tracking/migrations/0002_activetimer.py",
       "source_location": "L9",
       "id": "migrations_0002_activetimer_migration",
-      "community": 33,
+      "community": 35,
       "norm_label": "migration"
     },
     {
@@ -4203,7 +4563,7 @@
       "source_file": "time_tracking/migrations/__init__.py",
       "source_location": "L1",
       "id": "time_tracking_migrations_init_py",
-      "community": 62,
+      "community": 64,
       "norm_label": "__init__.py"
     },
     {
@@ -4212,7 +4572,7 @@
       "source_file": "workspaces/admin.py",
       "source_location": "L1",
       "id": "workspaces_admin_py",
-      "community": 4,
+      "community": 5,
       "norm_label": "admin.py"
     },
     {
@@ -4239,7 +4599,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L1",
       "id": "workspaces_forms_py",
-      "community": 4,
+      "community": 5,
       "norm_label": "forms.py"
     },
     {
@@ -4248,7 +4608,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L6",
       "id": "workspaces_forms_workspaceslaform",
-      "community": 4,
+      "community": 5,
       "norm_label": "workspaceslaform"
     },
     {
@@ -4257,7 +4617,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L7",
       "id": "workspaces_forms_meta",
-      "community": 4,
+      "community": 5,
       "norm_label": "meta"
     },
     {
@@ -4266,7 +4626,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L12",
       "id": "workspaces_forms_slapolicyform",
-      "community": 4,
+      "community": 5,
       "norm_label": "slapolicyform"
     },
     {
@@ -4275,7 +4635,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L18",
       "id": "workspaces_forms_businesshourscalendarform",
-      "community": 4,
+      "community": 5,
       "norm_label": "businesshourscalendarform"
     },
     {
@@ -4284,7 +4644,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L25",
       "id": "workspaces_forms_invitationform",
-      "community": 4,
+      "community": 5,
       "norm_label": "invitationform"
     },
     {
@@ -4293,7 +4653,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L34",
       "id": "workspaces_forms_applicationstoragesettingsform",
-      "community": 4,
+      "community": 5,
       "norm_label": "applicationstoragesettingsform"
     },
     {
@@ -4302,7 +4662,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L54",
       "id": "workspaces_forms_applicationstoragesettingsform_save",
-      "community": 4,
+      "community": 5,
       "norm_label": ".save()"
     },
     {
@@ -4311,7 +4671,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L64",
       "id": "workspaces_forms_acceptinvitationform",
-      "community": 4,
+      "community": 5,
       "norm_label": "acceptinvitationform"
     },
     {
@@ -4320,7 +4680,7 @@
       "source_file": "workspaces/forms.py",
       "source_location": "L70",
       "id": "workspaces_forms_acceptinvitationform_clean_username",
-      "community": 4,
+      "community": 5,
       "norm_label": ".clean_username()"
     },
     {
@@ -4329,7 +4689,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L1",
       "id": "workspaces_models_py",
-      "community": 4,
+      "community": 5,
       "norm_label": "models.py"
     },
     {
@@ -4347,7 +4707,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L19",
       "id": "workspaces_models_meta",
-      "community": 4,
+      "community": 5,
       "norm_label": "meta"
     },
     {
@@ -4365,7 +4725,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L26",
       "id": "workspaces_models_workspacemembership",
-      "community": 4,
+      "community": 5,
       "norm_label": "workspacemembership"
     },
     {
@@ -4374,7 +4734,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L27",
       "id": "workspaces_models_role",
-      "community": 4,
+      "community": 5,
       "norm_label": "role"
     },
     {
@@ -4383,7 +4743,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L42",
       "id": "workspaces_models_workspacemembership_str",
-      "community": 4,
+      "community": 5,
       "norm_label": ".__str__()"
     },
     {
@@ -4392,7 +4752,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L46",
       "id": "workspaces_models_applicationstoragesettings",
-      "community": 4,
+      "community": 5,
       "norm_label": "applicationstoragesettings"
     },
     {
@@ -4401,7 +4761,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L47",
       "id": "workspaces_models_backend",
-      "community": 4,
+      "community": 5,
       "norm_label": "backend"
     },
     {
@@ -4410,7 +4770,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L66",
       "id": "workspaces_models_is_s3_enabled",
-      "community": 4,
+      "community": 5,
       "norm_label": "is_s3_enabled()"
     },
     {
@@ -4419,7 +4779,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L69",
       "id": "workspaces_models_applicationstoragesettings_str",
-      "community": 4,
+      "community": 5,
       "norm_label": ".__str__()"
     },
     {
@@ -4428,7 +4788,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L73",
       "id": "workspaces_models_slapolicy",
-      "community": 4,
+      "community": 5,
       "norm_label": "slapolicy"
     },
     {
@@ -4437,7 +4797,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L74",
       "id": "workspaces_models_priority",
-      "community": 4,
+      "community": 5,
       "norm_label": "priority"
     },
     {
@@ -4446,7 +4806,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L91",
       "id": "workspaces_models_businesshourscalendar",
-      "community": 4,
+      "community": 5,
       "norm_label": "businesshourscalendar"
     },
     {
@@ -4455,7 +4815,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L105",
       "id": "workspaces_models_businesshourscalendar_str",
-      "community": 4,
+      "community": 5,
       "norm_label": ".__str__()"
     },
     {
@@ -4464,7 +4824,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L109",
       "id": "workspaces_models_invitation",
-      "community": 4,
+      "community": 5,
       "norm_label": "invitation"
     },
     {
@@ -4473,7 +4833,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L110",
       "id": "workspaces_models_invitetype",
-      "community": 4,
+      "community": 5,
       "norm_label": "invitetype"
     },
     {
@@ -4482,7 +4842,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L133",
       "id": "workspaces_models_is_expired",
-      "community": 4,
+      "community": 5,
       "norm_label": "is_expired()"
     },
     {
@@ -4491,7 +4851,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L137",
       "id": "workspaces_models_is_accepted",
-      "community": 4,
+      "community": 5,
       "norm_label": "is_accepted()"
     },
     {
@@ -4500,7 +4860,7 @@
       "source_file": "workspaces/models.py",
       "source_location": "L141",
       "id": "workspaces_models_first_workspace_for",
-      "community": 4,
+      "community": 5,
       "norm_label": "first_workspace_for()"
     },
     {
@@ -4509,7 +4869,7 @@
       "source_file": "workspaces/views.py",
       "source_location": "L1",
       "id": "workspaces_views_py",
-      "community": 4,
+      "community": 5,
       "norm_label": "views.py"
     },
     {
@@ -4518,7 +4878,7 @@
       "source_file": "workspaces/views.py",
       "source_location": "L9",
       "id": "workspaces_views_accept_invitation",
-      "community": 4,
+      "community": 5,
       "norm_label": "accept_invitation()"
     },
     {
@@ -4527,7 +4887,7 @@
       "source_file": "workspaces/__init__.py",
       "source_location": "L1",
       "id": "workspaces_init_py",
-      "community": 63,
+      "community": 65,
       "norm_label": "__init__.py"
     },
     {
@@ -4536,7 +4896,7 @@
       "source_file": "workspaces/management/__init__.py",
       "source_location": "L1",
       "id": "workspaces_management_init_py",
-      "community": 64,
+      "community": 66,
       "norm_label": "__init__.py"
     },
     {
@@ -4572,7 +4932,7 @@
       "source_file": "workspaces/management/commands/__init__.py",
       "source_location": "L1",
       "id": "workspaces_management_commands_init_py",
-      "community": 65,
+      "community": 67,
       "norm_label": "__init__.py"
     },
     {
@@ -4590,7 +4950,7 @@
       "source_file": "workspaces/migrations/0002_workspace_first_response_target_minutes_and_more.py",
       "source_location": "L1",
       "id": "workspaces_migrations_0002_workspace_first_response_target_minutes_and_more_py",
-      "community": 34,
+      "community": 36,
       "norm_label": "0002_workspace_first_response_target_minutes_and_more.py"
     },
     {
@@ -4599,7 +4959,7 @@
       "source_file": "workspaces/migrations/0002_workspace_first_response_target_minutes_and_more.py",
       "source_location": "L6",
       "id": "migrations_0002_workspace_first_response_target_minutes_and_more_migration",
-      "community": 34,
+      "community": 36,
       "norm_label": "migration"
     },
     {
@@ -4608,7 +4968,7 @@
       "source_file": "workspaces/migrations/0003_businesshourscalendar_invitation_slapolicy.py",
       "source_location": "L1",
       "id": "workspaces_migrations_0003_businesshourscalendar_invitation_slapolicy_py",
-      "community": 35,
+      "community": 37,
       "norm_label": "0003_businesshourscalendar_invitation_slapolicy.py"
     },
     {
@@ -4617,7 +4977,7 @@
       "source_file": "workspaces/migrations/0003_businesshourscalendar_invitation_slapolicy.py",
       "source_location": "L11",
       "id": "migrations_0003_businesshourscalendar_invitation_slapolicy_migration",
-      "community": 35,
+      "community": 37,
       "norm_label": "migration"
     },
     {
@@ -4626,7 +4986,7 @@
       "source_file": "workspaces/migrations/0004_applicationstoragesettings.py",
       "source_location": "L1",
       "id": "workspaces_migrations_0004_applicationstoragesettings_py",
-      "community": 36,
+      "community": 38,
       "norm_label": "0004_applicationstoragesettings.py"
     },
     {
@@ -4635,7 +4995,7 @@
       "source_file": "workspaces/migrations/0004_applicationstoragesettings.py",
       "source_location": "L5",
       "id": "migrations_0004_applicationstoragesettings_migration",
-      "community": 36,
+      "community": 38,
       "norm_label": "migration"
     },
     {
@@ -4644,7 +5004,7 @@
       "source_file": "workspaces/migrations/__init__.py",
       "source_location": "L1",
       "id": "workspaces_migrations_init_py",
-      "community": 66,
+      "community": 68,
       "norm_label": "__init__.py"
     },
     {
@@ -4922,7 +5282,7 @@
       "file_type": "code",
       "source_file": "core/models.py",
       "source_location": "L1",
-      "community": 67,
+      "community": 69,
       "norm_label": "models.py",
       "id": "core_models_py"
     },
@@ -4949,7 +5309,7 @@
       "file_type": "code",
       "source_file": "activity/tests.py",
       "source_location": "L1",
-      "community": 68,
+      "community": 70,
       "norm_label": "tests.py",
       "id": "activity_tests_py"
     },
@@ -4958,7 +5318,7 @@
       "file_type": "code",
       "source_file": "communications/tests.py",
       "source_location": "L1",
-      "community": 69,
+      "community": 71,
       "norm_label": "tests.py",
       "id": "communications_tests_py"
     },
@@ -4967,7 +5327,7 @@
       "file_type": "code",
       "source_file": "core/tasks.py",
       "source_location": "L1",
-      "community": 37,
+      "community": 39,
       "norm_label": "tasks.py",
       "id": "core_tasks_py"
     },
@@ -4976,7 +5336,7 @@
       "file_type": "code",
       "source_file": "core/tasks.py",
       "source_location": "L5",
-      "community": 37,
+      "community": 39,
       "norm_label": "example_health_task()",
       "id": "core_tasks_example_health_task"
     },
@@ -4985,7 +5345,7 @@
       "file_type": "code",
       "source_file": "core/tests.py",
       "source_location": "L1",
-      "community": 70,
+      "community": 72,
       "norm_label": "tests.py",
       "id": "core_tests_py"
     },
@@ -4994,7 +5354,7 @@
       "file_type": "code",
       "source_file": "crm/tests.py",
       "source_location": "L1",
-      "community": 71,
+      "community": 73,
       "norm_label": "tests.py",
       "id": "crm_tests_py"
     },
@@ -5003,7 +5363,7 @@
       "file_type": "code",
       "source_file": "crm/views.py",
       "source_location": "L286",
-      "community": 3,
+      "community": 4,
       "norm_label": "_validate_import_row()",
       "id": "crm_views_validate_import_row"
     },
@@ -5012,7 +5372,7 @@
       "file_type": "code",
       "source_file": "crm/views.py",
       "source_location": "L300",
-      "community": 3,
+      "community": 4,
       "norm_label": "_detect_duplicate()",
       "id": "crm_views_detect_duplicate"
     },
@@ -5021,7 +5381,7 @@
       "file_type": "code",
       "source_file": "crm/views.py",
       "source_location": "L315",
-      "community": 3,
+      "community": 4,
       "norm_label": "_import_row()",
       "id": "crm_views_import_row"
     },
@@ -5030,7 +5390,7 @@
       "file_type": "code",
       "source_file": "crm/views.py",
       "source_location": "L343",
-      "community": 3,
+      "community": 4,
       "norm_label": "_apply_organization_row()",
       "id": "crm_views_apply_organization_row"
     },
@@ -5039,7 +5399,7 @@
       "file_type": "code",
       "source_file": "crm/views.py",
       "source_location": "L361",
-      "community": 3,
+      "community": 4,
       "norm_label": "_settings_redirect()",
       "id": "crm_views_settings_redirect"
     },
@@ -5048,7 +5408,7 @@
       "file_type": "code",
       "source_file": "customer_portal/tests.py",
       "source_location": "L1",
-      "community": 72,
+      "community": 74,
       "norm_label": "tests.py",
       "id": "customer_portal_tests_py"
     },
@@ -5057,7 +5417,7 @@
       "file_type": "code",
       "source_file": "search/tests.py",
       "source_location": "L1",
-      "community": 73,
+      "community": 75,
       "norm_label": "tests.py",
       "id": "search_tests_py"
     },
@@ -5066,7 +5426,7 @@
       "file_type": "code",
       "source_file": "tickets/tests.py",
       "source_location": "L1",
-      "community": 74,
+      "community": 76,
       "norm_label": "tests.py",
       "id": "tickets_tests_py"
     },
@@ -5084,7 +5444,7 @@
       "file_type": "code",
       "source_file": "time_tracking/tests.py",
       "source_location": "L1",
-      "community": 75,
+      "community": 77,
       "norm_label": "tests.py",
       "id": "time_tracking_tests_py"
     },
@@ -5093,7 +5453,7 @@
       "file_type": "code",
       "source_file": "workspaces/tests.py",
       "source_location": "L1",
-      "community": 76,
+      "community": 78,
       "norm_label": "tests.py",
       "id": "workspaces_tests_py"
     },
@@ -5497,9 +5857,31 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ai/services.py",
+      "source_location": "L200",
+      "weight": 1.0,
+      "source": "ai_services_approve_reply_draft",
+      "target": "activity_services_record_event"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/services.py",
       "source_location": "L207",
       "weight": 1.0,
       "source": "ai_services_approve_time_suggestion",
+      "target": "activity_services_record_event"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/services.py",
+      "source_location": "L346",
+      "weight": 1.0,
+      "source": "ai_services_approve_solution_snippet",
       "target": "activity_services_record_event"
     },
     {
@@ -6186,6 +6568,56 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ai/client.py",
+      "source_location": "L84",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_py",
+      "target": "ai_client_reply_schema"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L96",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_py",
+      "target": "ai_client_crm_insight_schema"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_py",
+      "target": "ai_client_time_suggestion_schema"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L134",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_py",
+      "target": "ai_client_solution_snippet_schema"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L146",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_py",
+      "target": "ai_client_schema"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
       "source_location": "L64",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -6211,6 +6643,16 @@
       "confidence_score": 1.0,
       "source": "ai_client_py",
       "target": "ai_client_parse_analysis_response"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L195",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_py",
+      "target": "ai_client_parse_structured_response"
     },
     {
       "relation": "contains",
@@ -6319,10 +6761,10 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ai/client.py",
-      "source_location": "L108",
+      "source_location": "L201",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "ai_client_parse_analysis_response",
+      "source": "ai_client_parse_structured_response",
       "target": "ai_client_openroutererror"
     },
     {
@@ -6351,11 +6793,110 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ai/client.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_parse_analysis_response",
+      "target": "ai_client_openroutererror"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
       "source_location": "L73",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "ai_client_build_request_payload",
       "target": "ai_client_ticket_analysis_schema"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L85",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_reply_schema",
+      "target": "ai_client_schema"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_client_reply_schema"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L97",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_crm_insight_schema",
+      "target": "ai_client_schema"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L219",
+      "weight": 1.0,
+      "source": "ai_services_generate_crm_insight",
+      "target": "ai_client_crm_insight_schema"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L118",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_time_suggestion_schema",
+      "target": "ai_client_schema"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L269",
+      "weight": 1.0,
+      "source": "ai_services_suggest_time_entry",
+      "target": "ai_client_time_suggestion_schema"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L135",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_solution_snippet_schema",
+      "target": "ai_client_schema"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L325",
+      "weight": 1.0,
+      "source": "ai_services_create_solution_snippet",
+      "target": "ai_client_solution_snippet_schema"
     },
     {
       "relation": "calls",
@@ -6404,6 +6945,50 @@
     {
       "relation": "calls",
       "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_client_send_chat_completion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L219",
+      "weight": 1.0,
+      "source": "ai_services_generate_crm_insight",
+      "target": "ai_client_send_chat_completion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L269",
+      "weight": 1.0,
+      "source": "ai_services_suggest_time_entry",
+      "target": "ai_client_send_chat_completion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L325",
+      "weight": 1.0,
+      "source": "ai_services_create_solution_snippet",
+      "target": "ai_client_send_chat_completion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ai/management/commands/test_ai_provider.py",
@@ -6439,33 +7024,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ai/client.py",
-      "source_location": "L109",
+      "source_location": "L190",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "ai_client_parse_analysis_response",
-      "target": "ai_client_safe_preview"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "ai/client.py",
-      "source_location": "L107",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "ai_client_parse_analysis_response",
-      "target": "ai_client_parse_message_payload"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "ai/client.py",
-      "source_location": "L109",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "ai_client_parse_analysis_response",
-      "target": "ai_client_message_content_preview"
+      "target": "ai_client_parse_structured_response"
     },
     {
       "relation": "calls",
@@ -6549,6 +7112,116 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ai/client.py",
+      "source_location": "L109",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_parse_analysis_response",
+      "target": "ai_client_safe_preview"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_parse_analysis_response",
+      "target": "ai_client_parse_message_payload"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L109",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_parse_analysis_response",
+      "target": "ai_client_message_content_preview"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L200",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_parse_structured_response",
+      "target": "ai_client_safe_preview"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L206",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_parse_structured_response",
+      "target": "ai_client_parse_message_payload"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
+      "source_location": "L210",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_client_parse_structured_response",
+      "target": "ai_client_message_content_preview"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L173",
+      "weight": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_client_parse_structured_response"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L220",
+      "weight": 1.0,
+      "source": "ai_services_generate_crm_insight",
+      "target": "ai_client_parse_structured_response"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L270",
+      "weight": 1.0,
+      "source": "ai_services_suggest_time_entry",
+      "target": "ai_client_parse_structured_response"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L326",
+      "weight": 1.0,
+      "source": "ai_services_create_solution_snippet",
+      "target": "ai_client_parse_structured_response"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/client.py",
       "source_location": "L130",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -6586,6 +7259,76 @@
       "target": "ai_context_build_analysis_messages"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_py",
+      "target": "ai_context_build_reply_messages"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L136",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_py",
+      "target": "ai_context_build_crm_context"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L176",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_py",
+      "target": "ai_context_build_crm_messages"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L186",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_py",
+      "target": "ai_context_build_time_context"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L212",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_py",
+      "target": "ai_context_build_time_messages"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L219",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_py",
+      "target": "ai_context_build_solution_messages"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L226",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_py",
+      "target": "ai_context_find_unlogged_work"
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -6612,10 +7355,65 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ai/context.py",
+      "source_location": "L122",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_build_reply_messages",
+      "target": "ai_context_redact_secrets"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L150",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_build_crm_context",
+      "target": "ai_context_redact_secrets"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L197",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_build_time_context",
+      "target": "ai_context_redact_secrets"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
       "source_location": "L88",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "ai_context_build_analysis_messages",
+      "target": "ai_context_build_ticket_context"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L120",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_build_reply_messages",
+      "target": "ai_context_build_ticket_context"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L222",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_build_solution_messages",
       "target": "ai_context_build_ticket_context"
     },
     {
@@ -6650,6 +7448,83 @@
       "weight": 1.0,
       "source": "tests_test_ai_foundation_test_analysis_context_is_compact_json_and_bounded",
       "target": "ai_context_build_analysis_messages"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_context_build_reply_messages"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L182",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_build_crm_messages",
+      "target": "ai_context_build_crm_context"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L219",
+      "weight": 1.0,
+      "source": "ai_services_generate_crm_insight",
+      "target": "ai_context_build_crm_messages"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/context.py",
+      "source_location": "L215",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_context_build_time_messages",
+      "target": "ai_context_build_time_context"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L269",
+      "weight": 1.0,
+      "source": "ai_services_suggest_time_entry",
+      "target": "ai_context_build_time_messages"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L325",
+      "weight": 1.0,
+      "source": "ai_services_create_solution_snippet",
+      "target": "ai_context_build_solution_messages"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/services.py",
+      "source_location": "L386",
+      "weight": 1.0,
+      "source": "ai_services_time_cleanup_context",
+      "target": "ai_context_find_unlogged_work"
     },
     {
       "relation": "contains",
@@ -6753,6 +7628,17 @@
       "source_location": "L109",
       "weight": 1.0,
       "source": "ai_services_apply_selected_ticket_suggestions",
+      "target": "valueerror"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/services.py",
+      "source_location": "L168",
+      "weight": 1.0,
+      "source": "ai_services_generate_reply_draft",
       "target": "valueerror"
     },
     {
@@ -7127,6 +8013,16 @@
       "confidence_score": 1.0,
       "source": "ai_models_py",
       "target": "ai_models_solutionsnippet"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/models.py",
+      "source_location": "L308",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_models_py",
+      "target": "ai_models_queueintelligencesnapshot"
     },
     {
       "relation": "imports_from",
@@ -7983,6 +8879,56 @@
       "target": "workspaces_models_workspace"
     },
     {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "ai/models.py",
+      "source_location": "L6",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "ai_models_queueintelligencesnapshot",
+      "target": "crm_models_contact"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "ai/models.py",
+      "source_location": "L6",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "ai_models_queueintelligencesnapshot",
+      "target": "crm_models_organization"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "ai/models.py",
+      "source_location": "L7",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "ai_models_queueintelligencesnapshot",
+      "target": "tickets_models_ticket"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "ai/models.py",
+      "source_location": "L8",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "ai_models_queueintelligencesnapshot",
+      "target": "time_tracking_models_timeentry"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "ai/models.py",
+      "source_location": "L9",
+      "weight": 0.8,
+      "confidence_score": 0.5,
+      "source": "ai_models_queueintelligencesnapshot",
+      "target": "workspaces_models_workspace"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ai/services.py",
@@ -8036,6 +8982,26 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ai/services.py",
+      "source_location": "L165",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_generate_reply_draft"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L190",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_approve_reply_draft"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
       "source_location": "L156",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8051,6 +9017,16 @@
       "confidence_score": 1.0,
       "source": "ai_services_py",
       "target": "ai_services_generate_crm_insight"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L241",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_heuristic_crm_insight"
     },
     {
       "relation": "contains",
@@ -8096,6 +9072,46 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ai/services.py",
+      "source_location": "L341",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_approve_solution_snippet"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L350",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_reject_solution_snippet"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L357",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_build_queue_intelligence"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L384",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_time_cleanup_context"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
       "source_location": "L92",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8131,6 +9147,36 @@
       "confidence_score": 1.0,
       "source": "ai_services_py",
       "target": "ai_services_finish_run"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L466",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_fail_run"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L475",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_elapsed_ms"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L479",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_py",
+      "target": "ai_services_ticket_card"
     },
     {
       "relation": "contains",
@@ -8201,6 +9247,50 @@
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_services_get_ai_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L214",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_crm_insight",
+      "target": "ai_services_get_ai_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L265",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_suggest_time_entry",
+      "target": "ai_services_get_ai_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L321",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_create_solution_snippet",
+      "target": "ai_services_get_ai_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ai/views.py",
       "source_location": "L16",
@@ -8236,6 +9326,17 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ai/views.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "ai_views_ticket_ai_reply_draft",
+      "target": "ai_services_get_ai_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/views.py",
       "source_location": "L125",
       "weight": 1.0,
       "source": "ai_views_organization_ai_briefing",
@@ -8255,12 +9356,34 @@
     {
       "relation": "calls",
       "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/views.py",
+      "source_location": "L202",
+      "weight": 1.0,
+      "source": "ai_views_workspace_ai_queue_intelligence",
+      "target": "ai_services_get_ai_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ai/management/commands/test_ai_provider.py",
       "source_location": "L26",
       "weight": 1.0,
       "source": "commands_test_ai_provider_command_handle",
+      "target": "ai_services_get_ai_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "core/views.py",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "core_views_dashboard",
       "target": "ai_services_get_ai_settings"
     },
     {
@@ -8520,6 +9643,105 @@
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L169",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_services_start_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L175",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_services_fail_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L185",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_services_finish_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L185",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_reply_draft",
+      "target": "ai_services_elapsed_ms"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/tasks.py",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "ai_tasks_generate_reply_draft_with_ai",
+      "target": "ai_services_generate_reply_draft"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L305",
+      "weight": 1.0,
+      "source": "tests_test_ai_foundation_test_reply_composer_creates_draft_and_approval_posts_public_comment",
+      "target": "ai_services_generate_reply_draft"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/services.py",
+      "source_location": "L194",
+      "weight": 1.0,
+      "source": "ai_services_approve_reply_draft",
+      "target": "search_services_index_comment"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/views.py",
+      "source_location": "L135",
+      "weight": 1.0,
+      "source": "ai_views_ticket_ai_reply_approve",
+      "target": "ai_services_approve_reply_draft"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L308",
+      "weight": 1.0,
+      "source": "tests_test_ai_foundation_test_reply_composer_creates_draft_and_approval_posts_public_comment",
+      "target": "ai_services_approve_reply_draft"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ai/views.py",
       "source_location": "L85",
@@ -8543,6 +9765,28 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "ai/services.py",
+      "source_location": "L216",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_crm_insight",
+      "target": "ai_services_heuristic_crm_insight"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L222",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_crm_insight",
+      "target": "ai_services_fail_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
       "source_location": "L178",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8553,11 +9797,44 @@
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L237",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_generate_crm_insight",
+      "target": "ai_services_elapsed_ms"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ai/tasks.py",
       "source_location": "L21",
       "weight": 1.0,
       "source": "ai_tasks_generate_crm_insight_with_ai",
+      "target": "ai_services_generate_crm_insight"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L282",
+      "weight": 1.0,
+      "source": "tests_test_ai_foundation_test_crm_time_and_digest_ai_artifacts_are_workspace_scoped",
+      "target": "ai_services_generate_crm_insight"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L353",
+      "weight": 1.0,
+      "source": "tests_test_ai_foundation_test_openrouter_backed_crm_insight_uses_structured_output",
       "target": "ai_services_generate_crm_insight"
     },
     {
@@ -8574,13 +9851,13 @@
     {
       "relation": "calls",
       "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "tests/test_ai_foundation.py",
-      "source_location": "L282",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L259",
       "weight": 1.0,
-      "source": "tests_test_ai_foundation_test_crm_time_and_digest_ai_artifacts_are_workspace_scoped",
-      "target": "ai_services_generate_crm_insight"
+      "confidence_score": 1.0,
+      "source": "ai_services_heuristic_crm_insight",
+      "target": "ai_services_finish_run"
     },
     {
       "relation": "calls",
@@ -8603,6 +9880,28 @@
       "confidence_score": 1.0,
       "source": "ai_services_suggest_time_entry",
       "target": "ai_services_finish_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L273",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_suggest_time_entry",
+      "target": "ai_services_elapsed_ms"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L276",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_suggest_time_entry",
+      "target": "ai_services_fail_run"
     },
     {
       "relation": "calls",
@@ -8729,12 +10028,155 @@
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L328",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_create_solution_snippet",
+      "target": "ai_services_elapsed_ms"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L331",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_create_solution_snippet",
+      "target": "ai_services_fail_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ai/tasks.py",
       "source_location": "L45",
       "weight": 1.0,
       "source": "ai_tasks_create_solution_snippet_with_ai",
       "target": "ai_services_create_solution_snippet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/services.py",
+      "source_location": "L344",
+      "weight": 1.0,
+      "source": "ai_services_approve_solution_snippet",
+      "target": "search_services_index_solution_snippet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/views.py",
+      "source_location": "L155",
+      "weight": 1.0,
+      "source": "ai_views_ticket_ai_solution_decision",
+      "target": "ai_services_approve_solution_snippet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L317",
+      "weight": 1.0,
+      "source": "tests_test_ai_foundation_test_solution_memory_approval_indexes_internal_snippet",
+      "target": "ai_services_approve_solution_snippet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/views.py",
+      "source_location": "L158",
+      "weight": 1.0,
+      "source": "ai_views_ticket_ai_solution_decision",
+      "target": "ai_services_reject_solution_snippet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L358",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_build_queue_intelligence",
+      "target": "ai_services_start_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L361",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_build_queue_intelligence",
+      "target": "ai_services_ticket_card"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/services.py",
+      "source_location": "L380",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_services_build_queue_intelligence",
+      "target": "ai_services_finish_run"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/tasks.py",
+      "source_location": "L74",
+      "weight": 1.0,
+      "source": "ai_tasks_build_queue_intelligence_with_ai",
+      "target": "ai_services_build_queue_intelligence"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L362",
+      "weight": 1.0,
+      "source": "tests_test_ai_foundation_test_queue_intelligence_and_time_cleanup_are_workspace_scoped",
+      "target": "ai_services_build_queue_intelligence"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ai/views.py",
+      "source_location": "L216",
+      "weight": 1.0,
+      "source": "ai_views_time_ai_cleanup",
+      "target": "ai_services_time_cleanup_context"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L363",
+      "weight": 1.0,
+      "source": "tests_test_ai_foundation_test_queue_intelligence_and_time_cleanup_are_workspace_scoped",
+      "target": "ai_services_time_cleanup_context"
     },
     {
       "relation": "calls",
@@ -8796,6 +10238,26 @@
       "confidence_score": 1.0,
       "source": "ai_tasks_py",
       "target": "ai_tasks_create_solution_snippet_with_ai"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/tasks.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_tasks_py",
+      "target": "ai_tasks_generate_reply_draft_with_ai"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/tasks.py",
+      "source_location": "L69",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_tasks_py",
+      "target": "ai_tasks_build_queue_intelligence_with_ai"
     },
     {
       "relation": "imports_from",
@@ -8892,11 +10354,41 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "ai/views.py",
+      "source_location": "L114",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_views_py",
+      "target": "ai_views_ticket_ai_reply_draft"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/views.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_views_py",
+      "target": "ai_views_ticket_ai_reply_approve"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/views.py",
       "source_location": "L113",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "ai_views_py",
       "target": "ai_views_ticket_ai_solution_memory"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/views.py",
+      "source_location": "L150",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_views_py",
+      "target": "ai_views_ticket_ai_solution_decision"
     },
     {
       "relation": "contains",
@@ -8927,6 +10419,26 @@
       "confidence_score": 1.0,
       "source": "ai_views_py",
       "target": "ai_views_workspace_ai_digest"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/views.py",
+      "source_location": "L200",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_views_py",
+      "target": "ai_views_workspace_ai_queue_intelligence"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/views.py",
+      "source_location": "L214",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_views_py",
+      "target": "ai_views_time_ai_cleanup"
     },
     {
       "relation": "calls",
@@ -9044,9 +10556,42 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "ai/views.py",
+      "source_location": "L115",
+      "weight": 1.0,
+      "source": "ai_views_ticket_ai_reply_draft",
+      "target": "core_permissions_require_internal_workspace"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/views.py",
+      "source_location": "L132",
+      "weight": 1.0,
+      "source": "ai_views_ticket_ai_reply_approve",
+      "target": "core_permissions_require_internal_workspace"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/views.py",
       "source_location": "L114",
       "weight": 1.0,
       "source": "ai_views_ticket_ai_solution_memory",
+      "target": "core_permissions_require_internal_workspace"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/views.py",
+      "source_location": "L151",
+      "weight": 1.0,
+      "source": "ai_views_ticket_ai_solution_decision",
       "target": "core_permissions_require_internal_workspace"
     },
     {
@@ -9080,6 +10625,28 @@
       "source_location": "L143",
       "weight": 1.0,
       "source": "ai_views_workspace_ai_digest",
+      "target": "core_permissions_require_internal_workspace"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/views.py",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "ai_views_workspace_ai_queue_intelligence",
+      "target": "core_permissions_require_internal_workspace"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ai/views.py",
+      "source_location": "L215",
+      "weight": 1.0,
+      "source": "ai_views_time_ai_cleanup",
       "target": "core_permissions_require_internal_workspace"
     },
     {
@@ -9181,6 +10748,16 @@
       "confidence_score": 1.0,
       "source": "ai_migrations_0003_aiprovidersettings_crm_insights_enabled_and_more_py",
       "target": "migrations_0003_aiprovidersettings_crm_insights_enabled_and_more_migration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ai/migrations/0004_aiprovidersettings_queue_intelligence_enabled_and_more.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_migrations_0004_aiprovidersettings_queue_intelligence_enabled_and_more_py",
+      "target": "migrations_0004_aiprovidersettings_queue_intelligence_enabled_and_more_migration"
     },
     {
       "relation": "imports_from",
@@ -12949,6 +14526,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "search/services.py",
+      "source_location": "L141",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "search_services_py",
+      "target": "search_services_index_solution_snippet"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "search/services.py",
       "source_location": "L128",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -13129,6 +14716,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "search/services.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "search_services_rebuild_workspace_index",
+      "target": "search_services_index_solution_snippet"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "search/services.py",
       "source_location": "L43",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -13272,6 +14870,28 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "search/services.py",
+      "source_location": "L143",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "search_services_index_solution_snippet",
+      "target": "search_services_upsert_document"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "search/services.py",
+      "source_location": "L153",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "search_services_index_solution_snippet",
+      "target": "search_services_refresh_document_vector"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "search/services.py",
       "source_location": "L170",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -13381,6 +15001,16 @@
       "confidence_score": 0.5,
       "source": "commands_rebuild_search_index_command",
       "target": "workspaces_models_workspace"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "search/migrations/0002_alter_searchdocument_entity_type.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "search_migrations_0002_alter_searchdocument_entity_type_py",
+      "target": "migrations_0002_alter_searchdocument_entity_type_migration"
     },
     {
       "relation": "contains",
@@ -13551,6 +15181,46 @@
       "confidence_score": 1.0,
       "source": "tests_test_ai_foundation_py",
       "target": "tests_test_ai_foundation_test_crm_time_and_digest_ai_artifacts_are_workspace_scoped"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L292",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_ai_foundation_py",
+      "target": "tests_test_ai_foundation_test_reply_composer_creates_draft_and_approval_posts_public_comment"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L315",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_ai_foundation_py",
+      "target": "tests_test_ai_foundation_test_solution_memory_approval_indexes_internal_snippet"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L324",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_ai_foundation_py",
+      "target": "tests_test_ai_foundation_test_openrouter_backed_crm_insight_uses_structured_output"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_ai_foundation.py",
+      "source_location": "L360",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_ai_foundation_py",
+      "target": "tests_test_ai_foundation_test_queue_intelligence_and_time_cleanup_are_workspace_scoped"
     },
     {
       "relation": "contains",
@@ -17058,5 +18728,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "bed976744cd8d856aaa0039a3d5e709fe291996f"
+  "built_at_commit": "7448c6d033b068df9efb6d172ef9344f623671f5"
 }

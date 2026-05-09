@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="tl-page-header">
+  <div>
+    <div class="tl-kicker">AI time tracking</div>
+    <h1 class="tl-page-title">Time cleanup</h1>
+    <p class="tl-page-subtitle">Draft time entries and likely unlogged ticket work for your recent support activity.</p>
+  </div>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="tl-panel overflow-hidden">
+    <div class="tl-toolbar"><div class="font-semibold">Draft suggestions</div></div>
+    <div class="divide-y divide-slate-100">
+      {% for suggestion in draft_suggestions %}
+        <div class="p-4 text-sm">
+          <div class="font-medium"><a class="text-blue-700" href="{% url 'ticket_detail' suggestion.ticket.pk %}">{{ suggestion.ticket.title }}</a></div>
+          <div class="mt-1 text-slate-600">{{ suggestion.suggested_minutes }}m - {% if suggestion.billable %}billable{% else %}non-billable{% endif %}</div>
+          <div class="mt-1 text-slate-600">{{ suggestion.notes }}</div>
+          {% if suggestion.reason %}<div class="mt-1 text-xs text-slate-500">{{ suggestion.reason }}</div>{% endif %}
+          <form method="post" action="{% url 'ticket_ai_time_approve' suggestion.ticket.pk suggestion.pk %}" class="mt-2">{% csrf_token %}<button class="tl-button-secondary">Approve time entry</button></form>
+        </div>
+      {% empty %}
+        <div class="p-4 text-sm text-slate-500">No draft time suggestions.</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="tl-panel overflow-hidden">
+    <div class="tl-toolbar"><div class="font-semibold">Likely unlogged work</div></div>
+    <div class="divide-y divide-slate-100">
+      {% for ticket in unlogged_tickets %}
+        <div class="p-4 text-sm">
+          <div class="font-medium"><a class="text-blue-700" href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.title }}</a></div>
+          <div class="mt-1 text-slate-500">{{ ticket.organization|default:"No organization" }} - {{ ticket.agent_comment_count }} agent comment{{ ticket.agent_comment_count|pluralize }}</div>
+          <form method="post" action="{% url 'ticket_ai_time_suggestion' ticket.pk %}" class="mt-2">{% csrf_token %}<button class="tl-button-secondary">Suggest time</button></form>
+        </div>
+      {% empty %}
+        <div class="p-4 text-sm text-slate-500">No unlogged work detected.</div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

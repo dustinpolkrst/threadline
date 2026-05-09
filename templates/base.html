@@ -192,6 +192,7 @@
           <a class="tl-sidebar-link {% if '/organizations/' in request.path %}is-active{% endif %}" href="{% url 'organization_list' %}"><span class="tl-sidebar-dot"></span>Organizations</a>
           <a class="tl-sidebar-link {% if '/contacts/' in request.path %}is-active{% endif %}" href="{% url 'contact_list' %}"><span class="tl-sidebar-dot"></span>Contacts</a>
           <a class="tl-sidebar-link {% if '/timesheet/' in request.path %}is-active{% endif %}" href="{% url 'timesheet' %}"><span class="tl-sidebar-dot"></span>Timesheet</a>
+          <a class="tl-sidebar-link {% if '/ai/time-cleanup/' in request.path %}is-active{% endif %}" href="{% url 'time_ai_cleanup' %}"><span class="tl-sidebar-dot"></span>AI time cleanup</a>
           <a class="tl-sidebar-link {% if '/reports/' in request.path %}is-active{% endif %}" href="{% url 'time_report' %}"><span class="tl-sidebar-dot"></span>Reports</a>
           <a class="tl-sidebar-link {% if '/ai/' in request.path %}is-active{% endif %}" href="{% url 'ai_audit' %}"><span class="tl-sidebar-dot"></span>AI audit</a>
           <a class="tl-sidebar-link {% if '/search/' in request.path %}is-active{% endif %}" href="{% url 'search' %}"><span class="tl-sidebar-dot"></span>Search</a>
@@ -224,6 +225,7 @@
             <a class="{% if '/organizations/' in request.path %}is-active{% endif %}" href="{% url 'organization_list' %}">Organizations</a>
             <a class="{% if '/contacts/' in request.path %}is-active{% endif %}" href="{% url 'contact_list' %}">Contacts</a>
             <a class="{% if '/timesheet/' in request.path %}is-active{% endif %}" href="{% url 'timesheet' %}">Timesheet</a>
+            <a class="{% if '/ai/time-cleanup/' in request.path %}is-active{% endif %}" href="{% url 'time_ai_cleanup' %}">AI time cleanup</a>
             <a class="{% if '/reports/' in request.path %}is-active{% endif %}" href="{% url 'time_report' %}">Reports</a>
             <a class="{% if '/ai/' in request.path %}is-active{% endif %}" href="{% url 'ai_audit' %}">AI audit</a>
             <a class="{% if '/search/' in request.path %}is-active{% endif %}" href="{% url 'search' %}">Search</a>

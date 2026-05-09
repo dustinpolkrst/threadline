@@ -28,6 +28,18 @@ def ticket_analysis_schema():
                 "required": ["summary", "triage", "client_context", "solution_draft", "risks", "context_refs"],
                 "properties": {
                     "summary": {"type": "string"},
+                    "customer_sentiment": {"type": "string"},
+                    "urgency_reason": {"type": "string"},
+                    "next_best_action": {"type": "string"},
+                    "similar_tickets": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["id", "title", "reason"],
+                            "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "reason": {"type": "string"}},
+                        },
+                    },
                     "root_cause_notes": {"type": "string"},
                     "customer_reply_draft": {"type": "string"},
                     "internal_note_draft": {"type": "string"},
@@ -67,6 +79,72 @@ def ticket_analysis_schema():
             },
         },
     }
+
+
+def reply_schema():
+    return _schema(
+        "threadline_reply_draft",
+        {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["body", "reason"],
+            "properties": {"body": {"type": "string"}, "reason": {"type": "string"}},
+        },
+    )
+
+
+def crm_insight_schema():
+    return _schema(
+        "threadline_crm_insight",
+        {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["summary", "support_tone", "recommended_next_touch", "recurring_issues", "product_areas", "risks", "suggestions", "hygiene_suggestions"],
+            "properties": {
+                "summary": {"type": "string"},
+                "support_tone": {"type": "string"},
+                "recommended_next_touch": {"type": "string"},
+                "recurring_issues": {"type": "array", "items": {"type": "string"}},
+                "product_areas": {"type": "array", "items": {"type": "string"}},
+                "risks": {"type": "array", "items": {"type": "string"}},
+                "suggestions": {"type": "array", "items": {"type": "string"}},
+                "hygiene_suggestions": {"type": "array", "items": {"type": "string"}},
+            },
+        },
+    )
+
+
+def time_suggestion_schema():
+    return _schema(
+        "threadline_time_suggestion",
+        {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["minutes", "billable", "notes", "reason"],
+            "properties": {
+                "minutes": {"type": "integer", "minimum": 1, "maximum": 480},
+                "billable": {"type": "boolean"},
+                "notes": {"type": "string"},
+                "reason": {"type": "string"},
+            },
+        },
+    )
+
+
+def solution_snippet_schema():
+    return _schema(
+        "threadline_solution_snippet",
+        {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["title", "body", "tags"],
+            "properties": {"title": {"type": "string"}, "body": {"type": "string"}, "tags": {"type": "array", "items": {"type": "string"}}},
+        },
+    )
+
+
+def _schema(name, schema):
+    return {"type": "json_schema", "json_schema": {"name": name, "strict": True, "schema": schema}}
 
 
 def build_request_payload(ai_settings, messages, max_tokens=1200, structured=True, response_format=None):
@@ -109,6 +187,12 @@ def send_chat_completion(ai_settings, messages, max_tokens=1200, structured=True
 
 
 def parse_analysis_response(response):
+    parsed, usage = parse_structured_response(response)
+    _validate_analysis_payload(parsed)
+    return parsed, usage
+
+
+def parse_structured_response(response):
     content = ""
     try:
         choice = response["choices"][0]
@@ -126,12 +210,12 @@ def parse_analysis_response(response):
         preview = _safe_preview(content or _message_content_preview(response))
         raise OpenRouterError(f"OpenRouter returned malformed analysis JSON. Preview: {preview}", code="malformed_json") from exc
     usage = response.get("usage") or {}
-    _validate_analysis_payload(parsed)
     return parsed, {
         "raw_model": response.get("model", ""),
         "prompt_tokens": int(usage.get("prompt_tokens") or 0),
         "completion_tokens": int(usage.get("completion_tokens") or 0),
         "total_tokens": int(usage.get("total_tokens") or 0),
+        "provider_generation_id": response.get("id", ""),
     }
 
 

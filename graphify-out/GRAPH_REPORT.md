@@ -1,16 +1,16 @@
 # Graph Report - threadline  (2026-05-09)
 
 ## Corpus Check
-- 129 files · ~30,389 words
+- 131 files · ~33,673 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 569 nodes · 1155 edges · 77 communities (56 shown, 21 thin omitted)
-- Extraction: 57% EXTRACTED · 43% INFERRED · 0% AMBIGUOUS · INFERRED: 501 edges (avg confidence: 0.6)
+- 609 nodes · 1278 edges · 79 communities (56 shown, 23 thin omitted)
+- Extraction: 59% EXTRACTED · 41% INFERRED · 0% AMBIGUOUS · INFERRED: 523 edges (avg confidence: 0.61)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bed97674`
+- Built from commit: `7448c6d0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,7 +38,7 @@
 - [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
-- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
 - [[_COMMUNITY_Community 27|Community 27]]
 - [[_COMMUNITY_Community 28|Community 28]]
 - [[_COMMUNITY_Community 29|Community 29]]
@@ -49,56 +49,58 @@
 - [[_COMMUNITY_Community 34|Community 34]]
 - [[_COMMUNITY_Community 35|Community 35]]
 - [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Workspace` - 66 edges
-2. `Organization` - 52 edges
-3. `Contact` - 52 edges
-4. `require_internal_workspace()` - 47 edges
-5. `Ticket` - 44 edges
-6. `TimeEntry` - 26 edges
-7. `TicketComment` - 23 edges
-8. `record_event()` - 21 edges
-9. `AIProviderSettings` - 15 edges
-10. `get_ai_settings()` - 15 edges
+1. `Workspace` - 67 edges
+2. `Organization` - 53 edges
+3. `Contact` - 53 edges
+4. `require_internal_workspace()` - 52 edges
+5. `Ticket` - 45 edges
+6. `TimeEntry` - 27 edges
+7. `record_event()` - 23 edges
+8. `TicketComment` - 23 edges
+9. `get_ai_settings()` - 22 edges
+10. `AIProviderSettings` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `ticket_ai_solution_memory()` --calls--> `require_internal_workspace()`  [INFERRED]
-  ai/views.py → core/permissions.py
-- `ai_audit()` --calls--> `require_internal_workspace()`  [INFERRED]
-  ai/views.py → core/permissions.py
+- `test_apply_selected_ticket_suggestions_are_human_approved()` --calls--> `apply_selected_ticket_suggestions()`  [INFERRED]
+  tests/test_ai_foundation.py → ai/services.py
 - `require_internal_workspace()` --calls--> `first_workspace_for()`  [INFERRED]
   core/permissions.py → workspaces/models.py
 - `organization_detail()` --calls--> `require_internal_workspace()`  [INFERRED]
   crm/views.py → core/permissions.py
 - `contact_detail()` --calls--> `require_internal_workspace()`  [INFERRED]
   crm/views.py → core/permissions.py
+- `ticket_download_attachment()` --calls--> `require_internal_workspace()`  [INFERRED]
+  tickets/views.py → core/permissions.py
 
-## Communities (77 total, 21 thin omitted)
+## Communities (79 total, 23 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.09
-Nodes (58): ActivityEvent, Meta, Visibility, AIProviderSettingsAdmin, AIRunAdmin, TicketAIAnalysisAdmin, AIProviderSettings, AIRun (+50 more)
+Cohesion: 0.08
+Nodes (57): ActivityEvent, Meta, Visibility, AIProviderSettingsAdmin, AIRunAdmin, TicketAIAnalysisAdmin, Meta, AIProviderSettings (+49 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.06
-Nodes (51): record_event(), activity_log(), paginate(), customer_profile_for(), require_customer_profile(), require_internal_workspace(), dashboard(), contact_list() (+43 more)
+Cohesion: 0.08
+Nodes (52): record_event(), require_customer_profile(), portal_account(), portal_download_attachment(), portal_ticket_create(), portal_ticket_detail(), portal_ticket_list(), portal_ticket_reply() (+44 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.06
-Nodes (50): build_analysis_messages(), build_ticket_context(), redact_secrets(), apply_analysis(), apply_selected_ticket_suggestions(), approve_time_suggestion(), create_queued_analysis(), create_solution_snippet() (+42 more)
+Cohesion: 0.07
+Nodes (59): find_unlogged_work(), apply_analysis(), apply_selected_ticket_suggestions(), approve_reply_draft(), approve_solution_snippet(), approve_time_suggestion(), build_queue_intelligence(), create_queued_analysis() (+51 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.07
-Nodes (47): ContactForm, CRMImportUploadForm, Meta, OrganizationForm, apply_organization_row(), confirm_import_job(), create_import_job(), detect_duplicate() (+39 more)
+Cohesion: 0.06
+Nodes (47): build_request_payload(), _code_for_status(), crm_insight_schema(), _extract_json_object(), _message_content_preview(), OpenRouterError, parse_analysis_response(), _parse_message_payload() (+39 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.1
-Nodes (28): AIProviderSettingsForm, Meta, build_settings_context(), _handle_ai_test(), handle_settings_post(), normalize_settings_section(), _scope_invitation_form(), settings_redirect() (+20 more)
+Cohesion: 0.07
+Nodes (47): activity_log(), paginate(), customer_profile_for(), OrganizationForm, apply_organization_row(), confirm_import_job(), create_import_job(), detect_duplicate() (+39 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.11
-Nodes (19): build_request_payload(), _code_for_status(), _extract_json_object(), _message_content_preview(), OpenRouterError, parse_analysis_response(), _parse_message_payload(), _safe_preview() (+11 more)
+Nodes (27): AIProviderSettingsForm, build_settings_context(), _handle_ai_test(), handle_settings_post(), normalize_settings_section(), _scope_invitation_form(), settings_redirect(), team_settings() (+19 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.09
@@ -129,24 +131,24 @@ Cohesion: 0.25
 Nodes (6): Deployment Notes, graphify, Local Commands, Project Defaults, Security And Scoping Rules, Threadline Agent Notes
 
 ## Knowledge Gaps
-- **46 isolated node(s):** `Run administrative tasks.`, `Migration`, `Migration`, `Migration`, `Migration` (+41 more)
+- **48 isolated node(s):** `Run administrative tasks.`, `Migration`, `Migration`, `Migration`, `Migration` (+43 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Workspace` connect `Community 0` to `Community 3`, `Community 4`, `Community 5`, `Community 14`?**
-  _High betweenness centrality (0.127) - this node is a cross-community bridge._
-- **Why does `require_internal_workspace()` connect `Community 1` to `Community 17`, `Community 2`, `Community 3`, `Community 4`?**
-  _High betweenness centrality (0.105) - this node is a cross-community bridge._
-- **Why does `team_settings()` connect `Community 4` to `Community 1`, `Community 2`, `Community 3`, `Community 5`?**
-  _High betweenness centrality (0.044) - this node is a cross-community bridge._
-- **Are the 64 inferred relationships involving `Workspace` (e.g. with `ActivityEvent` and `Visibility`) actually correct?**
-  _`Workspace` has 64 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 48 inferred relationships involving `Organization` (e.g. with `ActivityEvent` and `Visibility`) actually correct?**
-  _`Organization` has 48 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 48 inferred relationships involving `Contact` (e.g. with `ActivityEvent` and `Visibility`) actually correct?**
-  _`Contact` has 48 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 46 inferred relationships involving `require_internal_workspace()` (e.g. with `activity_log()` and `ticket_ai_analyze()`) actually correct?**
-  _`require_internal_workspace()` has 46 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `Workspace` connect `Community 0` to `Community 1`, `Community 3`, `Community 5`, `Community 14`?**
+  _High betweenness centrality (0.118) - this node is a cross-community bridge._
+- **Why does `require_internal_workspace()` connect `Community 2` to `Community 17`, `Community 4`, `Community 5`, `Community 1`?**
+  _High betweenness centrality (0.104) - this node is a cross-community bridge._
+- **Why does `record_event()` connect `Community 1` to `Community 0`, `Community 8`, `Community 2`?**
+  _High betweenness centrality (0.046) - this node is a cross-community bridge._
+- **Are the 65 inferred relationships involving `Workspace` (e.g. with `ActivityEvent` and `Visibility`) actually correct?**
+  _`Workspace` has 65 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 49 inferred relationships involving `Organization` (e.g. with `ActivityEvent` and `Visibility`) actually correct?**
+  _`Organization` has 49 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 49 inferred relationships involving `Contact` (e.g. with `ActivityEvent` and `Visibility`) actually correct?**
+  _`Contact` has 49 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 51 inferred relationships involving `require_internal_workspace()` (e.g. with `activity_log()` and `ticket_ai_analyze()`) actually correct?**
+  _`require_internal_workspace()` has 51 INFERRED edges - model-reasoned connections that need verification._

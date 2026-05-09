@@ -80,7 +80,12 @@
       {% for insight in ai_insights %}
         <div class="border-t border-slate-100 py-2 text-sm">
           <div class="font-medium">{{ insight.summary }}</div>
+          {% if insight.support_tone %}<div class="mt-1 text-slate-600">Tone: {{ insight.support_tone }}</div>{% endif %}
+          {% if insight.recommended_next_touch %}<div class="mt-1 text-blue-700">Next touch: {{ insight.recommended_next_touch }}</div>{% endif %}
+          {% if insight.recurring_issues %}<div class="mt-1 text-slate-600">Recurring: {{ insight.recurring_issues|join:", " }}</div>{% endif %}
+          {% if insight.product_areas %}<div class="mt-1 text-slate-600">Product areas: {{ insight.product_areas|join:", " }}</div>{% endif %}
           {% if insight.risks %}<div class="mt-1 text-rose-700">Risks: {{ insight.risks|join:", " }}</div>{% endif %}
+          {% if insight.hygiene_suggestions %}<div class="mt-1 text-amber-700">Hygiene: {{ insight.hygiene_suggestions|join:"; " }}</div>{% endif %}
           {% if insight.suggestions %}<div class="mt-1 text-slate-600">Suggestions: {{ insight.suggestions|join:"; " }}</div>{% endif %}
         </div>
       {% empty %}

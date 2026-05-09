@@ -22,9 +22,12 @@ class AIProviderSettings(models.Model):
     model = models.CharField(max_length=160, default="openrouter/auto")
     zdr_only = models.BooleanField(default=True)
     auto_triage_enabled = models.BooleanField(default=False)
+    reply_composer_enabled = models.BooleanField(default=True)
+    solution_memory_enabled = models.BooleanField(default=True)
     ticket_drafts_enabled = models.BooleanField(default=True)
     crm_insights_enabled = models.BooleanField(default=True)
     time_suggestions_enabled = models.BooleanField(default=True)
+    queue_intelligence_enabled = models.BooleanField(default=True)
     digest_enabled = models.BooleanField(default=False)
     max_historical_tickets = models.PositiveSmallIntegerField(default=5)
     last_test_status = models.CharField(max_length=20, blank=True)
@@ -78,6 +81,10 @@ class TicketAIAnalysis(models.Model):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.QUEUED)
     mode = models.CharField(max_length=20, choices=Mode.choices, default=Mode.DRAFT)
     summary = models.TextField(blank=True)
+    customer_sentiment = models.CharField(max_length=40, blank=True)
+    urgency_reason = models.TextField(blank=True)
+    next_best_action = models.TextField(blank=True)
+    similar_tickets = models.JSONField(default=list, blank=True)
     suggested_priority = models.CharField(max_length=20, blank=True)
     suggested_status = models.CharField(max_length=20, blank=True)
     suggested_tags = models.JSONField(default=list, blank=True)
@@ -118,10 +125,12 @@ class TicketAIAnalysis(models.Model):
 class AIRun(models.Model):
     class Workflow(models.TextChoices):
         TICKET_WORKBENCH = "ticket_workbench", "Ticket workbench"
+        REPLY_COMPOSER = "reply_composer", "Reply composer"
         CRM_INSIGHT = "crm_insight", "CRM insight"
         TIME_SUGGESTION = "time_suggestion", "Time suggestion"
         WORKSPACE_DIGEST = "workspace_digest", "Workspace digest"
         SOLUTION_MEMORY = "solution_memory", "Solution memory"
+        QUEUE_INTELLIGENCE = "queue_intelligence", "Queue intelligence"
 
     class Status(models.TextChoices):
         QUEUED = "queued", "Queued"
@@ -145,6 +154,8 @@ class AIRun(models.Model):
     prompt_tokens = models.PositiveIntegerField(default=0)
     completion_tokens = models.PositiveIntegerField(default=0)
     total_tokens = models.PositiveIntegerField(default=0)
+    provider_generation_id = models.CharField(max_length=120, blank=True)
+    latency_ms = models.PositiveIntegerField(default=0)
     privacy_mode = models.CharField(max_length=20, default="zdr")
     error_code = models.CharField(max_length=80, blank=True)
     error_message = models.TextField(blank=True)
@@ -204,6 +215,7 @@ class TicketReplyDraft(models.Model):
     analysis = models.ForeignKey(TicketAIAnalysis, on_delete=models.SET_NULL, null=True, blank=True, related_name="reply_drafts")
     audience = models.CharField(max_length=20, choices=Audience.choices)
     body = models.TextField()
+    prompt = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
     approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     approved_at = models.DateTimeField(null=True, blank=True)
@@ -221,6 +233,9 @@ class CRMInsight(models.Model):
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE, null=True, blank=True, related_name="ai_insights")
     run = models.ForeignKey(AIRun, on_delete=models.SET_NULL, null=True, blank=True, related_name="crm_insights")
     summary = models.TextField()
+    support_tone = models.CharField(max_length=80, blank=True)
+    recommended_next_touch = models.TextField(blank=True)
+    hygiene_suggestions = models.JSONField(default=list, blank=True)
     recurring_issues = models.JSONField(default=list, blank=True)
     product_areas = models.JSONField(default=list, blank=True)
     risks = models.JSONField(default=list, blank=True)
@@ -246,6 +261,7 @@ class TimeEntrySuggestion(models.Model):
     suggested_minutes = models.PositiveIntegerField(default=15)
     billable = models.BooleanField(default=True)
     notes = models.TextField(blank=True)
+    reason = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
     created_time_entry = models.ForeignKey(TimeEntry, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -287,3 +303,20 @@ class SolutionSnippet(models.Model):
     class Meta:
         ordering = ["-created_at"]
         indexes = [models.Index(fields=["workspace", "approved"])]
+
+
+class QueueIntelligenceSnapshot(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="ai_queue_snapshots")
+    run = models.ForeignKey(AIRun, on_delete=models.SET_NULL, null=True, blank=True, related_name="queue_snapshots")
+    likely_urgent = models.JSONField(default=list, blank=True)
+    stale_pending = models.JSONField(default=list, blank=True)
+    missing_customer_info = models.JSONField(default=list, blank=True)
+    probable_duplicates = models.JSONField(default=list, blank=True)
+    sla_risks = models.JSONField(default=list, blank=True)
+    high_effort_accounts = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["workspace", "created_at"])]

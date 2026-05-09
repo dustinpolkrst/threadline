@@ -32,4 +32,20 @@
     <div class="divide-y divide-slate-100">{% for event in activity %}<div class="p-3 text-sm"><div>{{ event.summary }}</div><div class="text-xs text-slate-500">{{ event.created_at|date:"M j, g:i A" }}</div></div>{% empty %}<div class="p-4 text-sm text-slate-500">No activity.</div>{% endfor %}</div>
   </section>
 </div>
+
+<div class="mt-6 tl-panel overflow-hidden">
+  <div class="tl-toolbar">
+    <div><div class="font-semibold">AI queue intelligence</div><div class="tl-meta">Agent-assist recommendations for the current support queue</div></div>
+    {% if ai_settings.queue_intelligence_enabled %}<form method="post" action="{% url 'workspace_ai_queue_intelligence' %}">{% csrf_token %}<button class="tl-button-secondary">Refresh intelligence</button></form>{% endif %}
+  </div>
+  {% if queue_snapshot %}
+    <div class="grid gap-px bg-slate-200 md:grid-cols-3">
+      <div class="bg-white p-4"><div class="tl-kicker">Likely urgent</div><div class="mt-2 space-y-2">{% for item in queue_snapshot.likely_urgent|slice:":4" %}<a class="block text-sm font-medium text-blue-700" href="{% url 'ticket_detail' item.id %}">{{ item.title }}</a>{% empty %}<div class="text-sm text-slate-500">None flagged.</div>{% endfor %}</div></div>
+      <div class="bg-white p-4"><div class="tl-kicker">SLA risk</div><div class="mt-2 space-y-2">{% for item in queue_snapshot.sla_risks|slice:":4" %}<a class="block text-sm font-medium text-blue-700" href="{% url 'ticket_detail' item.id %}">{{ item.title }}</a>{% empty %}<div class="text-sm text-slate-500">No near-term risks.</div>{% endfor %}</div></div>
+      <div class="bg-white p-4"><div class="tl-kicker">Needs customer info</div><div class="mt-2 space-y-2">{% for item in queue_snapshot.missing_customer_info|slice:":4" %}<a class="block text-sm font-medium text-blue-700" href="{% url 'ticket_detail' item.id %}">{{ item.title }}</a>{% empty %}<div class="text-sm text-slate-500">No gaps found.</div>{% endfor %}</div></div>
+    </div>
+  {% else %}
+    <div class="p-5 text-sm text-slate-500">No queue intelligence snapshot yet.</div>
+  {% endif %}
+</div>
 {% endblock %}

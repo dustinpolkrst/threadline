@@ -7,8 +7,8 @@ from django.utils import timezone
 
 from ai.client import OpenRouterError, build_request_payload, parse_analysis_response
 from ai.context import build_analysis_messages, build_ticket_context
-from ai.models import AIRun, AISuggestedAction, AIProviderSettings, CRMInsight, TicketAIAnalysis, TicketReplyDraft, TimeEntrySuggestion, WorkspaceDigest
-from ai.services import apply_analysis, apply_selected_ticket_suggestions, generate_crm_insight, generate_workspace_digest, run_ticket_analysis, suggest_time_entry
+from ai.models import AIRun, AISuggestedAction, AIProviderSettings, CRMInsight, QueueIntelligenceSnapshot, SolutionSnippet, TicketAIAnalysis, TicketReplyDraft, TimeEntrySuggestion, WorkspaceDigest
+from ai.services import approve_reply_draft, approve_solution_snippet, apply_analysis, apply_selected_ticket_suggestions, build_queue_intelligence, generate_crm_insight, generate_reply_draft, generate_workspace_digest, run_ticket_analysis, suggest_time_entry, time_cleanup_context
 from crm.models import Contact, Organization
 from customer_portal.models import CustomerProfile
 from search.models import SearchDocument
@@ -286,6 +286,85 @@ def test_crm_time_and_digest_ai_artifacts_are_workspace_scoped(ai_data):
     assert TimeEntrySuggestion.objects.filter(workspace=ai_data["workspace"], pk=suggestion.pk, ticket=ai_data["ticket"]).exists()
     assert WorkspaceDigest.objects.filter(workspace=ai_data["workspace"], pk=digest.pk).exists()
     assert not CRMInsight.objects.filter(workspace=ai_data["other_workspace"], pk=insight.pk).exists()
+
+
+@pytest.mark.django_db
+def test_reply_composer_creates_draft_and_approval_posts_public_comment(monkeypatch, ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
+
+    def fake_send(ai_settings, messages, max_tokens=1200, structured=True, response_format=None):
+        assert response_format["json_schema"]["name"] == "threadline_reply_draft"
+        return {
+            "id": "gen-reply-1",
+            "model": "openrouter/mock",
+            "choices": [{"message": {"content": json.dumps({"body": "Thanks, we are checking this now.", "reason": "Clear customer-safe update."})}}],
+            "usage": {"prompt_tokens": 5, "completion_tokens": 6, "total_tokens": 11},
+        }
+
+    monkeypatch.setattr("ai.services.send_chat_completion", fake_send)
+    draft = generate_reply_draft(ai_data["ticket"], ai_data["agent"], intent="customer_safe", source_text="internal rough note")
+    assert draft.status == TicketReplyDraft.Status.DRAFT
+    assert draft.run.provider_generation_id == "gen-reply-1"
+    approve_reply_draft(draft, ai_data["agent"])
+    draft.refresh_from_db()
+    assert draft.status == TicketReplyDraft.Status.APPROVED
+    assert TicketComment.objects.filter(workspace=ai_data["workspace"], ticket=ai_data["ticket"], visibility=TicketComment.Visibility.PUBLIC, body=draft.body).exists()
+
+
+@pytest.mark.django_db
+def test_solution_memory_approval_indexes_internal_snippet(ai_data):
+    snippet = SolutionSnippet.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], title="SSO cache reset", body="Reset stale SSO mapping cache.", tags=["sso"])
+    approve_solution_snippet(snippet, ai_data["agent"])
+    snippet.refresh_from_db()
+    assert snippet.approved is True
+    assert SearchDocument.objects.filter(workspace=ai_data["workspace"], entity_type=SearchDocument.EntityType.SOLUTION_SNIPPET, object_id=snippet.pk, customer_visible=False, body__contains="SSO").exists()
+
+
+@pytest.mark.django_db
+def test_openrouter_backed_crm_insight_uses_structured_output(monkeypatch, ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
+
+    def fake_send(ai_settings, messages, max_tokens=1800, structured=True, response_format=None):
+        assert response_format["json_schema"]["name"] == "threadline_crm_insight"
+        return {
+            "model": "openrouter/mock",
+            "choices": [
+                {
+                    "message": {
+                        "content": json.dumps(
+                            {
+                                "summary": "Acme has recurring SSO issues.",
+                                "support_tone": "calm but blocked",
+                                "recommended_next_touch": "Confirm affected users before next reply.",
+                                "recurring_issues": ["SSO"],
+                                "product_areas": ["Authentication"],
+                                "risks": ["Repeated login failures"],
+                                "suggestions": ["Review identity provider settings"],
+                                "hygiene_suggestions": ["Add renewal date"],
+                            }
+                        )
+                    }
+                }
+            ],
+            "usage": {},
+        }
+
+    monkeypatch.setattr("ai.services.send_chat_completion", fake_send)
+    insight = generate_crm_insight(ai_data["org"], ai_data["agent"])
+    assert insight.summary == "Acme has recurring SSO issues."
+    assert insight.support_tone == "calm but blocked"
+    assert insight.hygiene_suggestions == ["Add renewal date"]
+
+
+@pytest.mark.django_db
+def test_queue_intelligence_and_time_cleanup_are_workspace_scoped(ai_data):
+    Ticket.objects.create(workspace=ai_data["workspace"], organization=None, title="urgent missing customer", description="urgent", priority=Ticket.Priority.NORMAL)
+    snapshot = build_queue_intelligence(ai_data["workspace"], ai_data["agent"])
+    cleanup = time_cleanup_context(ai_data["workspace"], ai_data["agent"])
+    assert QueueIntelligenceSnapshot.objects.filter(workspace=ai_data["workspace"], pk=snapshot.pk).exists()
+    assert snapshot.likely_urgent
+    assert ai_data["other_ticket"].title not in json.dumps(snapshot.likely_urgent + snapshot.missing_customer_info)
+    assert ai_data["ticket"] in list(cleanup["unlogged_tickets"])
 
 
 @pytest.mark.django_db

@@ -2,7 +2,7 @@
   <div class="mb-3 flex items-start justify-between gap-3">
     <div>
       <h2 class="font-medium">AI workbench</h2>
-      <p class="mt-1 text-sm text-slate-500">Triage, reply drafts, next actions, time suggestions, and solution memory.</p>
+      <p class="mt-1 text-sm text-slate-500">Agent brief, reply drafts, next actions, time suggestions, and solution memory.</p>
     </div>
     {% if ai_settings.enabled %}<span class="tl-badge bg-emerald-50 text-emerald-700">Enabled</span>{% else %}<span class="tl-badge bg-slate-100 text-slate-600">Off</span>{% endif %}
   </div>
@@ -12,8 +12,22 @@
       <button class="tl-button" name="mode" value="draft">Generate draft</button>
       {% if ai_settings.auto_triage_enabled %}<button class="tl-button-secondary" name="mode" value="auto_triage">Generate auto-triage</button>{% endif %}
       {% if ai_settings.time_suggestions_enabled %}<button class="tl-button-secondary" formaction="{% url 'ticket_ai_time_suggestion' ticket.pk %}">Suggest time</button>{% endif %}
-      <button class="tl-button-secondary" formaction="{% url 'ticket_ai_solution_memory' ticket.pk %}">Remember solution</button>
+      {% if ai_settings.reply_composer_enabled %}<button class="tl-button-secondary" formaction="{% url 'ticket_ai_reply_draft' ticket.pk %}" name="intent" value="generate">Draft reply</button>{% endif %}
+      {% if ai_settings.solution_memory_enabled %}<button class="tl-button-secondary" formaction="{% url 'ticket_ai_solution_memory' ticket.pk %}">Remember solution</button>{% endif %}
     </form>
+    {% if ai_settings.reply_composer_enabled %}
+      <form method="post" action="{% url 'ticket_ai_reply_draft' ticket.pk %}" class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+        {% csrf_token %}
+        <label class="text-xs font-semibold uppercase text-slate-500" for="reply-source-text">Reply composer</label>
+        <textarea id="reply-source-text" name="source_text" rows="3" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder="Optional notes or rough draft to rewrite"></textarea>
+        <div class="mt-2 flex flex-wrap gap-2">
+          <button class="tl-button-secondary" name="intent" value="generate">Generate</button>
+          <button class="tl-button-secondary" name="intent" value="shorten">Shorten</button>
+          <button class="tl-button-secondary" name="intent" value="expand_steps">Add steps</button>
+          <button class="tl-button-secondary" name="intent" value="customer_safe">Make customer-safe</button>
+        </div>
+      </form>
+    {% endif %}
   {% else %}
     <div class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">AI is not enabled for this workspace. Configure it in Settings - AI.</div>
   {% endif %}
@@ -28,12 +42,21 @@
           <div class="text-rose-700">{{ analysis.error_message }}</div>
         {% else %}
           <div class="font-semibold text-slate-900">{{ analysis.summary|default:"Analysis pending" }}</div>
+          {% if analysis.customer_sentiment or analysis.urgency_reason or analysis.next_best_action %}
+            <div class="mt-3 rounded-md border border-blue-100 bg-blue-50 p-3 text-blue-950">
+              <div class="text-xs font-semibold uppercase text-blue-700">Agent brief</div>
+              {% if analysis.customer_sentiment %}<div class="mt-1"><span class="font-medium">Sentiment:</span> {{ analysis.customer_sentiment }}</div>{% endif %}
+              {% if analysis.urgency_reason %}<div class="mt-1"><span class="font-medium">Urgency:</span> {{ analysis.urgency_reason }}</div>{% endif %}
+              {% if analysis.next_best_action %}<div class="mt-1"><span class="font-medium">Next best action:</span> {{ analysis.next_best_action }}</div>{% endif %}
+            </div>
+          {% endif %}
           {% if analysis.suggested_priority or analysis.suggested_tags %}
             <div class="mt-2 text-slate-600">Priority: {{ analysis.suggested_priority|default:"-" }}{% if analysis.suggested_status %} - Status: {{ analysis.suggested_status }}{% endif %}{% if analysis.suggested_tags %} - Tags: {{ analysis.suggested_tags|join:", " }}{% endif %}</div>
           {% endif %}
           {% if analysis.root_cause_notes %}<div class="mt-2 text-slate-700"><span class="font-medium">Root cause:</span> {{ analysis.root_cause_notes }}</div>{% endif %}
           {% if analysis.missing_info %}<div class="mt-2 text-slate-700"><span class="font-medium">Missing info:</span> {{ analysis.missing_info|join:", " }}</div>{% endif %}
           {% if analysis.next_actions %}<div class="mt-2 text-slate-700"><span class="font-medium">Next actions:</span> {{ analysis.next_actions|join:"; " }}</div>{% endif %}
+          {% if analysis.similar_tickets %}<div class="mt-2 text-slate-700"><span class="font-medium">Similar tickets:</span> {% for item in analysis.similar_tickets %}{{ item.title }}{% if not forloop.last %}; {% endif %}{% endfor %}</div>{% endif %}
           {% if analysis.solution_draft %}<div class="mt-2 whitespace-pre-wrap rounded-md bg-slate-50 p-2 text-slate-700">{{ analysis.solution_draft }}</div>{% endif %}
           {% if analysis.customer_reply_draft %}<div class="mt-2 whitespace-pre-wrap rounded-md border border-blue-100 bg-blue-50 p-2 text-blue-950"><div class="mb-1 text-xs font-semibold uppercase text-blue-700">Customer reply draft</div>{{ analysis.customer_reply_draft }}</div>{% endif %}
           {% if analysis.internal_note_draft %}<div class="mt-2 whitespace-pre-wrap rounded-md border border-slate-200 bg-white p-2 text-slate-700"><div class="mb-1 text-xs font-semibold uppercase text-slate-500">Internal note draft</div>{{ analysis.internal_note_draft }}</div>{% endif %}
@@ -73,10 +96,22 @@
       {% endfor %}</div>
     </div>
   {% endif %}
+  {% if reply_drafts %}
+    <div class="mt-4 border-t border-slate-200 pt-4">
+      <h3 class="mb-2 text-sm font-semibold">Reply drafts</h3>
+      <div class="space-y-2">{% for draft in reply_drafts %}
+        <div class="rounded-md border border-blue-100 bg-blue-50 p-3 text-sm text-blue-950">
+          <div class="mb-1 flex items-center justify-between gap-2"><span class="tl-badge bg-white text-blue-700">{{ draft.get_status_display }}</span><span class="tl-meta">{{ draft.created_at|date:"M j, g:i A" }}</span></div>
+          <div class="whitespace-pre-wrap">{{ draft.body }}</div>
+          {% if draft.status == "draft" and draft.audience == "customer" %}<form method="post" action="{% url 'ticket_ai_reply_approve' ticket.pk draft.pk %}" class="mt-2">{% csrf_token %}<button class="tl-button-secondary">Approve and post</button></form>{% endif %}
+        </div>
+      {% endfor %}</div>
+    </div>
+  {% endif %}
   {% if solution_snippets %}
     <div class="mt-4 border-t border-slate-200 pt-4">
       <h3 class="mb-2 text-sm font-semibold">Solution memory</h3>
-      {% for snippet in solution_snippets %}<div class="rounded-md border border-slate-200 p-2 text-sm"><div class="font-medium">{{ snippet.title }}</div><div class="mt-1 whitespace-pre-wrap text-slate-600">{{ snippet.body }}</div></div>{% endfor %}
+      {% for snippet in solution_snippets %}<div class="rounded-md border border-slate-200 p-2 text-sm"><div class="flex items-center justify-between gap-2"><div class="font-medium">{{ snippet.title }}</div>{% if snippet.approved %}<span class="tl-badge bg-emerald-50 text-emerald-700">Approved</span>{% else %}<span class="tl-badge bg-amber-50 text-amber-700">Draft</span>{% endif %}</div><div class="mt-1 whitespace-pre-wrap text-slate-600">{{ snippet.body }}</div>{% if not snippet.approved %}<form method="post" action="{% url 'ticket_ai_solution_decision' ticket.pk snippet.pk %}" class="mt-2 flex gap-2">{% csrf_token %}<button class="tl-button-secondary" name="decision" value="approve">Approve memory</button><button class="tl-button-secondary" name="decision" value="reject">Reject</button></form>{% endif %}</div>{% endfor %}
     </div>
   {% endif %}
 </div>

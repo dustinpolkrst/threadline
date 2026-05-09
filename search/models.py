@@ -11,6 +11,7 @@ class SearchDocument(models.Model):
         COMMENT = "comment", "Comment"
         ORGANIZATION = "organization", "Organization"
         CONTACT = "contact", "Contact"
+        SOLUTION_SNIPPET = "solution_snippet", "Solution snippet"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="search_documents")

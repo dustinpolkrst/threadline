@@ -12,13 +12,30 @@ class AIProviderSettingsForm(forms.ModelForm):
 
     class Meta:
         model = AIProviderSettings
-        fields = ["enabled", "api_key", "model", "zdr_only", "auto_triage_enabled", "ticket_drafts_enabled", "crm_insights_enabled", "time_suggestions_enabled", "digest_enabled", "max_historical_tickets"]
+        fields = [
+            "enabled",
+            "api_key",
+            "model",
+            "zdr_only",
+            "auto_triage_enabled",
+            "ticket_drafts_enabled",
+            "reply_composer_enabled",
+            "solution_memory_enabled",
+            "crm_insights_enabled",
+            "time_suggestions_enabled",
+            "queue_intelligence_enabled",
+            "digest_enabled",
+            "max_historical_tickets",
+        ]
         help_texts = {
             "zdr_only": "Required by default for client ticket history.",
             "auto_triage_enabled": "Allows users to apply AI triage suggestions after generation.",
             "ticket_drafts_enabled": "Allows internal ticket reply drafts and next-action suggestions.",
+            "reply_composer_enabled": "Allows agents to generate and transform human-approved customer reply drafts.",
+            "solution_memory_enabled": "Allows approved reusable solution snippets to be generated and searched.",
             "crm_insights_enabled": "Allows account and contact support briefings.",
             "time_suggestions_enabled": "Allows draft time-entry suggestions from ticket activity.",
+            "queue_intelligence_enabled": "Allows dashboard recommendations for urgent, stale, duplicate, and SLA-risk tickets.",
             "digest_enabled": "Allows workspace-level AI digests for admins.",
             "max_historical_tickets": "Bounded same-client ticket history included in prompts.",
         }

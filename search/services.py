@@ -39,6 +39,15 @@ def rebuild_workspace_index(workspace, clear=False):
     for contact in Contact.objects.filter(workspace=workspace).select_related("organization"):
         index_contact(contact, refresh_vector=False)
         counts["contact"] += 1
+    try:
+        from ai.models import SolutionSnippet
+
+        counts["solution_snippet"] = 0
+        for snippet in SolutionSnippet.objects.filter(workspace=workspace, approved=True).select_related("ticket", "ticket__organization"):
+            index_solution_snippet(snippet, refresh_vector=False)
+            counts["solution_snippet"] += 1
+    except Exception:
+        pass
     if uses_postgres():
         refresh_search_vectors(workspace)
     return counts
@@ -129,6 +138,22 @@ def index_contact(contact, refresh_vector=True):
     return doc
 
 
+def index_solution_snippet(snippet, refresh_vector=True):
+    ticket = snippet.ticket
+    doc = _upsert_document(
+        workspace=snippet.workspace,
+        entity_type=SearchDocument.EntityType.SOLUTION_SNIPPET,
+        object_id=snippet.pk,
+        title=snippet.title,
+        body="\n".join([snippet.body, ", ".join(snippet.tags or []), ticket.title]),
+        customer_visible=False,
+        organization_id=ticket.organization_id,
+    )
+    if refresh_vector:
+        _refresh_document_vector(doc)
+    return doc
+
+
 def search_documents_for_user(user, query_text, entity="all"):
     from core.permissions import customer_profile_for, require_internal_workspace
 
@@ -148,6 +173,7 @@ def search_documents_for_user(user, query_text, entity="all"):
         "comments": SearchDocument.EntityType.COMMENT,
         "organizations": SearchDocument.EntityType.ORGANIZATION,
         "contacts": SearchDocument.EntityType.CONTACT,
+        "solutions": SearchDocument.EntityType.SOLUTION_SNIPPET,
     }
     if entity in type_map:
         documents = documents.filter(entity_type=type_map[entity])
@@ -243,6 +269,8 @@ def _document_url(doc, is_customer, comment_ticket_map=None):
         return reverse("organization_detail", args=[doc.object_id])
     if not is_customer and doc.entity_type == SearchDocument.EntityType.CONTACT:
         return reverse("contact_detail", args=[doc.object_id])
+    if not is_customer and doc.entity_type == SearchDocument.EntityType.SOLUTION_SNIPPET:
+        return reverse("ai_audit")
     return "#"
 
 

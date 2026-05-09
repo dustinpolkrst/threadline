@@ -5,6 +5,8 @@ from activity.models import ActivityEvent
 from core.permissions import customer_profile_for, require_internal_workspace
 from tickets.models import Ticket
 from time_tracking.models import TimeEntry
+from ai.models import QueueIntelligenceSnapshot
+from ai.services import get_ai_settings
 
 
 @login_required
@@ -16,4 +18,6 @@ def dashboard(request):
     status_counts = Ticket.objects.filter(workspace=workspace).values("status").annotate(count=Count("id"))
     time_total = TimeEntry.objects.filter(workspace=workspace).aggregate(total=Sum("duration_minutes"))["total"] or 0
     activity = ActivityEvent.objects.filter(workspace=workspace).select_related("ticket", "organization", "actor")[:12]
-    return render(request, "core/dashboard.html", {"workspace": workspace, "tickets": tickets, "status_counts": status_counts, "time_total": time_total, "activity": activity})
+    ai_settings = get_ai_settings(workspace)
+    queue_snapshot = QueueIntelligenceSnapshot.objects.filter(workspace=workspace).first()
+    return render(request, "core/dashboard.html", {"workspace": workspace, "tickets": tickets, "status_counts": status_counts, "time_total": time_total, "activity": activity, "ai_settings": ai_settings, "queue_snapshot": queue_snapshot})

@@ -21,7 +21,7 @@ class Command(BaseCommand):
             if not workspaces.exists():
                 raise CommandError(f"Workspace not found: {workspace_value}")
 
-        totals = {"ticket": 0, "comment": 0, "organization": 0, "contact": 0}
+        totals = {"ticket": 0, "comment": 0, "organization": 0, "contact": 0, "solution_snippet": 0}
         for workspace in workspaces:
             counts = rebuild_workspace_index(workspace, clear=options["clear"])
             for key, count in counts.items():
