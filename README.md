@@ -20,6 +20,7 @@ Threadline is for software support teams that need:
 - Copyable invitation links for internal users and customer portal users.
 - Ticket and email-message attachment records.
 - Provider-neutral email plumbing that can later support real inbound and outbound email.
+- AI-assisted ticket triage, reply drafting, CRM account intelligence, time cleanup, and queue recommendations with human approval before customer-visible output or record mutations.
 
 Threadline is intentionally built as a modular monolith:
 
@@ -58,8 +59,14 @@ We are intentionally avoiding Kubernetes, microservices, a separate SPA, GraphQL
 - CSV import templates and duplicate-resolution controls.
 - PostgreSQL full-text search ranking, highlighting, and rebuildable search documents.
 - Optional local or S3-compatible private attachment storage.
-- OpenRouter AI settings, internal ticket analysis drafts, and opt-in AI triage application.
-- AI workbench foundations: auditable AI runs, suggested actions, reply drafts, CRM account briefings, time-entry suggestions, workspace digests, and solution memory records.
+- OpenRouter AI settings with encrypted provider keys, ZDR routing, per-feature controls, and Celery-backed generation jobs.
+- AI ticket workbench with agent briefs, customer sentiment, urgency reasoning, next-best-action guidance, similar tickets, reply drafts, internal notes, triage suggestions, and selected human-approved application.
+- AI reply composer for internal agents, including generate, shorten, expand with steps, and customer-safe rewrite flows. Customer replies remain drafts until approved by an internal user.
+- AI solution memory records with approve/reject controls and approved snippet indexing in permission-scoped search.
+- AI CRM account briefings with recurring issues, support tone, product areas, risks, recommended next touch, and hygiene suggestions.
+- AI time-entry suggestions and a time cleanup page for likely unlogged work.
+- AI queue intelligence dashboard for likely urgent tickets, stale pending work, missing customer info, probable duplicates, SLA risks, and high-effort accounts.
+- AI audit console with auditable runs, suggested action outcomes, reply/snippet artifacts, token usage, latency, provider generation IDs, and privacy mode.
 - Email plumbing models and stub services, without real provider integration.
 - Docker Compose development and production-style deployment.
 - Demo seed data and permission tests.
@@ -106,18 +113,21 @@ Recently completed:
 - [x] S3-compatible attachment storage option.
 - [x] Search index rebuild command and richer highlighting.
 - [x] Import templates and duplicate-resolution UI.
+- [x] OpenRouter AI foundation with encrypted keys, structured outputs, Celery jobs, and ticket analysis polling.
+- [x] AI agent-assist workbench, reply composer, solution memory, CRM intelligence, time cleanup, queue intelligence, and expanded AI audit.
 
 High-priority next steps:
 
 - [ ] Real inbound email-to-ticket integration.
 - [ ] Outbound ticket replies by email.
-- [ ] OpenRouter-backed CRM/time/digest generation beyond the first local intelligence pass.
+- [ ] AI cost controls, generation retention settings, and admin-visible usage charts.
+- [ ] Optional vector/embedding retrieval for approved solution memory and historical support context.
 - [ ] SLA escalation notifications after email is configured.
 - [ ] Public API endpoints for integrations where needed.
 
 Longer-term possibilities:
 
-- [ ] Knowledge base and reply snippets.
+- [ ] Customer-facing AI self-service after email and approval workflows are mature.
 - [ ] Webhook integrations.
 - [ ] Custom fields for tickets, contacts, and organizations.
 - [ ] Per-organization support plans.
@@ -242,7 +252,11 @@ Persistent volumes are defined for PostgreSQL, Redis, uploaded media, and collec
 
 Attachment storage defaults to local private media. For S3-compatible storage, either set `MEDIA_STORAGE_BACKEND=s3` with the `AWS_*` values in `.env`, or configure a provider from Settings -> Application storage as an owner/admin. Objects remain private and Threadline still streams downloads through Django permission checks. Existing local media is not migrated automatically when switching storage backends.
 
-AI analysis is configured from Settings -> AI by an owner/admin. The first provider is OpenRouter, with draft-only analysis by default, ZDR routing required for client ticket history, and opt-in manual application of AI triage suggestions. AI jobs require a running Celery worker; Threadline does not fall back to running model calls in the web request. Set `THREADLINE_FIELD_ENCRYPTION_KEY` in production so provider secrets are encrypted independently of `SECRET_KEY`. Provider connectivity can be checked with:
+AI is configured from Settings -> AI by an owner/admin. The first provider is OpenRouter, with draft-only agent-assist workflows by default, ZDR routing required for client ticket history, and opt-in manual application of AI triage suggestions. Provider keys are encrypted with `THREADLINE_FIELD_ENCRYPTION_KEY` in production.
+
+Current AI workflows include ticket analysis, agent reply drafts, selected suggestion approval, solution memory generation, CRM account briefings, time-entry suggestions, workspace digests, queue intelligence, and audit history. Customer-visible messages and record mutations still require an internal user to approve the draft or selected suggestion.
+
+AI jobs require a running Celery worker; Threadline does not fall back to running model calls in the web request. Provider connectivity can be checked with:
 
 ```bash
 uv run python manage.py test_ai_provider --workspace demo
@@ -270,6 +284,7 @@ Health checks:
 - `customer_portal`: restricted customer ticket flows, dashboard filters, attachments, and account management.
 - `communications`: provider-neutral email plumbing, email attachment metadata, and stub tasks.
 - `search`: permission-scoped search, PostgreSQL full-text ranking, and a replaceable search document model.
+- `ai`: OpenRouter provider settings, structured AI workflows, ticket analyses, reply drafts, suggested actions, CRM insights, time suggestions, digests, queue intelligence snapshots, solution memory, and audit records.
 
 Customer portal access is represented by `CustomerProfile`. Internal access is represented by `WorkspaceMembership`. Customer-facing queries are scoped by workspace and organization, and sensitive internal comments, internal activity, private time entries, internal users, and workspace settings must not leak into the customer portal.
 

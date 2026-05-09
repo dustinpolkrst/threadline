@@ -5101,7 +5101,7 @@
       "label": "Current MVP Features",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L35",
+      "source_location": "L36",
       "id": "threadline_readme_current_mvp_features",
       "community": 7,
       "norm_label": "current mvp features"
@@ -5110,7 +5110,7 @@
       "label": "Email Scope",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L67",
+      "source_location": "L74",
       "id": "threadline_readme_email_scope",
       "community": 7,
       "norm_label": "email scope"
@@ -5119,7 +5119,7 @@
       "label": "Roadmap And TODOs",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L81",
+      "source_location": "L88",
       "id": "threadline_readme_roadmap_and_todos",
       "community": 7,
       "norm_label": "roadmap and todos"
@@ -5128,7 +5128,7 @@
       "label": "Open Source Maintenance Goals",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L128",
+      "source_location": "L138",
       "id": "threadline_readme_open_source_maintenance_goals",
       "community": 7,
       "norm_label": "open source maintenance goals"
@@ -5137,7 +5137,7 @@
       "label": "Local Development",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L150",
+      "source_location": "L160",
       "id": "threadline_readme_local_development",
       "community": 7,
       "norm_label": "local development"
@@ -5146,7 +5146,7 @@
       "label": "code:bash (uv sync)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L160",
+      "source_location": "L170",
       "id": "threadline_readme_codeblock_1",
       "community": 7,
       "norm_label": "code:bash (uv sync)"
@@ -5155,7 +5155,7 @@
       "label": "code:bash (uv run python manage.py migrate)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L166",
+      "source_location": "L176",
       "id": "threadline_readme_codeblock_2",
       "community": 7,
       "norm_label": "code:bash (uv run python manage.py migrate)"
@@ -5164,7 +5164,7 @@
       "label": "code:bash (uv run pytest)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L179",
+      "source_location": "L189",
       "id": "threadline_readme_codeblock_3",
       "community": 7,
       "norm_label": "code:bash (uv run pytest)"
@@ -5173,7 +5173,7 @@
       "label": "Docker Compose Development",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L183",
+      "source_location": "L193",
       "id": "threadline_readme_docker_compose_development",
       "community": 7,
       "norm_label": "docker compose development"
@@ -5182,7 +5182,7 @@
       "label": "code:bash (cp .env.example .env)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L187",
+      "source_location": "L197",
       "id": "threadline_readme_codeblock_4",
       "community": 7,
       "norm_label": "code:bash (cp .env.example .env)"
@@ -5191,7 +5191,7 @@
       "label": "code:bash (docker compose up --build)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L193",
+      "source_location": "L203",
       "id": "threadline_readme_codeblock_5",
       "community": 7,
       "norm_label": "code:bash (docker compose up --build)"
@@ -5200,7 +5200,7 @@
       "label": "code:bash (docker compose exec web python manage.py seed_demo)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L199",
+      "source_location": "L209",
       "id": "threadline_readme_codeblock_6",
       "community": 7,
       "norm_label": "code:bash (docker compose exec web python manage.py seed_demo)"
@@ -5209,7 +5209,7 @@
       "label": "code:bash (docker compose build)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L207",
+      "source_location": "L217",
       "id": "threadline_readme_codeblock_7",
       "community": 7,
       "norm_label": "code:bash (docker compose build)"
@@ -5218,7 +5218,7 @@
       "label": "Production-Style Single VPS Deployment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L214",
+      "source_location": "L224",
       "id": "threadline_readme_production_style_single_vps_deployment",
       "community": 7,
       "norm_label": "production-style single vps deployment"
@@ -5227,7 +5227,7 @@
       "label": "code:bash (cp .env.example .env)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L218",
+      "source_location": "L228",
       "id": "threadline_readme_codeblock_8",
       "community": 7,
       "norm_label": "code:bash (cp .env.example .env)"
@@ -5236,7 +5236,7 @@
       "label": "code:bash (docker compose -f compose.yml -f compose.prod.yml up -d --bu)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L235",
+      "source_location": "L245",
       "id": "threadline_readme_codeblock_9",
       "community": 7,
       "norm_label": "code:bash (docker compose -f compose.yml -f compose.prod.yml up -d --bu)"
@@ -5245,7 +5245,7 @@
       "label": "code:bash (uv run python manage.py test_ai_provider --workspace demo)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L247",
+      "source_location": "L261",
       "id": "threadline_readme_codeblock_10",
       "community": 7,
       "norm_label": "code:bash (uv run python manage.py test_ai_provider --workspace demo)"
@@ -5254,7 +5254,7 @@
       "label": "code:bash (uv run python manage.py rebuild_search_index --clear)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L253",
+      "source_location": "L267",
       "id": "threadline_readme_codeblock_11",
       "community": 7,
       "norm_label": "code:bash (uv run python manage.py rebuild_search_index --clear)"
@@ -5263,7 +5263,7 @@
       "label": "Architecture Notes",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L263",
+      "source_location": "L277",
       "id": "threadline_readme_architecture_notes",
       "community": 7,
       "norm_label": "architecture notes"
@@ -5272,7 +5272,7 @@
       "label": "Security And Data Isolation",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L276",
+      "source_location": "L291",
       "id": "threadline_readme_security_and_data_isolation",
       "community": 7,
       "norm_label": "security and data isolation"
@@ -18728,5 +18728,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7448c6d033b068df9efb6d172ef9344f623671f5"
+  "built_at_commit": "c137c66c157ac7572c894fe3d2c5812c11515cc2"
 }
