@@ -32,8 +32,8 @@ INSTALLED_APPS = [
     "activity",
     "customer_portal",
     "communications",
-    "search",
-    "ai",
+    "search.apps.SearchConfig",
+    "ai.apps.AiConfig",
 ]
 
 MIDDLEWARE = [
@@ -118,3 +118,4 @@ OPENROUTER_SITE_URL = env("OPENROUTER_SITE_URL", default="https://threadline.loc
 OPENROUTER_APP_TITLE = env("OPENROUTER_APP_TITLE", default="Threadline")
 OPENROUTER_TIMEOUT_SECONDS = env.int("OPENROUTER_TIMEOUT_SECONDS", default=45)
 OPENROUTER_ANALYSIS_MAX_TOKENS = env.int("OPENROUTER_ANALYSIS_MAX_TOKENS", default=2400)
+THREADLINE_FIELD_ENCRYPTION_KEY = env("THREADLINE_FIELD_ENCRYPTION_KEY", default="")

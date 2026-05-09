@@ -37,5 +37,3 @@ class ActivityEvent(models.Model):
 
     def __str__(self):
         return self.summary
-
-# Create your models here.

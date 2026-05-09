@@ -7,5 +7,3 @@ admin.site.register(EmailMessage)
 admin.site.register(EmailDeliveryAttempt)
 admin.site.register(EmailIngestLog)
 admin.site.register(EmailAttachment)
-
-# Register your models here.

@@ -6,5 +6,3 @@ admin.site.register(TicketComment)
 admin.site.register(TicketAttachment)
 admin.site.register(TicketRelation)
 admin.site.register(SavedTicketFilter)
-
-# Register your models here.

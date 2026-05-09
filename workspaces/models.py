@@ -143,5 +143,3 @@ def first_workspace_for(user):
         return None
     membership = user.workspace_memberships.select_related("workspace").first()
     return membership.workspace if membership else None
-
-# Create your models here.

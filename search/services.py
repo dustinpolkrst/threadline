@@ -28,23 +28,23 @@ def rebuild_workspace_index(workspace, clear=False):
         "contact": 0,
     }
     for ticket in Ticket.objects.filter(workspace=workspace).select_related("organization", "contact"):
-        index_ticket(ticket)
+        index_ticket(ticket, refresh_vector=False)
         counts["ticket"] += 1
     for comment in TicketComment.objects.filter(workspace=workspace).select_related("ticket", "ticket__organization"):
-        index_comment(comment)
+        index_comment(comment, refresh_vector=False)
         counts["comment"] += 1
     for organization in Organization.objects.filter(workspace=workspace):
-        index_organization(organization)
+        index_organization(organization, refresh_vector=False)
         counts["organization"] += 1
     for contact in Contact.objects.filter(workspace=workspace).select_related("organization"):
-        index_contact(contact)
+        index_contact(contact, refresh_vector=False)
         counts["contact"] += 1
     if uses_postgres():
         refresh_search_vectors(workspace)
     return counts
 
 
-def index_ticket(ticket):
+def index_ticket(ticket, refresh_vector=True):
     organization = ticket.organization
     contact = ticket.contact
     title = ticket.title
@@ -62,11 +62,12 @@ def index_ticket(ticket):
         customer_visible=organization is not None,
         organization_id=organization.pk if organization else None,
     )
-    _refresh_document_vector(doc)
+    if refresh_vector:
+        _refresh_document_vector(doc)
     return doc
 
 
-def index_comment(comment):
+def index_comment(comment, refresh_vector=True):
     ticket = comment.ticket
     organization = ticket.organization
     doc = _upsert_document(
@@ -78,11 +79,12 @@ def index_comment(comment):
         customer_visible=comment.visibility == TicketComment.Visibility.PUBLIC and organization is not None,
         organization_id=organization.pk if organization else None,
     )
-    _refresh_document_vector(doc)
+    if refresh_vector:
+        _refresh_document_vector(doc)
     return doc
 
 
-def index_organization(organization):
+def index_organization(organization, refresh_vector=True):
     body = "\n".join(
         part
         for part in [
@@ -106,11 +108,12 @@ def index_organization(organization):
         customer_visible=False,
         organization_id=organization.pk,
     )
-    _refresh_document_vector(doc)
+    if refresh_vector:
+        _refresh_document_vector(doc)
     return doc
 
 
-def index_contact(contact):
+def index_contact(contact, refresh_vector=True):
     body = "\n".join(part for part in [contact.email, contact.phone, contact.title, contact.notes, contact.organization.name] if part)
     doc = _upsert_document(
         workspace=contact.workspace,
@@ -121,7 +124,8 @@ def index_contact(contact):
         customer_visible=False,
         organization_id=contact.organization_id,
     )
-    _refresh_document_vector(doc)
+    if refresh_vector:
+        _refresh_document_vector(doc)
     return doc
 
 
@@ -162,10 +166,13 @@ def search_documents_for_user(user, query_text, entity="all"):
             .filter(search_vector=query)
             .order_by("-rank", "-updated_at")[:50]
         )
-        results = [_document_result(doc, doc.headline or doc.body, profile) for doc in documents]
+        docs = list(documents)
+        comment_ticket_map = _comment_ticket_map(docs)
+        results = [_document_result(doc, doc.headline or doc.body, profile, comment_ticket_map) for doc in docs]
     else:
-        documents = documents.filter(Q(title__icontains=query_text) | Q(body__icontains=query_text)).order_by("-updated_at")[:50]
-        results = [_document_result(doc, _plain_snippet(doc, query_text), profile) for doc in documents]
+        docs = list(documents.filter(Q(title__icontains=query_text) | Q(body__icontains=query_text)).order_by("-updated_at")[:50])
+        comment_ticket_map = _comment_ticket_map(docs)
+        results = [_document_result(doc, _plain_snippet(doc, query_text), profile, comment_ticket_map) for doc in docs]
     return results, bool(profile)
 
 
@@ -215,25 +222,32 @@ def _plain_snippet(doc, query_text):
     return mark_safe(f"{prefix}{before}<mark>{match}</mark>{after}{suffix}")
 
 
-def _document_result(doc, snippet, profile):
+def _document_result(doc, snippet, profile, comment_ticket_map=None):
     return {
         "document": doc,
         "badge": doc.get_entity_type_display(),
         "title": doc.title,
         "snippet": mark_safe(snippet) if "<mark>" in str(snippet) else conditional_escape(snippet),
-        "url": _document_url(doc, bool(profile)),
+        "url": _document_url(doc, bool(profile), comment_ticket_map or {}),
     }
 
 
-def _document_url(doc, is_customer):
+def _document_url(doc, is_customer, comment_ticket_map=None):
     if doc.entity_type == SearchDocument.EntityType.TICKET:
         return reverse("portal_ticket_detail" if is_customer else "ticket_detail", args=[doc.object_id])
     if doc.entity_type == SearchDocument.EntityType.COMMENT:
-        comment = TicketComment.objects.filter(pk=doc.object_id).select_related("ticket").first()
-        if comment:
-            return reverse("portal_ticket_detail" if is_customer else "ticket_detail", args=[comment.ticket_id])
+        ticket_id = (comment_ticket_map or {}).get(doc.object_id)
+        if ticket_id:
+            return reverse("portal_ticket_detail" if is_customer else "ticket_detail", args=[ticket_id])
     if not is_customer and doc.entity_type == SearchDocument.EntityType.ORGANIZATION:
         return reverse("organization_detail", args=[doc.object_id])
     if not is_customer and doc.entity_type == SearchDocument.EntityType.CONTACT:
         return reverse("contact_detail", args=[doc.object_id])
     return "#"
+
+
+def _comment_ticket_map(docs):
+    comment_ids = [doc.object_id for doc in docs if doc.entity_type == SearchDocument.EntityType.COMMENT]
+    if not comment_ids:
+        return {}
+    return dict(TicketComment.objects.filter(pk__in=comment_ids).values_list("pk", "ticket_id"))

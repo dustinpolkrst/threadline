@@ -13,3 +13,6 @@ media/
 staticfiles/
 .env
 .pytest_cache/
+
+# Graphify local state
+graphify-out/manifest.json

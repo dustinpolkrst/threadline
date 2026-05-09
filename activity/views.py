@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from core.pagination import paginate
 from core.permissions import require_internal_workspace
 from .models import ActivityEvent
 
@@ -18,4 +19,5 @@ def activity_log(request):
         events = events.filter(created_at__date__gte=request.GET["date_from"])
     if request.GET.get("date_to"):
         events = events.filter(created_at__date__lte=request.GET["date_to"])
-    return render(request, "activity/log.html", {"events": events[:200], "filters": request.GET, "event_types": ActivityEvent.objects.filter(workspace=workspace).values_list("event_type", flat=True).distinct()})
+    page_obj = paginate(request, events, per_page=50)
+    return render(request, "activity/log.html", {"events": page_obj, "page_obj": page_obj, "filters": request.GET, "event_types": ActivityEvent.objects.filter(workspace=workspace).values_list("event_type", flat=True).distinct()})

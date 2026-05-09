@@ -141,5 +141,3 @@ class SavedTicketFilter(models.Model):
         ordering = ["name"]
         unique_together = [("workspace", "user", "name")]
         indexes = [models.Index(fields=["workspace", "user"]), models.Index(fields=["workspace", "is_default"])]
-
-# Create your models here.

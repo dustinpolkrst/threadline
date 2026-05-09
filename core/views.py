@@ -17,5 +17,3 @@ def dashboard(request):
     time_total = TimeEntry.objects.filter(workspace=workspace).aggregate(total=Sum("duration_minutes"))["total"] or 0
     activity = ActivityEvent.objects.filter(workspace=workspace).select_related("ticket", "organization", "actor")[:12]
     return render(request, "core/dashboard.html", {"workspace": workspace, "tickets": tickets, "status_counts": status_counts, "time_total": time_total, "activity": activity})
-
-# Create your views here.

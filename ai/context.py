@@ -30,6 +30,7 @@ def build_ticket_context(ticket, ai_settings):
         "contact": ticket.contact.email if ticket.contact else "",
         "assignee": str(ticket.assignee) if ticket.assignee else "",
     }
+    latest_comments = list(ticket.comments.filter(workspace=workspace).select_related("author").order_by("-created_at")[:12])
     comments = [
         {
             "id": str(comment.pk),
@@ -38,7 +39,7 @@ def build_ticket_context(ticket, ai_settings):
             "body": redact_secrets(comment.body),
             "created_at": comment.created_at.isoformat(),
         }
-        for comment in ticket.comments.filter(workspace=workspace).select_related("author").order_by("-created_at")[:12]
+        for comment in reversed(latest_comments)
     ]
     time_total = ticket.time_entries.filter(workspace=workspace).aggregate(total=Sum("duration_minutes"))["total"] or 0
     attachments = [

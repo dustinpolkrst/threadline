@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="tl-page-header">
+  <div>
+    <div class="tl-kicker">AI operations</div>
+    <h1 class="tl-page-title">AI audit</h1>
+    <p class="tl-page-subtitle">Workspace-scoped AI runs, analyses, token usage, and approval history.</p>
+  </div>
+  <form method="post" action="{% url 'workspace_ai_digest' %}">{% csrf_token %}<button class="tl-button-secondary">Generate digest</button></form>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-3">
+  <section class="tl-panel overflow-hidden lg:col-span-2">
+    <div class="tl-toolbar"><div class="font-semibold">AI runs</div></div>
+    <table class="tl-table w-full text-left text-sm">
+      <thead><tr><th>Workflow</th><th>Status</th><th>Subject</th><th>Tokens</th><th>Privacy</th><th>Created</th></tr></thead>
+      <tbody>
+        {% for run in runs %}
+          <tr class="border-t border-slate-100">
+            <td>{{ run.get_workflow_display }}</td>
+            <td>{{ run.get_status_display }}</td>
+            <td>{{ run.subject_type }} {{ run.subject_id|default:"" }}</td>
+            <td>{{ run.total_tokens }}</td>
+            <td>{{ run.privacy_mode }}</td>
+            <td class="text-slate-500">{{ run.created_at|date:"M j, g:i A" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td class="p-4 text-slate-500" colspan="6">No AI runs yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  <section class="tl-panel tl-section">
+    <h2 class="mb-3 font-medium">Recent ticket analyses</h2>
+    <div class="space-y-3">
+      {% for analysis in analyses %}
+        <div class="rounded-md border border-slate-200 p-3 text-sm">
+          <div class="font-medium">{{ analysis.ticket.title }}</div>
+          <div class="text-slate-500">{{ analysis.get_status_display }} - {{ analysis.raw_model|default:"model pending" }}</div>
+          {% if analysis.feedback %}<div class="mt-1">Feedback: {{ analysis.feedback }}</div>{% endif %}
+        </div>
+      {% empty %}
+        <div class="text-sm text-slate-500">No analyses yet.</div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

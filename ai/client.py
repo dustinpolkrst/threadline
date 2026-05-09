@@ -28,12 +28,19 @@ def ticket_analysis_schema():
                 "required": ["summary", "triage", "client_context", "solution_draft", "risks", "context_refs"],
                 "properties": {
                     "summary": {"type": "string"},
+                    "root_cause_notes": {"type": "string"},
+                    "customer_reply_draft": {"type": "string"},
+                    "internal_note_draft": {"type": "string"},
+                    "missing_info": {"type": "array", "items": {"type": "string"}},
+                    "escalation_risk": {"type": "string", "enum": ["low", "medium", "high", ""]},
+                    "next_actions": {"type": "array", "items": {"type": "string"}},
                     "triage": {
                         "type": "object",
                         "additionalProperties": False,
                         "required": ["priority", "tags", "confidence", "reasoning", "assignee_reason"],
                         "properties": {
                             "priority": {"type": "string", "enum": ["low", "normal", "high", "urgent", ""]},
+                            "status": {"type": "string", "enum": ["new", "open", "pending", "resolved", "closed", ""]},
                             "tags": {"type": "array", "items": {"type": "string"}},
                             "confidence": {"type": "number", "minimum": 0, "maximum": 1},
                             "reasoning": {"type": "string"},
@@ -62,7 +69,7 @@ def ticket_analysis_schema():
     }
 
 
-def build_request_payload(ai_settings, messages, max_tokens=1200, structured=True):
+def build_request_payload(ai_settings, messages, max_tokens=1200, structured=True, response_format=None):
     payload = {
         "model": ai_settings.model or "openrouter/auto",
         "messages": messages,
@@ -71,18 +78,19 @@ def build_request_payload(ai_settings, messages, max_tokens=1200, structured=Tru
         "metadata": {"workspace_id": str(ai_settings.workspace_id)},
     }
     if structured:
-        payload["response_format"] = ticket_analysis_schema()
+        payload["response_format"] = response_format or ticket_analysis_schema()
     if ai_settings.zdr_only:
         payload["provider"] = {"zdr": True}
     return payload
 
 
-def send_chat_completion(ai_settings, messages, max_tokens=1200, structured=True):
-    if not ai_settings.api_key:
+def send_chat_completion(ai_settings, messages, max_tokens=1200, structured=True, response_format=None):
+    api_key = ai_settings.get_api_key()
+    if not api_key:
         raise OpenRouterError("OpenRouter API key is not configured.", code="missing_api_key")
-    payload = build_request_payload(ai_settings, messages, max_tokens=max_tokens, structured=structured)
+    payload = build_request_payload(ai_settings, messages, max_tokens=max_tokens, structured=structured, response_format=response_format)
     headers = {
-        "Authorization": f"Bearer {ai_settings.api_key}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "HTTP-Referer": getattr(settings, "OPENROUTER_SITE_URL", "https://threadline.local"),
         "X-OpenRouter-Title": getattr(settings, "OPENROUTER_APP_TITLE", "Threadline"),
@@ -118,12 +126,28 @@ def parse_analysis_response(response):
         preview = _safe_preview(content or _message_content_preview(response))
         raise OpenRouterError(f"OpenRouter returned malformed analysis JSON. Preview: {preview}", code="malformed_json") from exc
     usage = response.get("usage") or {}
+    _validate_analysis_payload(parsed)
     return parsed, {
         "raw_model": response.get("model", ""),
         "prompt_tokens": int(usage.get("prompt_tokens") or 0),
         "completion_tokens": int(usage.get("completion_tokens") or 0),
         "total_tokens": int(usage.get("total_tokens") or 0),
     }
+
+
+def _validate_analysis_payload(parsed):
+    if not isinstance(parsed, dict):
+        raise OpenRouterError("OpenRouter returned malformed analysis JSON. Preview: non-object JSON", code="malformed_json")
+    required = ["summary", "triage", "client_context", "solution_draft", "risks", "context_refs"]
+    missing = [field for field in required if field not in parsed]
+    triage = parsed.get("triage")
+    if missing or not isinstance(triage, dict):
+        detail = ", ".join(missing) if missing else "triage must be an object"
+        raise OpenRouterError(f"OpenRouter returned malformed analysis JSON. Preview: missing or invalid fields: {detail}", code="malformed_json")
+    triage_required = ["priority", "tags", "confidence", "reasoning", "assignee_reason"]
+    missing_triage = [field for field in triage_required if field not in triage]
+    if missing_triage:
+        raise OpenRouterError(f"OpenRouter returned malformed analysis JSON. Preview: missing triage fields: {', '.join(missing_triage)}", code="malformed_json")
 
 
 def _parse_message_payload(message):

@@ -19,5 +19,6 @@
     <thead><tr><th>When</th><th>Event</th><th>Summary</th><th>Actor</th><th>Record</th></tr></thead>
     <tbody>{% for event in events %}<tr class="border-t border-slate-100"><td class="text-slate-500">{{ event.created_at|date:"M j, g:i A" }}</td><td>{{ event.event_type }}</td><td>{{ event.summary }}</td><td>{{ event.actor|default:"System" }}</td><td>{% if event.ticket %}<a class="text-blue-700" href="{% url 'ticket_detail' event.ticket.pk %}">{{ event.ticket }}</a>{% elif event.organization %}<a class="text-blue-700" href="{% url 'organization_detail' event.organization.pk %}">{{ event.organization }}</a>{% else %}-{% endif %}</td></tr>{% empty %}<tr><td class="p-5 text-slate-500" colspan="5">No activity found.</td></tr>{% endfor %}</tbody>
   </table>
+  {% include "core/pagination.html" with page_obj=page_obj %}
 </div>
 {% endblock %}

@@ -12,6 +12,7 @@
     <p class="tl-page-subtitle">{{ organization.domain|default:"No domain" }}{% if organization.website %} - {{ organization.website }}{% endif %}</p>
   </div>
   <a class="tl-button-secondary" href="{% url 'organization_edit' organization.pk %}">Edit account</a>
+  <form method="post" action="{% url 'organization_ai_briefing' organization.pk %}">{% csrf_token %}<button class="tl-button">AI briefing</button></form>
 </div>
 
 <div class="grid gap-6 lg:grid-cols-4">
@@ -74,6 +75,18 @@
   </section>
 
   <aside class="space-y-6">
+    <section class="tl-panel tl-section">
+      <h2 class="mb-3 font-medium">AI Account Briefing</h2>
+      {% for insight in ai_insights %}
+        <div class="border-t border-slate-100 py-2 text-sm">
+          <div class="font-medium">{{ insight.summary }}</div>
+          {% if insight.risks %}<div class="mt-1 text-rose-700">Risks: {{ insight.risks|join:", " }}</div>{% endif %}
+          {% if insight.suggestions %}<div class="mt-1 text-slate-600">Suggestions: {{ insight.suggestions|join:"; " }}</div>{% endif %}
+        </div>
+      {% empty %}
+        <div class="text-sm text-slate-500">No AI briefing yet.</div>
+      {% endfor %}
+    </section>
     <section class="tl-panel tl-section">
       <h2 class="mb-3 font-medium">Ticket Status</h2>
       {% for item in status_counts %}

@@ -1,8 +1,8 @@
 <div class="tl-panel tl-section" id="ticket-ai-panel" {% for analysis in ai_analyses %}{% if analysis.status == "queued" or analysis.status == "running" %}hx-get="{% url 'ticket_ai_panel' ticket.pk %}" hx-trigger="every 3s" hx-swap="outerHTML"{% endif %}{% endfor %}>
   <div class="mb-3 flex items-start justify-between gap-3">
     <div>
-      <h2 class="font-medium">AI analysis</h2>
-      <p class="mt-1 text-sm text-slate-500">Internal triage drafts powered by OpenRouter.</p>
+      <h2 class="font-medium">AI workbench</h2>
+      <p class="mt-1 text-sm text-slate-500">Triage, reply drafts, next actions, time suggestions, and solution memory.</p>
     </div>
     {% if ai_settings.enabled %}<span class="tl-badge bg-emerald-50 text-emerald-700">Enabled</span>{% else %}<span class="tl-badge bg-slate-100 text-slate-600">Off</span>{% endif %}
   </div>
@@ -11,6 +11,8 @@
       {% csrf_token %}
       <button class="tl-button" name="mode" value="draft">Generate draft</button>
       {% if ai_settings.auto_triage_enabled %}<button class="tl-button-secondary" name="mode" value="auto_triage">Generate auto-triage</button>{% endif %}
+      {% if ai_settings.time_suggestions_enabled %}<button class="tl-button-secondary" formaction="{% url 'ticket_ai_time_suggestion' ticket.pk %}">Suggest time</button>{% endif %}
+      <button class="tl-button-secondary" formaction="{% url 'ticket_ai_solution_memory' ticket.pk %}">Remember solution</button>
     </form>
   {% else %}
     <div class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">AI is not enabled for this workspace. Configure it in Settings - AI.</div>
@@ -27,11 +29,32 @@
         {% else %}
           <div class="font-semibold text-slate-900">{{ analysis.summary|default:"Analysis pending" }}</div>
           {% if analysis.suggested_priority or analysis.suggested_tags %}
-            <div class="mt-2 text-slate-600">Priority: {{ analysis.suggested_priority|default:"-" }}{% if analysis.suggested_tags %} - Tags: {{ analysis.suggested_tags|join:", " }}{% endif %}</div>
+            <div class="mt-2 text-slate-600">Priority: {{ analysis.suggested_priority|default:"-" }}{% if analysis.suggested_status %} - Status: {{ analysis.suggested_status }}{% endif %}{% if analysis.suggested_tags %} - Tags: {{ analysis.suggested_tags|join:", " }}{% endif %}</div>
           {% endif %}
+          {% if analysis.root_cause_notes %}<div class="mt-2 text-slate-700"><span class="font-medium">Root cause:</span> {{ analysis.root_cause_notes }}</div>{% endif %}
+          {% if analysis.missing_info %}<div class="mt-2 text-slate-700"><span class="font-medium">Missing info:</span> {{ analysis.missing_info|join:", " }}</div>{% endif %}
+          {% if analysis.next_actions %}<div class="mt-2 text-slate-700"><span class="font-medium">Next actions:</span> {{ analysis.next_actions|join:"; " }}</div>{% endif %}
           {% if analysis.solution_draft %}<div class="mt-2 whitespace-pre-wrap rounded-md bg-slate-50 p-2 text-slate-700">{{ analysis.solution_draft }}</div>{% endif %}
-          {% if ai_settings.auto_triage_enabled and analysis.status == "succeeded" %}
-            <form method="post" action="{% url 'ticket_ai_apply' ticket.pk analysis.pk %}" class="mt-3">{% csrf_token %}<button class="tl-button-secondary">Apply triage</button></form>
+          {% if analysis.customer_reply_draft %}<div class="mt-2 whitespace-pre-wrap rounded-md border border-blue-100 bg-blue-50 p-2 text-blue-950"><div class="mb-1 text-xs font-semibold uppercase text-blue-700">Customer reply draft</div>{{ analysis.customer_reply_draft }}</div>{% endif %}
+          {% if analysis.internal_note_draft %}<div class="mt-2 whitespace-pre-wrap rounded-md border border-slate-200 bg-white p-2 text-slate-700"><div class="mb-1 text-xs font-semibold uppercase text-slate-500">Internal note draft</div>{{ analysis.internal_note_draft }}</div>{% endif %}
+          {% if analysis.status == "succeeded" %}
+            <form method="post" action="{% url 'ticket_ai_apply_selected' ticket.pk analysis.pk %}" class="mt-3 space-y-2">
+              {% csrf_token %}
+              <div class="grid gap-2 text-xs text-slate-700 sm:grid-cols-2">
+                {% if analysis.suggested_priority %}<label class="flex items-center gap-2"><input type="checkbox" name="actions" value="priority"> Apply priority</label>{% endif %}
+                {% if analysis.suggested_status %}<label class="flex items-center gap-2"><input type="checkbox" name="actions" value="status"> Apply status</label>{% endif %}
+                {% if analysis.suggested_tags %}<label class="flex items-center gap-2"><input type="checkbox" name="actions" value="tags"> Add tags</label>{% endif %}
+                {% if analysis.internal_note_draft %}<label class="flex items-center gap-2"><input type="checkbox" name="actions" value="internal_note"> Create internal note</label>{% endif %}
+                {% if analysis.customer_reply_draft %}<label class="flex items-center gap-2"><input type="checkbox" name="actions" value="customer_reply"> Approve reply draft</label>{% endif %}
+              </div>
+              <button class="tl-button-secondary">Apply selected</button>
+            </form>
+            <form method="post" action="{% url 'ticket_ai_feedback' ticket.pk analysis.pk %}" class="mt-2 flex flex-wrap gap-2">{% csrf_token %}
+              <button class="tl-button-secondary" name="feedback" value="accepted">Useful</button>
+              <button class="tl-button-secondary" name="feedback" value="edited">Edited</button>
+              <button class="tl-button-secondary" name="feedback" value="rejected">Not useful</button>
+              <button class="tl-button-secondary" name="feedback" value="wrong_context">Wrong context</button>
+            </form>
           {% endif %}
         {% endif %}
       </div>
@@ -39,4 +62,21 @@
       <div class="text-sm text-slate-500">No AI analyses yet.</div>
     {% endfor %}
   </div>
+  {% if time_suggestions %}
+    <div class="mt-4 border-t border-slate-200 pt-4">
+      <h3 class="mb-2 text-sm font-semibold">Time suggestions</h3>
+      <div class="space-y-2">{% for suggestion in time_suggestions %}
+        <div class="rounded-md border border-slate-200 p-2 text-sm">
+          <div>{{ suggestion.suggested_minutes }}m - {{ suggestion.notes }}</div>
+          {% if suggestion.status == "draft" %}<form method="post" action="{% url 'ticket_ai_time_approve' ticket.pk suggestion.pk %}" class="mt-2">{% csrf_token %}<button class="tl-button-secondary">Approve time entry</button></form>{% endif %}
+        </div>
+      {% endfor %}</div>
+    </div>
+  {% endif %}
+  {% if solution_snippets %}
+    <div class="mt-4 border-t border-slate-200 pt-4">
+      <h3 class="mb-2 text-sm font-semibold">Solution memory</h3>
+      {% for snippet in solution_snippets %}<div class="rounded-md border border-slate-200 p-2 text-sm"><div class="font-medium">{{ snippet.title }}</div><div class="mt-1 whitespace-pre-wrap text-slate-600">{{ snippet.body }}</div></div>{% endfor %}
+    </div>
+  {% endif %}
 </div>

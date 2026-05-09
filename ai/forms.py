@@ -12,10 +12,14 @@ class AIProviderSettingsForm(forms.ModelForm):
 
     class Meta:
         model = AIProviderSettings
-        fields = ["enabled", "api_key", "model", "zdr_only", "auto_triage_enabled", "max_historical_tickets"]
+        fields = ["enabled", "api_key", "model", "zdr_only", "auto_triage_enabled", "ticket_drafts_enabled", "crm_insights_enabled", "time_suggestions_enabled", "digest_enabled", "max_historical_tickets"]
         help_texts = {
             "zdr_only": "Required by default for client ticket history.",
             "auto_triage_enabled": "Allows users to apply AI triage suggestions after generation.",
+            "ticket_drafts_enabled": "Allows internal ticket reply drafts and next-action suggestions.",
+            "crm_insights_enabled": "Allows account and contact support briefings.",
+            "time_suggestions_enabled": "Allows draft time-entry suggestions from ticket activity.",
+            "digest_enabled": "Allows workspace-level AI digests for admins.",
             "max_historical_tickets": "Bounded same-client ticket history included in prompts.",
         }
 
@@ -30,9 +34,11 @@ class AIProviderSettingsForm(forms.ModelForm):
         instance = super().save(commit=False)
         api_key = self.cleaned_data.get("api_key", "").strip()
         if api_key:
-            instance.api_key = api_key
+            instance.set_api_key(api_key)
         elif instance.pk:
-            instance.api_key = AIProviderSettings.objects.get(pk=instance.pk).api_key
+            existing = AIProviderSettings.objects.get(pk=instance.pk)
+            instance.encrypted_api_key = existing.encrypted_api_key
+            instance.api_key = existing.api_key
         if commit:
             instance.save()
         return instance

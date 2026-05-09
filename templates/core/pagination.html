@@ -1,0 +1,13 @@
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <div class="flex items-center justify-between border-t border-slate-200 px-5 py-4 text-sm text-slate-600">
+    <div>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+    <div class="flex gap-2">
+      {% if page_obj.has_previous %}
+        <a class="tl-button-secondary" href="{% querystring page=page_obj.previous_page_number %}">Previous</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <a class="tl-button-secondary" href="{% querystring page=page_obj.next_page_number %}">Next</a>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}

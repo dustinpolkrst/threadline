@@ -114,5 +114,3 @@ class CRMImportRow(models.Model):
 
     class Meta:
         ordering = ["row_number"]
-
-# Create your models here.

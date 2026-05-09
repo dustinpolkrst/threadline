@@ -16,5 +16,3 @@ class CustomerProfile(models.Model):
 
     def __str__(self):
         return f"{self.user} portal profile"
-
-# Create your models here.

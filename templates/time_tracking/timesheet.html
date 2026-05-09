@@ -31,5 +31,6 @@
       {% endfor %}
     </tbody>
   </table>
+  {% include "core/pagination.html" with page_obj=page_obj %}
 </div>
 {% endblock %}

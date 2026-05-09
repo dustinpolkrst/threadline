@@ -59,6 +59,7 @@ We are intentionally avoiding Kubernetes, microservices, a separate SPA, GraphQL
 - PostgreSQL full-text search ranking, highlighting, and rebuildable search documents.
 - Optional local or S3-compatible private attachment storage.
 - OpenRouter AI settings, internal ticket analysis drafts, and opt-in AI triage application.
+- AI workbench foundations: auditable AI runs, suggested actions, reply drafts, CRM account briefings, time-entry suggestions, workspace digests, and solution memory records.
 - Email plumbing models and stub services, without real provider integration.
 - Docker Compose development and production-style deployment.
 - Demo seed data and permission tests.
@@ -110,6 +111,7 @@ High-priority next steps:
 
 - [ ] Real inbound email-to-ticket integration.
 - [ ] Outbound ticket replies by email.
+- [ ] OpenRouter-backed CRM/time/digest generation beyond the first local intelligence pass.
 - [ ] SLA escalation notifications after email is configured.
 - [ ] Public API endpoints for integrations where needed.
 
@@ -240,7 +242,7 @@ Persistent volumes are defined for PostgreSQL, Redis, uploaded media, and collec
 
 Attachment storage defaults to local private media. For S3-compatible storage, either set `MEDIA_STORAGE_BACKEND=s3` with the `AWS_*` values in `.env`, or configure a provider from Settings -> Application storage as an owner/admin. Objects remain private and Threadline still streams downloads through Django permission checks. Existing local media is not migrated automatically when switching storage backends.
 
-AI analysis is configured from Settings -> AI by an owner/admin. The first provider is OpenRouter, with draft-only analysis by default, ZDR routing required for client ticket history, and opt-in manual application of AI triage suggestions. Provider connectivity can be checked with:
+AI analysis is configured from Settings -> AI by an owner/admin. The first provider is OpenRouter, with draft-only analysis by default, ZDR routing required for client ticket history, and opt-in manual application of AI triage suggestions. AI jobs require a running Celery worker; Threadline does not fall back to running model calls in the web request. Set `THREADLINE_FIELD_ENCRYPTION_KEY` in production so provider secrets are encrypted independently of `SECRET_KEY`. Provider connectivity can be checked with:
 
 ```bash
 uv run python manage.py test_ai_provider --workspace demo

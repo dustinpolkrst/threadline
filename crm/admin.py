@@ -5,5 +5,3 @@ admin.site.register(Organization)
 admin.site.register(Contact)
 admin.site.register(CRMImportJob)
 admin.site.register(CRMImportRow)
-
-# Register your models here.

@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from activity.services import record_event
+from core.pagination import paginate
 from core.permissions import require_internal_workspace
 from .forms import TimeEntryForm
 from .models import TimeEntry
@@ -16,9 +17,9 @@ def timesheet(request):
     workspace = require_internal_workspace(request.user)
     start = timezone.now().date() - timezone.timedelta(days=7)
     entries = TimeEntry.objects.filter(workspace=workspace, user=request.user, started_at__date__gte=start).select_related("ticket", "organization")
-    total = sum(entry.duration_minutes for entry in entries)
-    billable = sum(entry.duration_minutes for entry in entries if entry.billable)
-    return render(request, "time_tracking/timesheet.html", {"entries": entries, "total": total, "billable": billable})
+    totals = entries.aggregate(total=Sum("duration_minutes"), billable=Sum("duration_minutes", filter=models.Q(billable=True)))
+    page_obj = paginate(request, entries, per_page=25)
+    return render(request, "time_tracking/timesheet.html", {"entries": page_obj, "page_obj": page_obj, "total": totals["total"] or 0, "billable": totals["billable"] or 0})
 
 
 @login_required
@@ -78,5 +79,3 @@ def _with_non_billable(rows):
         row["non_billable"] = row["total"] - row["billable"]
         hydrated.append(row)
     return hydrated
-
-# Create your views here.

@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from activity.models import ActivityEvent
 from activity.services import record_event
 from core.permissions import require_customer_profile
+from core.pagination import paginate
 from search.services import index_comment, index_ticket
 from tickets.forms import PortalCommentForm, PortalTicketForm, TicketAttachmentForm
 from tickets.models import Ticket, TicketAttachment, TicketComment
@@ -34,7 +35,8 @@ def portal_ticket_list(request):
         "recent": summary_base.order_by("-updated_at")[:5],
         "by_status": summary_base.values("status").annotate(count=Count("id")),
     }
-    return render(request, "customer_portal/ticket_list.html", {"tickets": tickets, "profile": profile, "summary": summary, "status": status, "priority": priority, "q": q})
+    page_obj = paginate(request, tickets, per_page=25)
+    return render(request, "customer_portal/ticket_list.html", {"tickets": page_obj, "page_obj": page_obj, "status_choices": Ticket.Status.choices, "priority_choices": Ticket.Priority.choices, "profile": profile, "summary": summary, "status": status, "priority": priority, "q": q})
 
 
 @login_required
@@ -133,5 +135,3 @@ def portal_account(request):
                 update_session_auth_hash(request, user)
                 return redirect("portal_account")
     return render(request, "customer_portal/account.html", {"profile": profile, "password_form": password_form})
-
-# Create your views here.

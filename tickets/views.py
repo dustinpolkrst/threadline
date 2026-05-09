@@ -2,19 +2,18 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import FileResponse, Http404
-from django.db.models import Sum
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
-from ai.views import ai_panel_context
-from activity.models import ActivityEvent
 from activity.services import record_event
 from core.permissions import require_internal_workspace
+from core.pagination import paginate
 from crm.models import Contact, Organization
 from search.services import index_comment, index_ticket
-from time_tracking.forms import TimeEntryForm, TimerStartForm, TimerStopForm
+from time_tracking.forms import TimerStartForm, TimerStopForm
 from time_tracking.models import ActiveTimer, TimeEntry
 from .forms import BulkTicketActionForm, CommentForm, SavedTicketFilterForm, TicketAttachmentForm, TicketForm, TicketRelationForm
 from .models import SavedTicketFilter, Ticket, TicketAttachment, TicketComment, TicketRelation
+from .detail import build_ticket_detail_context, relation_form
 from .services import OPEN_STATUSES, apply_initial_sla, mark_agent_reply, mark_resolved, merge_ticket, sla_state
 
 
@@ -50,10 +49,11 @@ def ticket_list(request):
         "urgent": all_tickets.filter(priority=Ticket.Priority.URGENT).count(),
         "unassigned": all_tickets.filter(assignee__isnull=True).count(),
     }
-    for ticket in tickets:
+    page_obj = paginate(request, tickets, per_page=25)
+    for ticket in page_obj:
         ticket.sla_state = sla_state(ticket)
     saved_filters = SavedTicketFilter.objects.filter(workspace=workspace, user=request.user)
-    return render(request, "tickets/ticket_list.html", {"tickets": tickets, "status": status, "priority": priority, "q": q, "queue": queue, "summary": summary, "saved_filters": saved_filters})
+    return render(request, "tickets/ticket_list.html", {"tickets": page_obj, "page_obj": page_obj, "status_choices": Ticket.Status.choices, "priority_choices": Ticket.Priority.choices, "status": status, "priority": priority, "q": q, "queue": queue, "summary": summary, "saved_filters": saved_filters})
 
 
 @login_required
@@ -77,39 +77,10 @@ def ticket_create(request):
 def ticket_detail(request, pk):
     workspace = require_internal_workspace(request.user)
     ticket = get_object_or_404(Ticket.objects.select_related("organization", "contact", "assignee"), pk=pk, workspace=workspace)
-    comment_form = CommentForm()
-    time_form = TimeEntryForm()
-    timer_start_form = TimerStartForm()
-    timer_stop_form = TimerStopForm()
-    comments = ticket.comments.filter(workspace=workspace).select_related("author")
-    time_entries = ticket.time_entries.filter(workspace=workspace).select_related("user")
-    attachments = ticket.attachments.filter(workspace=workspace).select_related("uploaded_by")
-    relations = TicketRelation.objects.filter(workspace=workspace).filter(source=ticket) | TicketRelation.objects.filter(workspace=workspace).filter(target=ticket)
-    time_total = time_entries.aggregate(total=Sum("duration_minutes"))["total"] or 0
-    active_timer = ActiveTimer.objects.filter(workspace=workspace, user=request.user).select_related("ticket").first()
-    activity = ticket.activity_events.filter(workspace=workspace).select_related("actor")
-    ticket.sla_state = sla_state(ticket)
-    context = {
-        "ticket": ticket,
-        "comments": comments,
-        "comment_form": comment_form,
-        "time_form": time_form,
-        "timer_start_form": timer_start_form,
-        "timer_stop_form": timer_stop_form,
-        "active_timer": active_timer,
-        "time_entries": time_entries,
-        "time_total": time_total,
-        "activity": activity,
-        "attachments": attachments,
-        "attachment_form": TicketAttachmentForm(),
-        "relation_form": _relation_form(workspace, ticket),
-        "relations": relations.select_related("source", "target", "created_by"),
-    }
-    context.update(ai_panel_context(ticket, workspace))
     return render(
         request,
         "tickets/ticket_detail.html",
-        context,
+        build_ticket_detail_context(request, workspace, ticket),
     )
 
 
@@ -184,7 +155,7 @@ def ticket_delete_attachment(request, pk, attachment_id):
 def ticket_add_relation(request, pk):
     workspace = require_internal_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
-    form = _relation_form(workspace, ticket, request.POST)
+    form = relation_form(workspace, ticket, request.POST)
     if form.is_valid():
         relation = form.save(commit=False)
         relation.workspace = workspace
@@ -245,6 +216,7 @@ def ticket_bulk_action(request):
                     tags.append(form.cleaned_data["tag"])
                     ticket.tags = ", ".join(tags)
                     ticket.save(update_fields=["tags", "updated_at"])
+                    index_ticket(ticket)
         messages.info(request, f"Updated {tickets.count()} tickets.")
     return redirect("ticket_list")
 
@@ -324,11 +296,3 @@ def _scope_form(form, workspace):
     form.fields["contact"].queryset = Contact.objects.filter(workspace=workspace)
     user_ids = workspace.memberships.values_list("user_id", flat=True)
     form.fields["assignee"].queryset = get_user_model().objects.filter(id__in=user_ids)
-
-
-def _relation_form(workspace, ticket, data=None):
-    form = TicketRelationForm(data)
-    form.fields["target"].queryset = Ticket.objects.filter(workspace=workspace).exclude(pk=ticket.pk)
-    return form
-
-# Create your views here.

@@ -7,10 +7,11 @@ from django.utils import timezone
 
 from ai.client import OpenRouterError, build_request_payload, parse_analysis_response
 from ai.context import build_analysis_messages, build_ticket_context
-from ai.models import AIProviderSettings, TicketAIAnalysis
-from ai.services import apply_analysis, run_ticket_analysis
+from ai.models import AIRun, AISuggestedAction, AIProviderSettings, CRMInsight, TicketAIAnalysis, TicketReplyDraft, TimeEntrySuggestion, WorkspaceDigest
+from ai.services import apply_analysis, apply_selected_ticket_suggestions, generate_crm_insight, generate_workspace_digest, run_ticket_analysis, suggest_time_entry
 from crm.models import Contact, Organization
 from customer_portal.models import CustomerProfile
+from search.models import SearchDocument
 from tickets.models import Ticket, TicketComment
 from workspaces.models import Workspace, WorkspaceMembership
 
@@ -78,7 +79,9 @@ def test_ai_settings_preserves_api_key_and_blocks_customer(client, ai_data):
     assert response.status_code == 302
     assert response["Location"].endswith("?section=ai")
     settings = AIProviderSettings.objects.get(workspace=ai_data["workspace"])
-    assert settings.api_key == "existing-key"
+    assert settings.api_key == ""
+    assert settings.encrypted_api_key
+    assert settings.get_api_key() == "existing-key"
     assert settings.enabled is True
     assert settings.zdr_only is True
 
@@ -109,9 +112,14 @@ def test_draft_generation_creates_analysis_without_mutating_ticket(monkeypatch, 
     ai_data["ticket"].refresh_from_db()
     assert analysis.status == TicketAIAnalysis.Status.SUCCEEDED
     assert analysis.summary == "Likely SSO configuration issue."
+    assert analysis.customer_reply_draft.startswith("We are checking")
+    assert analysis.root_cause_notes == "SSO mapping appears stale."
     assert analysis.total_tokens == 30
     assert ai_data["ticket"].priority == original_priority
     assert settings.enabled is True
+    assert AIRun.objects.filter(workspace=ai_data["workspace"], workflow=AIRun.Workflow.TICKET_WORKBENCH, subject_id=ai_data["ticket"].pk).exists()
+    assert TicketReplyDraft.objects.filter(workspace=ai_data["workspace"], ticket=ai_data["ticket"], audience=TicketReplyDraft.Audience.CUSTOMER).exists()
+    assert AISuggestedAction.objects.filter(workspace=ai_data["workspace"], ticket_analysis=analysis, action_type="customer_reply").exists()
 
 
 @pytest.mark.django_db
@@ -152,6 +160,13 @@ def test_parser_raises_with_safe_preview_for_non_json():
         parse_analysis_response({"choices": [{"message": {"content": "not json at all"}}]})
     assert exc.value.code == "malformed_json"
     assert "Preview: not json at all" in str(exc.value)
+
+
+def test_parser_rejects_missing_required_fields():
+    with pytest.raises(OpenRouterError) as exc:
+        parse_analysis_response({"choices": [{"message": {"content": json.dumps({"summary": "too small"})}}]})
+    assert exc.value.code == "malformed_json"
+    assert "missing or invalid fields" in str(exc.value)
 
 
 def test_parser_reports_truncated_output():
@@ -236,6 +251,61 @@ def test_auto_triage_requires_setting_and_apply_updates_ticket(ai_data):
     assert "sso" in ai_data["ticket"].tags
     assert analysis.status == TicketAIAnalysis.Status.APPLIED
     assert TicketComment.objects.filter(ticket=ai_data["ticket"], body__contains="AI triage applied").exists()
+    assert SearchDocument.objects.filter(workspace=ai_data["workspace"], object_id=ai_data["ticket"].pk, body__contains="sso").exists()
+
+
+@pytest.mark.django_db
+def test_apply_selected_ticket_suggestions_are_human_approved(ai_data):
+    analysis = TicketAIAnalysis.objects.create(
+        workspace=ai_data["workspace"],
+        ticket=ai_data["ticket"],
+        requested_by=ai_data["agent"],
+        status=TicketAIAnalysis.Status.SUCCEEDED,
+        suggested_priority=Ticket.Priority.URGENT,
+        suggested_status=Ticket.Status.PENDING,
+        suggested_tags=["cache"],
+        customer_reply_draft="Customer-safe update draft.",
+        internal_note_draft="Internal note draft.",
+    )
+    TicketReplyDraft.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], analysis=analysis, audience=TicketReplyDraft.Audience.CUSTOMER, body=analysis.customer_reply_draft)
+    applied = apply_selected_ticket_suggestions(analysis, ai_data["agent"], ["priority", "tags", "internal_note", "customer_reply"])
+    ai_data["ticket"].refresh_from_db()
+    assert set(applied) == {"priority", "tags", "internal_note", "customer_reply"}
+    assert ai_data["ticket"].priority == Ticket.Priority.URGENT
+    assert "cache" in ai_data["ticket"].tags
+    assert TicketComment.objects.filter(ticket=ai_data["ticket"], body="Internal note draft.").exists()
+    assert TicketReplyDraft.objects.get(analysis=analysis, audience=TicketReplyDraft.Audience.CUSTOMER).status == TicketReplyDraft.Status.APPROVED
+
+
+@pytest.mark.django_db
+def test_crm_time_and_digest_ai_artifacts_are_workspace_scoped(ai_data):
+    insight = generate_crm_insight(ai_data["org"], ai_data["agent"])
+    suggestion = suggest_time_entry(ai_data["ticket"], ai_data["agent"])
+    digest = generate_workspace_digest(ai_data["workspace"], ai_data["admin"])
+    assert CRMInsight.objects.filter(workspace=ai_data["workspace"], pk=insight.pk, organization=ai_data["org"]).exists()
+    assert TimeEntrySuggestion.objects.filter(workspace=ai_data["workspace"], pk=suggestion.pk, ticket=ai_data["ticket"]).exists()
+    assert WorkspaceDigest.objects.filter(workspace=ai_data["workspace"], pk=digest.pk).exists()
+    assert not CRMInsight.objects.filter(workspace=ai_data["other_workspace"], pk=insight.pk).exists()
+
+
+@pytest.mark.django_db
+def test_ai_enqueue_failure_does_not_run_synchronously(client, monkeypatch, ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test")
+
+    def fail_delay(*args, **kwargs):
+        raise RuntimeError("broker unavailable")
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("run_ticket_analysis should not run in the web request")
+
+    monkeypatch.setattr("ai.views.analyze_ticket_with_ai.delay", fail_delay)
+    monkeypatch.setattr("ai.views.run_ticket_analysis", fail_if_called, raising=False)
+    client.login(username="ai-agent", password="password")
+    response = client.post(reverse("ticket_ai_analyze", args=[ai_data["ticket"].pk]))
+    assert response.status_code == 302
+    analysis = TicketAIAnalysis.objects.get(ticket=ai_data["ticket"])
+    assert analysis.status == TicketAIAnalysis.Status.FAILED
+    assert analysis.error_code == "queue_unavailable"
 
 
 @pytest.mark.django_db
@@ -274,8 +344,15 @@ def test_ai_panel_terminal_states_do_not_poll(client, ai_data):
 def _analysis_payload():
     return {
         "summary": "Likely SSO configuration issue.",
+        "root_cause_notes": "SSO mapping appears stale.",
+        "customer_reply_draft": "We are checking the SSO mapping and will follow up shortly.",
+        "internal_note_draft": "Check SSO mapping and user session state.",
+        "missing_info": ["Affected user email"],
+        "escalation_risk": "medium",
+        "next_actions": ["Verify SSO mapping", "Ask customer for affected user"],
         "triage": {
             "priority": "high",
+            "status": "open",
             "tags": ["sso", "login"],
             "confidence": 0.82,
             "reasoning": "Historical login reset ticket is similar.",

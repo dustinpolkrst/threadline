@@ -22,7 +22,7 @@ services:
       - "6379:6379"
   web:
     build: .
-    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers ${WEB_CONCURRENCY:-2} --timeout ${GUNICORN_TIMEOUT:-60}"
     env_file: .env
     volumes:
       - media_data:/app/media
@@ -36,7 +36,8 @@ services:
         condition: service_started
   celery:
     build: .
-    command: celery -A config worker -l INFO
+    command: celery -A config worker -l ${CELERY_LOG_LEVEL:-INFO}
+    user: threadline
     env_file: .env
     volumes:
       - media_data:/app/media

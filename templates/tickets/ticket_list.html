@@ -31,8 +31,8 @@
   <form class="grid gap-3 border-b border-slate-200 bg-slate-50/70 px-5 py-4 md:grid-cols-[1fr_11rem_11rem_auto]" method="get">
     <input type="hidden" name="queue" value="{{ queue }}">
     <input name="q" value="{{ q }}" placeholder="Search tickets">
-    <select name="status"><option value="">Any status</option>{% for value,label in tickets.model.Status.choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
-    <select name="priority"><option value="">Any priority</option>{% for value,label in tickets.model.Priority.choices %}<option value="{{ value }}" {% if priority == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select name="status"><option value="">Any status</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select name="priority"><option value="">Any priority</option>{% for value,label in priority_choices %}<option value="{{ value }}" {% if priority == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
     <button class="tl-button-secondary">Apply filters</button>
   </form>
   <form method="post" action="{% url 'ticket_bulk_action' %}" class="border-b border-slate-200 px-5 py-4">
@@ -40,8 +40,8 @@
     <div class="grid gap-3 md:grid-cols-[1fr_11rem_11rem_1fr_auto]">
       <input id="bulk-ticket-ids" type="hidden" name="ticket_ids">
       <select name="action"><option value="status">Change status</option><option value="priority">Change priority</option><option value="tag">Add tag</option></select>
-      <select name="status"><option value="">Status</option>{% for value,label in tickets.model.Status.choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
-      <select name="priority"><option value="">Priority</option>{% for value,label in tickets.model.Priority.choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
+      <select name="status"><option value="">Status</option>{% for value,label in status_choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
+      <select name="priority"><option value="">Priority</option>{% for value,label in priority_choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
       <input name="tag" placeholder="Tag">
       <button class="tl-button-secondary">Apply to selected</button>
     </div>
@@ -72,6 +72,7 @@
       {% endfor %}
     </tbody>
   </table>
+  {% include "core/pagination.html" with page_obj=page_obj %}
 </div>
 <script>
   const bulkAll = document.getElementById("bulk-all");
