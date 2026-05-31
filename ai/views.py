@@ -1,13 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
-from core.permissions import require_internal_workspace
+from core.permissions import require_internal_workspace, require_support_workspace
 from crm.models import Organization
 from tickets.models import Ticket
 
 from .models import AIRun, CRMInsight, QueueIntelligenceSnapshot, SolutionSnippet, TicketReplyDraft, TimeEntrySuggestion, TicketAIAnalysis
-from .services import approve_reply_draft, approve_solution_snippet, apply_analysis, apply_selected_ticket_suggestions, approve_time_suggestion, create_queued_analysis, fail_analysis, generate_workspace_digest, get_ai_settings, record_analysis_feedback, reject_solution_snippet, suggest_time_entry, time_cleanup_context
+from .services import ai_usage_summary, approve_reply_draft, approve_solution_snippet, apply_analysis, apply_selected_ticket_suggestions, approve_time_suggestion, create_queued_analysis, fail_analysis, generate_workspace_digest, get_ai_settings, record_analysis_feedback, reject_solution_snippet, suggest_time_entry, time_cleanup_context
 from .tasks import analyze_ticket_with_ai, build_queue_intelligence_with_ai, create_solution_snippet_with_ai, generate_crm_insight_with_ai, generate_reply_draft_with_ai
 
 
@@ -24,8 +25,9 @@ def ai_panel_context(ticket, workspace):
 
 
 @login_required
+@require_POST
 def ticket_ai_analyze(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     ai_settings = get_ai_settings(workspace)
     if not ai_settings.enabled:
@@ -52,8 +54,9 @@ def ticket_ai_panel(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_ai_apply(request, pk, analysis_id):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     analysis = get_object_or_404(TicketAIAnalysis, pk=analysis_id, workspace=workspace, ticket=ticket)
     try:
@@ -65,8 +68,9 @@ def ticket_ai_apply(request, pk, analysis_id):
 
 
 @login_required
+@require_POST
 def ticket_ai_apply_selected(request, pk, analysis_id):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     analysis = get_object_or_404(TicketAIAnalysis, pk=analysis_id, workspace=workspace, ticket=ticket)
     selected = request.POST.getlist("actions")
@@ -79,8 +83,9 @@ def ticket_ai_apply_selected(request, pk, analysis_id):
 
 
 @login_required
+@require_POST
 def ticket_ai_feedback(request, pk, analysis_id):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     analysis = get_object_or_404(TicketAIAnalysis, pk=analysis_id, workspace=workspace, ticket=ticket)
     record_analysis_feedback(analysis, request.POST.get("feedback", ""))
@@ -89,8 +94,9 @@ def ticket_ai_feedback(request, pk, analysis_id):
 
 
 @login_required
+@require_POST
 def ticket_ai_time_suggestion(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     if not get_ai_settings(workspace).time_suggestions_enabled:
         messages.error(request, "AI time suggestions are not enabled.")
@@ -101,8 +107,9 @@ def ticket_ai_time_suggestion(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_ai_time_approve(request, pk, suggestion_id):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     suggestion = get_object_or_404(TimeEntrySuggestion, pk=suggestion_id, workspace=workspace, ticket=ticket, user=request.user)
     approve_time_suggestion(suggestion, request.user)
@@ -111,8 +118,9 @@ def ticket_ai_time_approve(request, pk, suggestion_id):
 
 
 @login_required
+@require_POST
 def ticket_ai_reply_draft(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     if not get_ai_settings(workspace).reply_composer_enabled:
         messages.error(request, "AI reply composer is not enabled.")
@@ -128,8 +136,9 @@ def ticket_ai_reply_draft(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_ai_reply_approve(request, pk, draft_id):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     draft = get_object_or_404(TicketReplyDraft, pk=draft_id, workspace=workspace, ticket=ticket, audience=TicketReplyDraft.Audience.CUSTOMER)
     approve_reply_draft(draft, request.user)
@@ -138,8 +147,9 @@ def ticket_ai_reply_approve(request, pk, draft_id):
 
 
 @login_required
+@require_POST
 def ticket_ai_solution_memory(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     create_solution_snippet_with_ai.delay(str(ticket.pk), str(request.user.pk))
     messages.info(request, "Solution memory generation queued.")
@@ -147,8 +157,9 @@ def ticket_ai_solution_memory(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_ai_solution_decision(request, pk, snippet_id):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     snippet = get_object_or_404(SolutionSnippet, pk=snippet_id, workspace=workspace, ticket=ticket)
     if request.POST.get("decision") == "approve":
@@ -161,8 +172,9 @@ def ticket_ai_solution_decision(request, pk, snippet_id):
 
 
 @login_required
+@require_POST
 def organization_ai_briefing(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     organization = get_object_or_404(Organization, pk=pk, workspace=workspace)
     if not get_ai_settings(workspace).crm_insights_enabled:
         messages.error(request, "AI CRM insights are not enabled.")
@@ -182,12 +194,13 @@ def ai_audit(request):
     analyses = TicketAIAnalysis.objects.filter(workspace=workspace).select_related("ticket", "requested_by")[:50]
     actions = workspace.ai_suggested_actions.select_related("applied_by", "run")[:100]
     snippets = SolutionSnippet.objects.filter(workspace=workspace).select_related("ticket")[:50]
-    return render(request, "ai/audit.html", {"runs": runs, "analyses": analyses, "actions": actions, "snippets": snippets})
+    return render(request, "ai/audit.html", {"runs": runs, "analyses": analyses, "actions": actions, "snippets": snippets, "ai_usage": ai_usage_summary(workspace)})
 
 
 @login_required
+@require_POST
 def workspace_ai_digest(request):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     if not get_ai_settings(workspace).digest_enabled:
         messages.error(request, "AI workspace digests are not enabled.")
         return redirect("dashboard")
@@ -197,8 +210,9 @@ def workspace_ai_digest(request):
 
 
 @login_required
+@require_POST
 def workspace_ai_queue_intelligence(request):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     if not get_ai_settings(workspace).queue_intelligence_enabled:
         messages.error(request, "AI queue intelligence is not enabled.")
         return redirect("dashboard")

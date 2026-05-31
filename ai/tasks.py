@@ -5,7 +5,7 @@ from tickets.models import Ticket
 from workspaces.models import Workspace
 
 from .models import TicketAIAnalysis
-from .services import build_queue_intelligence, create_solution_snippet, generate_crm_insight, generate_reply_draft, generate_workspace_digest, run_ticket_analysis, suggest_time_entry
+from .services import build_queue_intelligence, create_solution_snippet, generate_crm_insight, generate_reply_draft, generate_workspace_digest, prune_ai_generation_retention, run_ticket_analysis, suggest_time_entry
 
 
 @shared_task
@@ -73,3 +73,8 @@ def build_queue_intelligence_with_ai(workspace_id, user_id=None):
     user = get_user_model().objects.filter(pk=user_id).first() if user_id else None
     snapshot = build_queue_intelligence(workspace, user)
     return str(snapshot.pk)
+
+
+@shared_task
+def prune_ai_generation_retention_task():
+    return prune_ai_generation_retention()

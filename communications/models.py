@@ -4,6 +4,7 @@ from django.db import models
 from crm.models import Contact, Organization
 from tickets.models import Ticket, TicketComment
 from workspaces.models import Workspace
+from ai.crypto import decrypt_secret, encrypt_secret, is_encrypted
 
 
 class MailboxChannel(models.Model):
@@ -19,6 +20,21 @@ class MailboxChannel(models.Model):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.STUBBED)
     provider = models.CharField(max_length=80, blank=True)
     provider_config = models.JSONField(default=dict, blank=True)
+    inbound_enabled = models.BooleanField(default=False)
+    outbound_enabled = models.BooleanField(default=False)
+    imap_host = models.CharField(max_length=255, blank=True)
+    imap_port = models.PositiveIntegerField(default=993)
+    imap_use_ssl = models.BooleanField(default=True)
+    imap_username = models.CharField(max_length=255, blank=True)
+    encrypted_imap_password = models.TextField(blank=True)
+    imap_folder = models.CharField(max_length=120, default="INBOX")
+    imap_last_uid = models.CharField(max_length=80, blank=True)
+    smtp_host = models.CharField(max_length=255, blank=True)
+    smtp_port = models.PositiveIntegerField(default=587)
+    smtp_use_tls = models.BooleanField(default=True)
+    smtp_use_ssl = models.BooleanField(default=False)
+    smtp_username = models.CharField(max_length=255, blank=True)
+    encrypted_smtp_password = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -29,6 +45,33 @@ class MailboxChannel(models.Model):
 
     def __str__(self):
         return f"{self.name} <{self.address}>"
+
+    @property
+    def has_imap_password(self):
+        return bool(self.encrypted_imap_password)
+
+    @property
+    def has_smtp_password(self):
+        return bool(self.encrypted_smtp_password)
+
+    def get_imap_password(self):
+        return decrypt_secret(self.encrypted_imap_password)
+
+    def get_smtp_password(self):
+        return decrypt_secret(self.encrypted_smtp_password)
+
+    def set_imap_password(self, value):
+        self.encrypted_imap_password = encrypt_secret(value)
+
+    def set_smtp_password(self, value):
+        self.encrypted_smtp_password = encrypt_secret(value)
+
+    def save(self, *args, **kwargs):
+        if self.encrypted_imap_password and not is_encrypted(self.encrypted_imap_password):
+            self.encrypted_imap_password = encrypt_secret(self.encrypted_imap_password)
+        if self.encrypted_smtp_password and not is_encrypted(self.encrypted_smtp_password):
+            self.encrypted_smtp_password = encrypt_secret(self.encrypted_smtp_password)
+        super().save(*args, **kwargs)
 
 
 class EmailMessage(models.Model):

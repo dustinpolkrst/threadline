@@ -1,8 +1,16 @@
 services:
   web:
     restart: unless-stopped
+    user: threadline
     environment:
       DEBUG: "false"
+      SECURE_SSL_REDIRECT: "true"
+      SESSION_COOKIE_SECURE: "true"
+      CSRF_COOKIE_SECURE: "true"
+      SECURE_HSTS_SECONDS: "31536000"
+      SECURE_HSTS_INCLUDE_SUBDOMAINS: "true"
+      SECURE_HSTS_PRELOAD: "true"
+      USE_X_FORWARDED_PROTO: "true"
     ports:
       - "127.0.0.1:8000:8000"
   celery:

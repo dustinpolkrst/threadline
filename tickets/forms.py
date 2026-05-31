@@ -27,6 +27,14 @@ class PortalCommentForm(forms.ModelForm):
         fields = ["body"]
 
 
+class TicketEmailReplyForm(forms.Form):
+    subject = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={"id": "id_email_reply_subject"}))
+    body = forms.CharField(
+        label="Message",
+        widget=forms.Textarea(attrs={"id": "id_email_reply_body", "rows": 5}),
+    )
+
+
 class TicketAttachmentForm(forms.ModelForm):
     class Meta:
         model = TicketAttachment

@@ -68,8 +68,9 @@ def index_ticket(ticket, refresh_vector=True):
         object_id=ticket.pk,
         title=title,
         body="\n".join(part for part in body_parts if part),
-        customer_visible=organization is not None,
+        customer_visible=organization is not None and contact is not None,
         organization_id=organization.pk if organization else None,
+        contact_id=contact.pk if contact else None,
     )
     if refresh_vector:
         _refresh_document_vector(doc)
@@ -85,8 +86,9 @@ def index_comment(comment, refresh_vector=True):
         object_id=comment.pk,
         title=f"Comment on {ticket.title}",
         body=comment.body,
-        customer_visible=comment.visibility == TicketComment.Visibility.PUBLIC and organization is not None,
+        customer_visible=comment.visibility == TicketComment.Visibility.PUBLIC and organization is not None and ticket.contact_id is not None,
         organization_id=organization.pk if organization else None,
+        contact_id=ticket.contact_id,
     )
     if refresh_vector:
         _refresh_document_vector(doc)
@@ -116,6 +118,7 @@ def index_organization(organization, refresh_vector=True):
         body=body,
         customer_visible=False,
         organization_id=organization.pk,
+        contact_id=None,
     )
     if refresh_vector:
         _refresh_document_vector(doc)
@@ -132,6 +135,7 @@ def index_contact(contact, refresh_vector=True):
         body=body,
         customer_visible=False,
         organization_id=contact.organization_id,
+        contact_id=contact.pk,
     )
     if refresh_vector:
         _refresh_document_vector(doc)
@@ -148,6 +152,7 @@ def index_solution_snippet(snippet, refresh_vector=True):
         body="\n".join([snippet.body, ", ".join(snippet.tags or []), ticket.title]),
         customer_visible=False,
         organization_id=ticket.organization_id,
+        contact_id=ticket.contact_id,
     )
     if refresh_vector:
         _refresh_document_vector(doc)
@@ -162,6 +167,7 @@ def search_documents_for_user(user, query_text, entity="all"):
         documents = SearchDocument.objects.filter(
             workspace=profile.workspace,
             organization_id=profile.organization_id,
+            contact_id=profile.contact_id,
             customer_visible=True,
         )
     else:
@@ -221,6 +227,7 @@ def _upsert_document(**values):
             "body": values["body"],
             "customer_visible": values["customer_visible"],
             "organization_id": values["organization_id"],
+            "contact_id": values["contact_id"],
         },
     )
     return doc

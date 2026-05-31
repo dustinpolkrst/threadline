@@ -48,6 +48,7 @@ urlpatterns = [
     path("tickets/<uuid:pk>/ai/solution-memory/", ai_views.ticket_ai_solution_memory, name="ticket_ai_solution_memory"),
     path("tickets/<uuid:pk>/ai/solution-memory/<uuid:snippet_id>/decision/", ai_views.ticket_ai_solution_decision, name="ticket_ai_solution_decision"),
     path("tickets/<uuid:pk>/comments/", ticket_views.ticket_add_comment, name="ticket_add_comment"),
+    path("tickets/<uuid:pk>/email-reply/", ticket_views.ticket_send_email_reply, name="ticket_send_email_reply"),
     path("tickets/<uuid:pk>/resolve/", ticket_views.ticket_resolve, name="ticket_resolve"),
     path("tickets/<uuid:pk>/time/", ticket_views.ticket_add_time, name="ticket_add_time"),
     path("tickets/<uuid:pk>/timer/start/", ticket_views.ticket_start_timer, name="ticket_start_timer"),

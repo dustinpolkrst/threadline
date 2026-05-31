@@ -7,7 +7,7 @@
     <p class="tl-page-subtitle">Configure storage, service levels, invitations, and account access for this workspace.</p>
   </div>
   <div class="tl-settings-status {% if storage_settings.is_s3_enabled %}text-emerald-700 bg-emerald-50 border-emerald-200{% endif %}">
-    {{ storage_settings.get_backend_display }}
+    {{ storage_settings.backend_label }}
   </div>
 </div>
 
@@ -15,6 +15,7 @@
   <aside class="tl-panel h-fit overflow-hidden">
     <nav class="tl-settings-nav" aria-label="Settings sections">
       <a class="{% if active_section == 'application' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=application">Application<span>Storage and private media</span></a>
+      <a class="{% if active_section == 'theme' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=theme">Theme<span>Workspace palette</span></a>
       <a class="{% if active_section == 'ai' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=ai">AI<span>OpenRouter and triage</span></a>
       <a class="{% if active_section == 'team' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=team">Team<span>Internal and portal overview</span></a>
       <a class="{% if active_section == 'sla' %}is-active{% endif %}" href="{% url 'team_settings' %}?section=sla">SLA<span>Targets and business hours</span></a>
@@ -30,65 +31,101 @@
           <div>
             <div class="tl-kicker">Application</div>
             <h2 class="tl-settings-card-title">Attachment storage</h2>
-            <p class="tl-settings-card-subtitle">Choose where Threadline stores private ticket and email attachments.</p>
+            <p class="tl-settings-card-subtitle">Configured by environment. Private media remains behind Django permission checks.</p>
           </div>
           <div class="grid min-w-72 gap-2 rounded-lg border border-slate-200 bg-white p-4 text-sm">
-            <div class="flex justify-between gap-6"><span class="text-slate-500">Backend</span><span class="font-semibold text-slate-900">{{ storage_settings.get_backend_display }}</span></div>
+            <div class="flex justify-between gap-6"><span class="text-slate-500">Backend</span><span class="font-semibold text-slate-900">{{ storage_settings.backend_label }}</span></div>
             <div class="flex justify-between gap-6"><span class="text-slate-500">Bucket</span><span class="font-semibold text-slate-900">{{ storage_settings.bucket_name|default:"Not configured" }}</span></div>
-            <div class="flex justify-between gap-6"><span class="text-slate-500">Updated</span><span class="font-semibold text-slate-900">{{ storage_settings.updated_at|date:"M j, Y g:i A" }}</span></div>
+            <div class="flex justify-between gap-6"><span class="text-slate-500">Endpoint</span><span class="font-semibold text-slate-900">{{ storage_settings.endpoint_url|default:"Default provider" }}</span></div>
+          </div>
+        </div>
+        <div class="grid gap-6 p-6">
+          <div class="tl-settings-callout">
+            Set <span class="font-semibold">MEDIA_STORAGE_BACKEND</span> and the <span class="font-semibold">AWS_*</span> environment variables before starting the app. Workspace admins can view the active storage mode here, but storage credentials are not stored in the database.
+          </div>
+          <div class="rounded-lg border border-slate-200 bg-white">
+            <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-slate-50 px-5 py-4">
+              <div>
+                <h3 class="font-semibold text-slate-950">Deployment storage status</h3>
+                <p class="mt-1 text-sm text-slate-500">Works with local private media or S3-compatible providers configured outside the app.</p>
+              </div>
+              <span class="tl-badge bg-slate-100 text-slate-600">Read only</span>
+            </div>
+            <div class="grid gap-3 p-5 text-sm md:grid-cols-2">
+              <div class="flex justify-between gap-4 rounded-md border border-slate-200 p-3"><span class="text-slate-500">Backend</span><span class="font-medium text-slate-900">{{ storage_settings.backend_label }}</span></div>
+              <div class="flex justify-between gap-4 rounded-md border border-slate-200 p-3"><span class="text-slate-500">Bucket</span><span class="font-medium text-slate-900">{{ storage_settings.bucket_name|default:"Not configured" }}</span></div>
+              <div class="flex justify-between gap-4 rounded-md border border-slate-200 p-3"><span class="text-slate-500">Region</span><span class="font-medium text-slate-900">{{ storage_settings.region_name|default:"Default" }}</span></div>
+              <div class="flex justify-between gap-4 rounded-md border border-slate-200 p-3"><span class="text-slate-500">Addressing</span><span class="font-medium text-slate-900">{{ storage_settings.addressing_style }}</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    {% endif %}
+
+    {% if active_section == 'theme' %}
+      <section class="tl-settings-card">
+        <div class="tl-settings-card-header">
+          <div>
+            <div class="tl-kicker">Appearance</div>
+            <h2 class="tl-settings-card-title">Workspace theme</h2>
+            <p class="tl-settings-card-subtitle">Choose a built-in palette, then customize core colors for this workspace and portal.</p>
+          </div>
+          <div class="grid min-w-72 gap-2 rounded-lg border border-slate-200 bg-white p-4 text-sm">
+            {% for token in theme_tokens %}
+              {% if token.key == "primary" or token.key == "background" or token.key == "panel" or token.key == "text" %}
+                <div class="flex items-center justify-between gap-6">
+                  <span class="text-slate-500">{{ token.label }}</span>
+                  <span class="flex items-center gap-2 font-semibold text-slate-900"><span class="inline-block h-4 w-4 rounded-full border border-slate-200" style="background: {{ token.value }}"></span>{{ token.value }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
           </div>
         </div>
         <form method="post">
           {% csrf_token %}
-          <input type="hidden" name="action" value="storage">
+          <input type="hidden" name="action" value="theme">
           <div class="grid gap-6 p-6">
-            <div class="grid gap-4 lg:grid-cols-[minmax(0,26rem)_1fr]">
+            <div class="grid gap-4 md:grid-cols-[minmax(0,24rem)_1fr]">
               <div>
-                <label for="{{ storage_form.backend.id_for_label }}">Storage backend</label>
-                {{ storage_form.backend }}
+                <label for="{{ theme_form.theme_preset.id_for_label }}">Preset</label>
+                {{ theme_form.theme_preset }}
+                {% if theme_form.theme_preset.errors %}<div class="mt-1 text-sm text-rose-700">{{ theme_form.theme_preset.errors }}</div>{% endif %}
               </div>
-              <div class="tl-settings-callout">
-                Private objects stay behind Django permission checks. Users never receive raw public object URLs in this version.
-              </div>
+              <label class="mt-7 flex items-center gap-2 text-sm normal-case tracking-normal text-slate-800">{{ theme_form.reset_custom_tokens }} Reset custom colors to the selected preset</label>
             </div>
-
-            <div class="rounded-lg border border-slate-200 bg-white">
-              <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-slate-50 px-5 py-4">
-                <div>
-                  <h3 class="font-semibold text-slate-950">S3-compatible provider</h3>
-                  <p class="mt-1 text-sm text-slate-500">Works with AWS S3, MinIO, Cloudflare R2, Backblaze, and compatible endpoints.</p>
-                </div>
-                <span class="tl-badge bg-slate-100 text-slate-600">Private media</span>
-              </div>
-              <div class="grid gap-6 p-5">
-                <div>
-                  <div class="mb-3 text-sm font-semibold text-slate-800">Bucket and endpoint</div>
-                  <div class="tl-settings-field-grid">
-                    <div><label for="{{ storage_form.bucket_name.id_for_label }}">Bucket name</label>{{ storage_form.bucket_name }}</div>
-                    <div><label for="{{ storage_form.endpoint_url.id_for_label }}">Endpoint URL</label>{{ storage_form.endpoint_url }}</div>
-                    <div><label for="{{ storage_form.region_name.id_for_label }}">Region</label>{{ storage_form.region_name }}</div>
-                    <div><label for="{{ storage_form.addressing_style.id_for_label }}">Addressing style</label>{{ storage_form.addressing_style }}</div>
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {% for field in theme_form %}
+                {% if field.name != "theme_preset" and field.name != "reset_custom_tokens" %}
+                  <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="mt-1 text-sm text-rose-700">{{ field.errors }}</div>{% endif %}
                   </div>
-                </div>
-                <div class="border-t border-slate-200 pt-5">
-                  <div class="mb-3 text-sm font-semibold text-slate-800">Credentials</div>
-                  <div class="tl-settings-field-grid">
-                    <div><label for="{{ storage_form.access_key_id.id_for_label }}">Access key ID</label>{{ storage_form.access_key_id }}</div>
-                    <div><label for="{{ storage_form.secret_access_key.id_for_label }}">Secret access key</label>{{ storage_form.secret_access_key }}<p class="mt-2 text-xs text-slate-500">Leave blank to keep the current secret.</p></div>
-                  </div>
-                </div>
-                <div class="border-t border-slate-200 pt-5">
-                  <div class="mb-3 text-sm font-semibold text-slate-800">Routing</div>
-                  <div><label for="{{ storage_form.custom_domain.id_for_label }}">Custom domain</label>{{ storage_form.custom_domain }}</div>
-                </div>
-              </div>
+                {% endif %}
+              {% endfor %}
             </div>
           </div>
           <div class="tl-settings-actionbar">
-            <p class="text-sm text-slate-500">Changing storage affects new file operations. Existing files are not migrated automatically.</p>
-            <button class="tl-button">Save storage</button>
+            <p class="text-sm text-slate-500">Theme changes apply to internal pages and the customer portal.</p>
+            <button class="tl-button" name="action" value="theme">Save theme</button>
           </div>
         </form>
+        {{ theme_preset_tokens|json_script:"theme-preset-tokens" }}
+        <script>
+          (() => {
+            const tokenData = document.getElementById("theme-preset-tokens");
+            const presetSelect = document.querySelector('select[name="theme_preset"]');
+            const colorInputs = Array.from(document.querySelectorAll('input[type="color"]'));
+            if (!tokenData || !presetSelect || colorInputs.length === 0) return;
+            const presets = JSON.parse(tokenData.textContent);
+            presetSelect.addEventListener("change", () => {
+              const tokens = presets[presetSelect.value] || {};
+              colorInputs.forEach((input) => {
+                if (tokens[input.name]) input.value = tokens[input.name];
+              });
+            });
+          })();
+        </script>
       </section>
     {% endif %}
 
@@ -103,6 +140,7 @@
           <div class="grid min-w-72 gap-2 rounded-lg border border-slate-200 bg-white p-4 text-sm">
             <div class="flex justify-between gap-6"><span class="text-slate-500">Provider</span><span class="font-semibold text-slate-900">{{ ai_settings.get_provider_display }}</span></div>
             <div class="flex justify-between gap-6"><span class="text-slate-500">Model</span><span class="font-semibold text-slate-900">{{ ai_settings.model }}</span></div>
+            <div class="flex justify-between gap-6"><span class="text-slate-500">This month</span><span class="font-semibold text-slate-900">{{ ai_usage.run_count }} runs / {{ ai_usage.total_tokens }} tokens</span></div>
             <div class="flex justify-between gap-6"><span class="text-slate-500">Last test</span><span class="font-semibold {% if ai_settings.last_test_status == 'ok' %}text-emerald-700{% elif ai_settings.last_test_status == 'failed' %}text-rose-700{% else %}text-slate-900{% endif %}">{{ ai_settings.last_test_status|default:"Not run" }}</span></div>
           </div>
         </div>
@@ -140,9 +178,34 @@
                 {{ ai_form.max_historical_tickets }}
                 <p class="mt-2 text-xs text-slate-500">Same-client ticket history included in analysis prompts.</p>
               </div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <div class="font-medium text-slate-900">Current month usage</div>
+                <div class="mt-3 grid gap-2 text-sm text-slate-600">
+                  <div class="flex justify-between gap-4"><span>Runs</span><span class="font-semibold text-slate-900">{{ ai_usage.run_count }}{% if ai_usage.monthly_run_cap %} / {{ ai_usage.monthly_run_cap }}{% endif %}</span></div>
+                  <div class="flex justify-between gap-4"><span>Tokens</span><span class="font-semibold text-slate-900">{{ ai_usage.total_tokens }}{% if ai_usage.monthly_token_cap %} / {{ ai_usage.monthly_token_cap }}{% endif %}</span></div>
+                </div>
+              </div>
               <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <label class="flex items-center gap-2 text-sm normal-case tracking-normal text-amber-900">{{ ai_form.auto_triage_enabled }} Allow apply triage</label>
                 <p class="mt-2 text-sm text-amber-800">When enabled, agents can apply suggested priority/tags and add an internal AI comment.</p>
+              </div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4 lg:col-span-2">
+                <div class="font-medium text-slate-900">Cost and retention controls</div>
+                <div class="mt-4 grid gap-4 md:grid-cols-3">
+                  <div>
+                    <label for="{{ ai_form.monthly_token_cap.id_for_label }}">Monthly token cap</label>
+                    {{ ai_form.monthly_token_cap }}
+                  </div>
+                  <div>
+                    <label for="{{ ai_form.monthly_run_cap.id_for_label }}">Monthly run cap</label>
+                    {{ ai_form.monthly_run_cap }}
+                  </div>
+                  <div>
+                    <label for="{{ ai_form.generation_retention_days.id_for_label }}">Retention days</label>
+                    {{ ai_form.generation_retention_days }}
+                  </div>
+                </div>
+                <p class="mt-3 text-sm text-slate-500">Caps use calendar-month AI run totals. Retention pruning clears generated payloads and context while keeping audit rows.</p>
               </div>
               <div class="rounded-lg border border-slate-200 bg-white p-4 lg:col-span-2">
                 <div class="font-medium text-slate-900">AI-first suite features</div>

@@ -1,10 +1,11 @@
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from crm.models import Contact, Organization
 from customer_portal.models import CustomerProfile
-from tickets.models import Ticket, TicketComment
+from tickets.models import Ticket, TicketAttachment, TicketComment
 from time_tracking.models import ActiveTimer, TimeEntry
 from workspaces.models import Workspace, WorkspaceMembership
 
@@ -51,6 +52,38 @@ def test_customer_cannot_access_other_workspace_ticket(client, demo):
 
 
 @pytest.mark.django_db
+def test_customer_portal_is_contact_scoped(client, demo):
+    other_contact = Contact.objects.create(
+        workspace=demo["workspace"],
+        organization=demo["ticket"].organization,
+        name="Other Contact",
+        email="other-contact@example.com",
+    )
+    other_ticket = Ticket.objects.create(
+        workspace=demo["workspace"],
+        organization=demo["ticket"].organization,
+        contact=other_contact,
+        title="Same org private ticket",
+        description="Different contact",
+    )
+    attachment = TicketAttachment.objects.create(
+        workspace=demo["workspace"],
+        ticket=other_ticket,
+        file=SimpleUploadedFile("other.txt", b"other"),
+        display_name="other.txt",
+        customer_visible=True,
+    )
+
+    client.login(username="customer", password="password")
+    list_body = client.get(reverse("portal_ticket_list")).content.decode()
+    assert "Visible" in list_body
+    assert "Same org private ticket" not in list_body
+    assert client.get(reverse("portal_ticket_detail", args=[other_ticket.pk])).status_code == 404
+    assert client.post(reverse("portal_ticket_reply", args=[other_ticket.pk]), {"body": "not mine"}).status_code == 404
+    assert client.get(reverse("portal_download_attachment", args=[other_ticket.pk, attachment.pk])).status_code == 404
+
+
+@pytest.mark.django_db
 def test_customer_cannot_access_internal_settings_or_ticket_detail(client, demo):
     client.login(username="customer", password="password")
     response = client.get(reverse("ticket_detail", args=[demo["ticket"].pk]))
@@ -72,6 +105,27 @@ def test_agent_can_start_and_stop_billable_timer(client, demo):
     entry = TimeEntry.objects.filter(user=demo["agent"], ticket=demo["ticket"], notes="Resolved with config change").latest("created_at")
     assert entry.billable is True
     assert entry.duration_minutes >= 7
+
+
+@pytest.mark.django_db
+def test_agent_can_log_manual_ticket_time(client, demo):
+    client.login(username="agent", password="password")
+    response = client.post(
+        reverse("ticket_add_time", args=[demo["ticket"].pk]),
+        {
+            "started_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
+            "duration_minutes": "25",
+            "billable": "on",
+            "notes": "Manual investigation",
+        },
+    )
+    assert response.status_code == 302
+    entry = TimeEntry.objects.get(ticket=demo["ticket"], notes="Manual investigation")
+    assert entry.workspace == demo["workspace"]
+    assert entry.organization == demo["ticket"].organization
+    assert entry.contact == demo["ticket"].contact
+    assert entry.user == demo["agent"]
+    assert entry.customer_visible is False
 
 
 @pytest.mark.django_db
@@ -124,3 +178,25 @@ def test_ticket_detail_shows_all_time_entries_for_ticket(client, demo):
     content = response.content.decode()
     assert "Old month entry" in content
     assert f'href="/time/{old_entry.pk}/edit/"' in content
+
+
+@pytest.mark.django_db
+def test_ticket_mutations_require_post(client, demo):
+    client.login(username="agent", password="password")
+    assert client.get(reverse("ticket_resolve", args=[demo["ticket"].pk])).status_code == 405
+    assert client.get(reverse("ticket_add_time", args=[demo["ticket"].pk])).status_code == 405
+    assert client.get(reverse("ticket_start_timer", args=[demo["ticket"].pk])).status_code == 405
+
+
+@pytest.mark.django_db
+def test_viewer_is_read_only(client, demo):
+    User = get_user_model()
+    viewer = User.objects.create_user("viewer", password="password")
+    WorkspaceMembership.objects.create(workspace=demo["workspace"], user=viewer, role=WorkspaceMembership.Role.VIEWER)
+
+    client.login(username="viewer", password="password")
+    assert client.get(reverse("ticket_detail", args=[demo["ticket"].pk])).status_code == 200
+    assert client.post(reverse("ticket_resolve", args=[demo["ticket"].pk])).status_code == 403
+    assert client.post(reverse("ticket_start_timer", args=[demo["ticket"].pk]), {"billable": "on"}).status_code == 403
+    assert client.get(reverse("crm_import_upload")).status_code == 403
+    assert client.post(reverse("ticket_ai_time_suggestion", args=[demo["ticket"].pk])).status_code == 403

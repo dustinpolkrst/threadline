@@ -14,6 +14,7 @@ from customer_portal.models import CustomerProfile
 from search.models import SearchDocument
 from tickets.models import Ticket, TicketComment
 from workspaces.models import Workspace, WorkspaceMembership
+from ai import services as ai_services
 
 
 @pytest.fixture
@@ -54,6 +55,69 @@ def test_openrouter_request_enforces_zdr_and_schema(ai_data):
     assert payload["provider"]["zdr"] is True
     assert payload["response_format"]["type"] == "json_schema"
     assert payload["metadata"]["workspace_id"] == str(ai_data["workspace"].pk)
+
+
+@pytest.mark.django_db
+def test_ai_usage_summary_counts_current_month_only(ai_data):
+    now = timezone.now()
+    old = now - timezone.timedelta(days=45)
+    old_run = AIRun.objects.create(workspace=ai_data["workspace"], workflow=AIRun.Workflow.REPLY_COMPOSER, status=AIRun.Status.SUCCEEDED, total_tokens=30, completed_at=old)
+    AIRun.objects.filter(pk=old_run.pk).update(created_at=old)
+    AIRun.objects.create(workspace=ai_data["workspace"], workflow=AIRun.Workflow.REPLY_COMPOSER, status=AIRun.Status.SUCCEEDED, total_tokens=12)
+    AIRun.objects.create(workspace=ai_data["other_workspace"], workflow=AIRun.Workflow.REPLY_COMPOSER, status=AIRun.Status.SUCCEEDED, total_tokens=99)
+    summary = ai_services.ai_usage_summary(ai_data["workspace"], today=now.date())
+    assert summary["run_count"] == 1
+    assert summary["total_tokens"] == 12
+    assert summary["monthly_token_cap"] == 0
+    assert summary["monthly_run_cap"] == 0
+
+
+@pytest.mark.django_db
+def test_ai_budget_blocks_ticket_analysis_before_provider_call(monkeypatch, ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], enabled=True, api_key="sk-or-test", monthly_token_cap=10)
+    AIRun.objects.create(workspace=ai_data["workspace"], workflow=AIRun.Workflow.REPLY_COMPOSER, status=AIRun.Status.SUCCEEDED, total_tokens=10)
+    analysis = TicketAIAnalysis.objects.create(workspace=ai_data["workspace"], ticket=ai_data["ticket"], requested_by=ai_data["agent"])
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("provider should not be called after cap is reached")
+
+    monkeypatch.setattr("ai.services.send_chat_completion", fail_if_called)
+    ai_services.run_ticket_analysis(analysis)
+    analysis.refresh_from_db()
+    assert analysis.status == TicketAIAnalysis.Status.FAILED
+    assert analysis.error_code == "budget_exceeded"
+
+
+@pytest.mark.django_db
+def test_prune_ai_generation_retention_clears_old_outputs(ai_data):
+    AIProviderSettings.objects.create(workspace=ai_data["workspace"], generation_retention_days=7)
+    old_run = AIRun.objects.create(
+        workspace=ai_data["workspace"],
+        workflow=AIRun.Workflow.REPLY_COMPOSER,
+        status=AIRun.Status.SUCCEEDED,
+        output={"body": "old generated text"},
+        context_refs=[{"ticket": "old"}],
+        selected_actions=["reply"],
+        rejected_actions=["note"],
+        completed_at=timezone.now() - timezone.timedelta(days=30),
+    )
+    fresh_run = AIRun.objects.create(
+        workspace=ai_data["workspace"],
+        workflow=AIRun.Workflow.REPLY_COMPOSER,
+        status=AIRun.Status.SUCCEEDED,
+        output={"body": "fresh generated text"},
+        context_refs=[{"ticket": "fresh"}],
+        completed_at=timezone.now(),
+    )
+    pruned = ai_services.prune_ai_generation_retention()
+    old_run.refresh_from_db()
+    fresh_run.refresh_from_db()
+    assert pruned == 1
+    assert old_run.output == {}
+    assert old_run.context_refs == []
+    assert old_run.selected_actions == []
+    assert old_run.rejected_actions == []
+    assert fresh_run.output == {"body": "fresh generated text"}
 
 
 @pytest.mark.django_db

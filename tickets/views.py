@@ -4,14 +4,16 @@ from django.contrib import messages
 from django.http import FileResponse, Http404
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from activity.services import record_event
-from core.permissions import require_internal_workspace
+from core.permissions import require_internal_workspace, require_support_workspace
 from core.pagination import paginate
 from crm.models import Contact, Organization
 from search.services import index_comment, index_ticket
-from time_tracking.forms import TimerStartForm, TimerStopForm
+from time_tracking.forms import TimeEntryForm, TimerStartForm, TimerStopForm
 from time_tracking.models import ActiveTimer, TimeEntry
-from .forms import BulkTicketActionForm, CommentForm, SavedTicketFilterForm, TicketAttachmentForm, TicketForm, TicketRelationForm
+from .email import TicketEmailReplyError, send_ticket_email_reply
+from .forms import BulkTicketActionForm, CommentForm, SavedTicketFilterForm, TicketAttachmentForm, TicketEmailReplyForm, TicketForm, TicketRelationForm
 from .models import SavedTicketFilter, Ticket, TicketAttachment, TicketComment, TicketRelation
 from .detail import build_ticket_detail_context, relation_form
 from .services import OPEN_STATUSES, apply_initial_sla, mark_agent_reply, mark_resolved, merge_ticket, sla_state
@@ -58,7 +60,7 @@ def ticket_list(request):
 
 @login_required
 def ticket_create(request):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     form = TicketForm(request.POST or None)
     _scope_form(form, workspace)
     if form.is_valid():
@@ -76,7 +78,7 @@ def ticket_create(request):
 @login_required
 def ticket_detail(request, pk):
     workspace = require_internal_workspace(request.user)
-    ticket = get_object_or_404(Ticket.objects.select_related("organization", "contact", "assignee"), pk=pk, workspace=workspace)
+    ticket = get_object_or_404(Ticket.objects.select_related("organization", "contact", "requester", "assignee"), pk=pk, workspace=workspace)
     return render(
         request,
         "tickets/ticket_detail.html",
@@ -85,8 +87,9 @@ def ticket_detail(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_add_comment(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     form = CommentForm(request.POST)
     if form.is_valid():
@@ -103,8 +106,38 @@ def ticket_add_comment(request, pk):
 
 
 @login_required
+@require_POST
+def ticket_send_email_reply(request, pk):
+    workspace = require_support_workspace(request.user)
+    ticket = get_object_or_404(Ticket.objects.select_related("organization", "contact", "requester"), pk=pk, workspace=workspace)
+    form = TicketEmailReplyForm(request.POST)
+    if not form.is_valid():
+        messages.error(request, "Add a customer-visible message before sending.")
+        return redirect("ticket_detail", pk=ticket.pk)
+
+    try:
+        result = send_ticket_email_reply(
+            workspace=workspace,
+            ticket=ticket,
+            author=request.user,
+            subject=form.cleaned_data["subject"],
+            body=form.cleaned_data["body"],
+        )
+    except TicketEmailReplyError as exc:
+        messages.error(request, str(exc))
+    else:
+        if result.sent:
+            messages.success(request, "Email sent to customer.")
+        else:
+            detail = f": {result.failure_detail}" if result.failure_detail else "."
+            messages.error(request, f"Email send failed{detail}")
+    return redirect("ticket_detail", pk=ticket.pk)
+
+
+@login_required
+@require_POST
 def ticket_resolve(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     mark_resolved(ticket)
     record_event(workspace=workspace, actor=request.user, ticket=ticket, event_type="ticket.resolved", summary="Ticket resolved", customer_visible=False)
@@ -112,8 +145,9 @@ def ticket_resolve(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_upload_attachment(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     form = TicketAttachmentForm(request.POST, request.FILES)
     if form.is_valid():
@@ -141,8 +175,9 @@ def ticket_download_attachment(request, pk, attachment_id):
 
 
 @login_required
+@require_POST
 def ticket_delete_attachment(request, pk, attachment_id):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     attachment = get_object_or_404(TicketAttachment, pk=attachment_id, ticket_id=pk, workspace=workspace)
     ticket = attachment.ticket
     name = attachment.display_name
@@ -152,8 +187,9 @@ def ticket_delete_attachment(request, pk, attachment_id):
 
 
 @login_required
+@require_POST
 def ticket_add_relation(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     form = relation_form(workspace, ticket, request.POST)
     if form.is_valid():
@@ -167,8 +203,9 @@ def ticket_add_relation(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_merge(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     source = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     target = get_object_or_404(Ticket, pk=request.POST.get("target"), workspace=workspace)
     relation = merge_ticket(source, target, request.user, request.POST.get("note", ""))
@@ -179,8 +216,9 @@ def ticket_merge(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_save_filter(request):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     form = SavedTicketFilterForm(request.POST)
     if form.is_valid():
         saved = form.save(commit=False)
@@ -194,8 +232,9 @@ def ticket_save_filter(request):
 
 
 @login_required
+@require_POST
 def ticket_bulk_action(request):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     user_ids = workspace.memberships.values_list("user_id", flat=True)
     form = BulkTicketActionForm(request.POST)
     form.fields["assignee"].queryset = get_user_model().objects.filter(id__in=user_ids)
@@ -222,8 +261,9 @@ def ticket_bulk_action(request):
 
 
 @login_required
+@require_POST
 def ticket_add_time(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     form = TimeEntryForm(request.POST)
     if form.is_valid():
@@ -240,8 +280,9 @@ def ticket_add_time(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_start_timer(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     form = TimerStartForm(request.POST)
     if form.is_valid():
@@ -263,8 +304,9 @@ def ticket_start_timer(request, pk):
 
 
 @login_required
+@require_POST
 def ticket_stop_timer(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     ticket = get_object_or_404(Ticket, pk=pk, workspace=workspace)
     timer = get_object_or_404(ActiveTimer, workspace=workspace, user=request.user, ticket=ticket)
     form = TimerStopForm(request.POST)

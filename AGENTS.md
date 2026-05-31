@@ -17,6 +17,7 @@ Threadline is a Django monolith for self-hosted support operations: CRM, tickets
 - Customer portal queries must also scope by the customer's `organization` and, where appropriate, `contact`.
 - Customer users must never see internal comments, internal activity, private time entries, internal users, other customers, or workspace settings.
 - Internal app access is based on `WorkspaceMembership`.
+- Internal `viewer` members are read-only; ticket, time, AI, import, and settings mutations require agent/admin/owner access as appropriate.
 - Customer portal access is based on `CustomerProfile`.
 
 ## Local Commands
@@ -30,7 +31,8 @@ Threadline is a Django monolith for self-hosted support operations: CRM, tickets
 ## Deployment Notes
 
 - Local and single-VPS deployment use Docker Compose.
-- Use environment variables for secrets, database, Redis, allowed hosts, CSRF, email, and debug mode.
+- Use environment variables for secrets, database, Redis, allowed hosts, CSRF, email, media storage, TLS/security flags, and debug mode.
+- Attachment storage is deployment-scoped: use `MEDIA_STORAGE_BACKEND=s3` and `AWS_*` environment variables for S3-compatible storage. Do not store storage credentials in workspace settings.
 - Production-style compose should run migrations and collectstatic before starting Gunicorn.
 
 ## graphify
