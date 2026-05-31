@@ -1,11 +1,14 @@
 import pytest
 from datetime import timezone as dt_timezone
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.utils import timezone
 
+from core.storage import ThreadlineMediaStorage
 from core.templatetags.threadline_markdown import render_markdown
 from crm.models import CRMImportJob, CRMImportRow, Contact, Organization
 from customer_portal.models import CustomerProfile
@@ -13,7 +16,7 @@ from communications.models import EmailAttachment, EmailMessage, MailboxChannel
 from search.models import SearchDocument
 from tickets.models import Ticket, TicketAttachment
 from tickets.services import add_business_minutes
-from workspaces.models import ApplicationStorageSettings, BusinessHoursCalendar, Invitation, Workspace, WorkspaceMembership
+from workspaces.models import BusinessHoursCalendar, Invitation, Workspace, WorkspaceMembership
 
 
 @pytest.fixture
@@ -188,26 +191,31 @@ def test_csv_import_duplicate_detection_is_workspace_scoped(client, workflow_dat
 
 
 @pytest.mark.django_db
-def test_admin_can_configure_s3_storage_settings(client, workflow_data):
+def test_storage_settings_are_read_only(client, workflow_data):
     client.login(username="workflow-admin", password="password")
-    response = client.post(
-        reverse("team_settings"),
-        {
-            "action": "storage",
-            "backend": ApplicationStorageSettings.Backend.S3,
-            "bucket_name": "threadline-media",
-            "endpoint_url": "https://s3.example.com",
-            "region_name": "us-east-1",
-            "access_key_id": "key",
-            "secret_access_key": "secret",
-            "custom_domain": "",
-            "addressing_style": "path",
-        },
-    )
-    assert response.status_code == 302
-    settings = ApplicationStorageSettings.objects.get(workspace=workflow_data["workspace"])
-    assert settings.is_s3_enabled
-    assert settings.bucket_name == "threadline-media"
+    body = client.get(reverse("team_settings") + "?section=application").content.decode()
+    assert "Configured by environment" in body
+    assert "Save storage" not in body
+    assert "secret_access_key" not in body
+
+
+@pytest.mark.django_db
+def test_media_storage_uses_env_only_settings(workflow_data, settings):
+    try:
+        storage_model = apps.get_model("workspaces", "ApplicationStorageSettings")
+    except LookupError:
+        storage_model = None
+    if storage_model is not None:
+        storage_model.objects.create(
+            workspace=workflow_data["workspace"],
+            backend="s3",
+            bucket_name="legacy-workspace-bucket",
+            access_key_id="legacy",
+            secret_access_key="legacy",
+        )
+
+    settings.MEDIA_STORAGE_BACKEND = "local"
+    assert isinstance(ThreadlineMediaStorage()._backend(), FileSystemStorage)
 
 
 @pytest.mark.django_db
@@ -215,9 +223,13 @@ def test_rebuild_search_index_and_customer_scope(client, workflow_data):
     Ticket.objects.create(workspace=workflow_data["other_workspace"], title="Other secret")
     public_comment = workflow_data["ticket"].comments.create(workspace=workflow_data["workspace"], author=workflow_data["agent"], body="Public searchable answer", visibility="public")
     workflow_data["ticket"].comments.create(workspace=workflow_data["workspace"], author=workflow_data["agent"], body="Internal searchable secret", visibility="internal")
+    other_contact = Contact.objects.create(workspace=workflow_data["workspace"], organization=workflow_data["org"], name="Other Contact", email="other-contact-search@example.com")
+    other_ticket = Ticket.objects.create(workspace=workflow_data["workspace"], organization=workflow_data["org"], contact=other_contact, title="Other contact searchable ticket")
+    other_ticket.comments.create(workspace=workflow_data["workspace"], author=workflow_data["agent"], body="Other contact searchable answer", visibility="public")
 
     call_command("rebuild_search_index", "--workspace", workflow_data["workspace"].slug, "--clear")
-    assert SearchDocument.objects.filter(workspace=workflow_data["workspace"], entity_type=SearchDocument.EntityType.TICKET, object_id=workflow_data["ticket"].pk).exists()
+    ticket_doc = SearchDocument.objects.get(workspace=workflow_data["workspace"], entity_type=SearchDocument.EntityType.TICKET, object_id=workflow_data["ticket"].pk)
+    assert ticket_doc.contact_id == workflow_data["contact"].pk
     assert SearchDocument.objects.filter(workspace=workflow_data["workspace"], entity_type=SearchDocument.EntityType.COMMENT, object_id=public_comment.pk, customer_visible=True).exists()
     assert not SearchDocument.objects.filter(title="Other secret", workspace=workflow_data["workspace"]).exists()
 
@@ -230,6 +242,7 @@ def test_rebuild_search_index_and_customer_scope(client, workflow_data):
     client.login(username="workflow-customer", password="password")
     body = client.get(reverse("search") + "?q=searchable").content.decode()
     assert "Public" in body and "<mark>searchable</mark>" in body and "answer" in body
+    assert "Other contact searchable" not in body
     assert "Internal searchable secret" not in body
     assert "Other secret" not in body
 

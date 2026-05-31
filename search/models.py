@@ -21,6 +21,7 @@ class SearchDocument(models.Model):
     body = models.TextField(blank=True)
     customer_visible = models.BooleanField(default=False)
     organization_id = models.UUIDField(null=True, blank=True)
+    contact = models.ForeignKey("crm.Contact", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     search_vector = SearchVectorField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -29,6 +30,7 @@ class SearchDocument(models.Model):
         indexes = [
             models.Index(fields=["workspace", "entity_type"]),
             models.Index(fields=["workspace", "organization_id", "customer_visible"]),
+            models.Index(fields=["workspace", "organization_id", "contact", "customer_visible"]),
         ]
 
     def __str__(self):

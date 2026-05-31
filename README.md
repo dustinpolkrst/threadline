@@ -36,7 +36,7 @@ We are intentionally avoiding Kubernetes, microservices, a separate SPA, GraphQL
 ## Current MVP Features
 
 - Workspace tenancy and internal workspace membership.
-- Internal roles: owner, admin, agent, viewer.
+- Internal roles: owner, admin, agent, viewer. Viewers have read-only internal access.
 - Organizations and contacts.
 - Ticket CRUD with statuses, priority, assignee, requester, source, and due date.
 - Customer portal ticket list/detail/create/reply.
@@ -58,7 +58,7 @@ We are intentionally avoiding Kubernetes, microservices, a separate SPA, GraphQL
 - CSV import preview/confirm flow for organizations and contacts.
 - CSV import templates and duplicate-resolution controls.
 - PostgreSQL full-text search ranking, highlighting, and rebuildable search documents.
-- Optional local or S3-compatible private attachment storage.
+- Env-configured local or S3-compatible private attachment storage.
 - OpenRouter AI settings with encrypted provider keys, ZDR routing, per-feature controls, and Celery-backed generation jobs.
 - AI ticket workbench with agent briefs, customer sentiment, urgency reasoning, next-best-action guidance, similar tickets, reply drafts, internal notes, triage suggestions, and selected human-approved application.
 - AI reply composer for internal agents, including generate, shorten, expand with steps, and customer-safe rewrite flows. Customer replies remain drafts until approved by an internal user.
@@ -66,24 +66,26 @@ We are intentionally avoiding Kubernetes, microservices, a separate SPA, GraphQL
 - AI CRM account briefings with recurring issues, support tone, product areas, risks, recommended next touch, and hygiene suggestions.
 - AI time-entry suggestions and a time cleanup page for likely unlogged work.
 - AI queue intelligence dashboard for likely urgent tickets, stale pending work, missing customer info, probable duplicates, SLA risks, and high-effort accounts.
-- AI audit console with auditable runs, suggested action outcomes, reply/snippet artifacts, token usage, latency, provider generation IDs, and privacy mode.
-- Email plumbing models and stub services, without real provider integration.
+- AI audit console with auditable runs, suggested action outcomes, reply/snippet artifacts, token usage, latency, provider generation IDs, privacy mode, monthly caps, and generation retention.
+- Provider-neutral email records with IMAP inbound polling, SMTP outbound delivery, delivery attempts, ingest logs, and retained stub helpers.
 - Docker Compose development and production-style deployment.
 - Demo seed data and permission tests.
 
 ## Email Scope
 
-Threadline currently includes email-ready plumbing only:
+Threadline includes provider-neutral email records plus generic IMAP/SMTP integration:
 
-- Mailbox placeholders.
+- Mailbox channels with encrypted IMAP and SMTP credentials.
 - Normalized email message records.
 - Ingest logs.
 - Delivery attempt records.
 - Email attachment metadata.
-- Stub service functions.
-- Stub Celery tasks.
+- Idempotent inbound processing by workspace and provider message id.
+- Ticket reference threading for inbound replies.
+- Outbound ticket reply queueing and delivery tracking.
+- Stub service functions and tasks for tests and offline development.
 
-Threadline does **not** currently connect to IMAP, SMTP, Gmail, Microsoft Graph, Postmark, SES, SendGrid, Mailgun, or webhook providers. It also does not send invitation emails yet. Invitation links are generated in-app and copied manually. The current goal is to make future email integration straightforward without prematurely committing to a provider.
+Threadline does **not** currently include provider-specific Gmail, Microsoft Graph, Postmark, SES, SendGrid, Mailgun, or webhook adapters. It also does not send invitation emails yet. Invitation links are generated in-app and copied manually.
 
 ## Roadmap And TODOs
 
@@ -110,17 +112,17 @@ Recently completed:
 - [x] CSV import for organizations and contacts.
 - [x] Better audit log filtering.
 - [x] Markdown support for comments.
-- [x] S3-compatible attachment storage option.
+- [x] Env-configured S3-compatible attachment storage option.
 - [x] Search index rebuild command and richer highlighting.
 - [x] Import templates and duplicate-resolution UI.
 - [x] OpenRouter AI foundation with encrypted keys, structured outputs, Celery jobs, and ticket analysis polling.
 - [x] AI agent-assist workbench, reply composer, solution memory, CRM intelligence, time cleanup, queue intelligence, and expanded AI audit.
+- [x] Generic IMAP inbound email-to-ticket integration.
+- [x] SMTP outbound ticket reply queueing and delivery attempts.
+- [x] AI cost controls, generation retention settings, and admin-visible usage summaries.
 
 High-priority next steps:
 
-- [ ] Real inbound email-to-ticket integration.
-- [ ] Outbound ticket replies by email.
-- [ ] AI cost controls, generation retention settings, and admin-visible usage charts.
 - [ ] Optional vector/embedding retrieval for approved solution memory and historical support context.
 - [ ] SLA escalation notifications after email is configured.
 - [ ] Public API endpoints for integrations where needed.
@@ -235,9 +237,10 @@ Edit `.env` and set:
 - `DEBUG=false`
 - `ALLOWED_HOSTS`
 - `CSRF_TRUSTED_ORIGINS`
+- `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_HSTS_SECONDS`, `SECURE_HSTS_INCLUDE_SUBDOMAINS`, `SECURE_HSTS_PRELOAD`, and `USE_X_FORWARDED_PROTO` for production TLS/proxy behavior
 - PostgreSQL credentials
 - `REDIS_URL`
-- Email placeholders
+- Django SMTP settings and any per-workspace mailbox channel credentials
 - Media storage settings, if using S3-compatible attachment storage
 
 Start services:
@@ -250,13 +253,13 @@ The web container runs migrations and `collectstatic` before Gunicorn starts. In
 
 Persistent volumes are defined for PostgreSQL, Redis, uploaded media, and collected static files.
 
-Attachment storage defaults to local private media. For S3-compatible storage, either set `MEDIA_STORAGE_BACKEND=s3` with the `AWS_*` values in `.env`, or configure a provider from Settings -> Application storage as an owner/admin. Objects remain private and Threadline still streams downloads through Django permission checks. Existing local media is not migrated automatically when switching storage backends.
+Attachment storage defaults to local private media. For S3-compatible storage, set `MEDIA_STORAGE_BACKEND=s3` with the `AWS_*` values in `.env` before starting the app. Storage is deployment-scoped and read-only in workspace settings; credentials are not stored in the database. Objects remain private and Threadline still streams downloads through Django permission checks. Existing local media is not migrated automatically when switching storage backends.
 
 AI is configured from Settings -> AI by an owner/admin. The first provider is OpenRouter, with draft-only agent-assist workflows by default, ZDR routing required for client ticket history, and opt-in manual application of AI triage suggestions. Provider keys are encrypted with `THREADLINE_FIELD_ENCRYPTION_KEY` in production.
 
 Current AI workflows include ticket analysis, agent reply drafts, selected suggestion approval, solution memory generation, CRM account briefings, time-entry suggestions, workspace digests, queue intelligence, and audit history. Customer-visible messages and record mutations still require an internal user to approve the draft or selected suggestion.
 
-AI jobs require a running Celery worker; Threadline does not fall back to running model calls in the web request. Provider connectivity can be checked with:
+AI jobs require a running Celery worker; Threadline does not fall back to running model calls in the web request. Email polling and outbound delivery are also Celery-friendly. Provider connectivity can be checked with:
 
 ```bash
 uv run python manage.py test_ai_provider --workspace demo
@@ -273,6 +276,7 @@ Health checks:
 - PostgreSQL uses `pg_isready` in Compose.
 - Django can be checked with `python manage.py check`.
 - Celery can be checked with `celery -A config inspect ping`.
+- Production readiness details are in `docs/production-readiness.md`.
 
 ## Architecture Notes
 
@@ -282,11 +286,11 @@ Health checks:
 - `time_tracking`: manual time, timers, editable entries, reports.
 - `activity`: internal and customer-visible activity events with filtering.
 - `customer_portal`: restricted customer ticket flows, dashboard filters, attachments, and account management.
-- `communications`: provider-neutral email plumbing, email attachment metadata, and stub tasks.
+- `communications`: provider-neutral email plumbing, IMAP/SMTP mailbox channels, email attachment metadata, delivery attempts, ingest logs, and stub tasks.
 - `search`: permission-scoped search, PostgreSQL full-text ranking, and a replaceable search document model.
 - `ai`: OpenRouter provider settings, structured AI workflows, ticket analyses, reply drafts, suggested actions, CRM insights, time suggestions, digests, queue intelligence snapshots, solution memory, and audit records.
 
-Customer portal access is represented by `CustomerProfile`. Internal access is represented by `WorkspaceMembership`. Customer-facing queries are scoped by workspace and organization, and sensitive internal comments, internal activity, private time entries, internal users, and workspace settings must not leak into the customer portal.
+Customer portal access is represented by `CustomerProfile`. Internal access is represented by `WorkspaceMembership`. Customer-facing queries are scoped by workspace, organization, and contact, and sensitive internal comments, internal activity, private time entries, internal users, and workspace settings must not leak into the customer portal.
 
 ## Security And Data Isolation
 
@@ -296,6 +300,7 @@ Every feature must preserve these rules:
 - Scope customer portal data by workspace and the customer user's organization/contact.
 - Customer users cannot access internal comments, internal activity, private time entries, internal users, email logs, reports, or workspace settings.
 - Internal users only see data for workspaces where they have membership.
+- Viewer members are read-only and cannot mutate tickets, time entries, AI runs/actions, CRM imports, or settings.
 - Admin/settings views require owner or admin roles.
 
 These rules should be covered by tests whenever related behavior changes.

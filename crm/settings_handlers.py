@@ -1,17 +1,19 @@
+from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 
 from ai.client import OpenRouterError, send_chat_completion
 from ai.forms import AIProviderSettingsForm
-from ai.services import get_ai_settings
+from ai.services import ai_usage_summary, get_ai_settings
 from customer_portal.models import CustomerProfile
 from crm.models import Contact, Organization
-from workspaces.forms import ApplicationStorageSettingsForm, BusinessHoursCalendarForm, InvitationForm, SLAPolicyForm, WorkspaceSLAForm
-from workspaces.models import ApplicationStorageSettings, BusinessHoursCalendar, Invitation, SLAPolicy, WorkspaceMembership
+from workspaces.forms import BusinessHoursCalendarForm, InvitationForm, SLAPolicyForm, WorkspaceSLAForm, WorkspaceThemeForm
+from workspaces.models import BusinessHoursCalendar, Invitation, SLAPolicy, WorkspaceMembership
+from workspaces.theme import THEME_PRESETS, THEME_TOKENS, merged_theme_tokens
 
 
-SETTINGS_SECTIONS = ["application", "ai", "team", "sla", "invitations", "users"]
+SETTINGS_SECTIONS = ["application", "theme", "ai", "team", "sla", "invitations", "users"]
 
 
 def normalize_settings_section(section):
@@ -53,12 +55,11 @@ def handle_settings_post(request, workspace):
             invite.invited_by = request.user
             invite.save()
         return settings_redirect("invitations")
-    if action == "storage":
-        storage_settings, _ = ApplicationStorageSettings.objects.get_or_create(workspace=workspace)
-        form = ApplicationStorageSettingsForm(request.POST, instance=storage_settings)
+    if action == "theme":
+        form = WorkspaceThemeForm(request.POST, instance=workspace)
         if form.is_valid():
             form.save()
-        return settings_redirect("application")
+        return settings_redirect("theme")
     if action == "ai":
         ai_settings = get_ai_settings(workspace)
         form = AIProviderSettingsForm(request.POST, instance=ai_settings)
@@ -79,7 +80,6 @@ def build_settings_context(workspace):
     invitation_form = InvitationForm(initial={"expires_at": timezone.now() + timezone.timedelta(days=7), "role": WorkspaceMembership.Role.AGENT})
     _scope_invitation_form(invitation_form, workspace)
     calendar, _ = BusinessHoursCalendar.objects.get_or_create(workspace=workspace)
-    storage_settings, _ = ApplicationStorageSettings.objects.get_or_create(workspace=workspace)
     ai_settings = get_ai_settings(workspace)
     return {
         "memberships": WorkspaceMembership.objects.filter(workspace=workspace).select_related("user"),
@@ -91,10 +91,14 @@ def build_settings_context(workspace):
         "calendar_form": BusinessHoursCalendarForm(instance=calendar),
         "invitation_form": invitation_form,
         "invitations": Invitation.objects.filter(workspace=workspace).select_related("organization", "contact", "invited_by")[:25],
-        "storage_form": ApplicationStorageSettingsForm(instance=storage_settings),
-        "storage_settings": storage_settings,
+        "storage_settings": _storage_settings_context(),
+        "theme_form": WorkspaceThemeForm(instance=workspace),
+        "theme_presets": THEME_PRESETS,
+        "theme_preset_tokens": {key: value["tokens"] for key, value in THEME_PRESETS.items()},
+        "theme_tokens": _theme_token_context(workspace),
         "ai_form": AIProviderSettingsForm(instance=ai_settings),
         "ai_settings": ai_settings,
+        "ai_usage": ai_usage_summary(workspace),
     }
 
 
@@ -130,3 +134,33 @@ def _handle_ai_test(request, workspace):
     ai_settings.last_tested_at = timezone.now()
     ai_settings.save(update_fields=["last_test_status", "last_test_message", "last_tested_at", "updated_at"])
     return settings_redirect("ai")
+
+
+def _storage_settings_context():
+    backend = getattr(settings, "MEDIA_STORAGE_BACKEND", "local")
+    is_s3 = backend == "s3"
+    return {
+        "backend": backend,
+        "backend_label": "S3-compatible" if is_s3 else "Local filesystem",
+        "is_s3_enabled": is_s3 and bool(getattr(settings, "AWS_STORAGE_BUCKET_NAME", "")),
+        "bucket_name": getattr(settings, "AWS_STORAGE_BUCKET_NAME", "") if is_s3 else "",
+        "endpoint_url": getattr(settings, "AWS_S3_ENDPOINT_URL", "") if is_s3 else "",
+        "region_name": getattr(settings, "AWS_S3_REGION_NAME", "") if is_s3 else "",
+        "addressing_style": getattr(settings, "AWS_S3_ADDRESSING_STYLE", "auto") if is_s3 else "auto",
+    }
+
+
+def _theme_token_context(workspace):
+    preset_key, merged_tokens = merged_theme_tokens(workspace)
+    preset_defaults = THEME_PRESETS[preset_key]["tokens"]
+    custom_tokens = workspace.theme_custom_tokens or {}
+    return [
+        {
+            "key": token.key,
+            "label": token.label,
+            "value": merged_tokens[token.key],
+            "default": preset_defaults[token.key],
+            "is_custom": token.key in custom_tokens,
+        }
+        for token in THEME_TOKENS
+    ]

@@ -1,4 +1,5 @@
 import time
+from datetime import datetime, time as datetime_time
 
 from django.db.models import Count, Q, Sum
 from django.utils import timezone
@@ -15,9 +16,62 @@ from .context import build_analysis_messages, build_crm_messages, build_reply_me
 from .models import AIRun, AISuggestedAction, AIProviderSettings, CRMInsight, QueueIntelligenceSnapshot, SolutionSnippet, TicketAIAnalysis, TicketReplyDraft, TimeEntrySuggestion, WorkspaceDigest
 
 
+class AIBudgetExceeded(ValueError):
+    pass
+
+
 def get_ai_settings(workspace):
     settings, _ = AIProviderSettings.objects.get_or_create(workspace=workspace)
     return settings
+
+
+def ai_usage_summary(workspace, today=None):
+    ai_settings = get_ai_settings(workspace)
+    start, end = _month_window(today)
+    runs = AIRun.objects.filter(workspace=workspace, created_at__gte=start, created_at__lt=end)
+    totals = runs.aggregate(total_tokens=Sum("total_tokens"), run_count=Count("id"))
+    by_workflow = list(
+        runs.values("workflow")
+        .annotate(run_count=Count("id"), total_tokens=Sum("total_tokens"))
+        .order_by("workflow")
+    )
+    total_tokens = totals["total_tokens"] or 0
+    run_count = totals["run_count"] or 0
+    return {
+        "period_start": start.date(),
+        "period_end": end.date(),
+        "run_count": run_count,
+        "total_tokens": total_tokens,
+        "monthly_token_cap": ai_settings.monthly_token_cap,
+        "monthly_run_cap": ai_settings.monthly_run_cap,
+        "token_percent": _cap_percent(total_tokens, ai_settings.monthly_token_cap),
+        "run_percent": _cap_percent(run_count, ai_settings.monthly_run_cap),
+        "by_workflow": by_workflow,
+    }
+
+
+def ensure_ai_budget_available(ai_settings):
+    summary = ai_usage_summary(ai_settings.workspace)
+    if ai_settings.monthly_token_cap and summary["total_tokens"] >= ai_settings.monthly_token_cap:
+        raise AIBudgetExceeded("Monthly AI token cap has been reached for this workspace.")
+    if ai_settings.monthly_run_cap and summary["run_count"] >= ai_settings.monthly_run_cap:
+        raise AIBudgetExceeded("Monthly AI run cap has been reached for this workspace.")
+    return summary
+
+
+def prune_ai_generation_retention(now=None):
+    now = now or timezone.now()
+    pruned = 0
+    for ai_settings in AIProviderSettings.objects.select_related("workspace").filter(generation_retention_days__gt=0):
+        cutoff = now - timezone.timedelta(days=ai_settings.generation_retention_days)
+        runs = AIRun.objects.filter(workspace=ai_settings.workspace, completed_at__lt=cutoff).exclude(
+            output={},
+            context_refs=[],
+            selected_actions=[],
+            rejected_actions=[],
+        )
+        pruned += runs.update(output={}, context_refs=[], selected_actions=[], rejected_actions=[])
+    return pruned
 
 
 def run_ticket_analysis(analysis):
@@ -28,6 +82,10 @@ def run_ticket_analysis(analysis):
     ai_settings = get_ai_settings(analysis.workspace)
     if not ai_settings.enabled:
         return fail_analysis(analysis, "disabled", "AI is not enabled for this workspace.")
+    try:
+        ensure_ai_budget_available(ai_settings)
+    except AIBudgetExceeded as exc:
+        return fail_analysis(analysis, "budget_exceeded", str(exc))
     try:
         messages = build_analysis_messages(analysis.ticket, ai_settings)
         response = send_chat_completion(ai_settings, messages, max_tokens=settings.OPENROUTER_ANALYSIS_MAX_TOKENS)
@@ -151,6 +209,7 @@ def apply_selected_ticket_suggestions(analysis, user, selected_actions):
             draft.save(update_fields=["status", "approved_by", "approved_at"])
             comment = TicketComment.objects.create(workspace=ticket.workspace, ticket=ticket, author=user, visibility=TicketComment.Visibility.PUBLIC, body=draft.body)
             index_comment(comment)
+            _queue_customer_reply_email(comment)
         applied.append("customer_reply")
     AISuggestedAction.objects.filter(workspace=ticket.workspace, ticket_analysis=analysis, action_type__in=applied).update(status=AISuggestedAction.Status.APPLIED, applied_by=user, applied_at=timezone.now())
     if applied:
@@ -166,6 +225,7 @@ def generate_reply_draft(ticket, user, intent="generate", source_text=""):
     ai_settings = get_ai_settings(ticket.workspace)
     if not ai_settings.enabled or not ai_settings.reply_composer_enabled:
         raise ValueError("AI reply composer is not enabled.")
+    ensure_ai_budget_available(ai_settings)
     run = _start_run(ticket.workspace, AIRun.Workflow.REPLY_COMPOSER, "ticket", ticket.pk, user)
     started = time.monotonic()
     try:
@@ -192,6 +252,7 @@ def approve_reply_draft(draft, user):
         return draft
     comment = TicketComment.objects.create(workspace=draft.workspace, ticket=draft.ticket, author=user, visibility=TicketComment.Visibility.PUBLIC, body=draft.body)
     index_comment(comment)
+    _queue_customer_reply_email(comment)
     draft.status = TicketReplyDraft.Status.APPROVED
     draft.approved_by = user
     draft.approved_at = timezone.now()
@@ -210,8 +271,10 @@ def record_analysis_feedback(analysis, feedback):
 
 
 def generate_crm_insight(organization, user=None):
-    run = _start_run(organization.workspace, AIRun.Workflow.CRM_INSIGHT, "organization", organization.pk, user)
     ai_settings = get_ai_settings(organization.workspace)
+    if ai_settings.enabled and ai_settings.crm_insights_enabled and ai_settings.has_api_key:
+        ensure_ai_budget_available(ai_settings)
+    run = _start_run(organization.workspace, AIRun.Workflow.CRM_INSIGHT, "organization", organization.pk, user)
     if not ai_settings.enabled or not ai_settings.crm_insights_enabled or not ai_settings.has_api_key:
         return _heuristic_crm_insight(organization, run)
     started = time.monotonic()
@@ -261,8 +324,10 @@ def _heuristic_crm_insight(organization, run):
 
 
 def suggest_time_entry(ticket, user):
-    run = _start_run(ticket.workspace, AIRun.Workflow.TIME_SUGGESTION, "ticket", ticket.pk, user)
     ai_settings = get_ai_settings(ticket.workspace)
+    if ai_settings.enabled and ai_settings.time_suggestions_enabled and ai_settings.has_api_key:
+        ensure_ai_budget_available(ai_settings)
+    run = _start_run(ticket.workspace, AIRun.Workflow.TIME_SUGGESTION, "ticket", ticket.pk, user)
     if ai_settings.enabled and ai_settings.time_suggestions_enabled and ai_settings.has_api_key:
         started = time.monotonic()
         try:
@@ -317,8 +382,10 @@ def generate_workspace_digest(workspace, user=None):
 
 
 def create_solution_snippet(ticket, user=None):
-    run = _start_run(ticket.workspace, AIRun.Workflow.SOLUTION_MEMORY, "ticket", ticket.pk, user)
     ai_settings = get_ai_settings(ticket.workspace)
+    if ai_settings.enabled and ai_settings.solution_memory_enabled and ai_settings.has_api_key:
+        ensure_ai_budget_available(ai_settings)
+    run = _start_run(ticket.workspace, AIRun.Workflow.SOLUTION_MEMORY, "ticket", ticket.pk, user)
     if ai_settings.enabled and ai_settings.solution_memory_enabled and ai_settings.has_api_key:
         started = time.monotonic()
         try:
@@ -478,6 +545,39 @@ def _elapsed_ms(started):
 
 def _ticket_card(ticket, reason):
     return {"id": str(ticket.pk), "title": ticket.title, "organization": ticket.organization.name if ticket.organization else "", "priority": ticket.priority, "status": ticket.status, "reason": reason}
+
+
+def _queue_customer_reply_email(comment):
+    if not comment.ticket.contact or not comment.ticket.contact.email:
+        return None
+    from communications.services import queue_outbound_ticket_reply
+
+    return queue_outbound_ticket_reply(
+        workspace=comment.workspace,
+        ticket=comment.ticket,
+        comment=comment,
+        recipients=[comment.ticket.contact.email],
+        subject=f"Re: {comment.ticket.title}",
+        text_body=comment.body,
+    )
+
+
+def _month_window(today=None):
+    today = today or timezone.localdate()
+    start_date = today.replace(day=1)
+    if start_date.month == 12:
+        end_date = start_date.replace(year=start_date.year + 1, month=1)
+    else:
+        end_date = start_date.replace(month=start_date.month + 1)
+    start = timezone.make_aware(datetime.combine(start_date, datetime_time.min), timezone.get_current_timezone())
+    end = timezone.make_aware(datetime.combine(end_date, datetime_time.min), timezone.get_current_timezone())
+    return start, end
+
+
+def _cap_percent(value, cap):
+    if not cap:
+        return 0
+    return min(100, round((value / cap) * 100))
 
 
 def _internal_comment_body(analysis):

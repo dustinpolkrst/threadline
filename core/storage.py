@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage, Storage
-from django.db import OperationalError, ProgrammingError
 from storages.backends.s3 import S3Storage
 
 
@@ -56,22 +55,4 @@ class ThreadlineMediaStorage(Storage):
                 "default_acl": None,
                 "querystring_auth": True,
             }
-        try:
-            from workspaces.models import ApplicationStorageSettings
-
-            storage_settings = ApplicationStorageSettings.objects.filter(backend=ApplicationStorageSettings.Backend.S3).exclude(bucket_name="").order_by("updated_at").last()
-        except (OperationalError, ProgrammingError):
-            storage_settings = None
-        if not storage_settings:
-            return None
-        return {
-            "access_key": storage_settings.access_key_id,
-            "secret_key": storage_settings.secret_access_key,
-            "bucket_name": storage_settings.bucket_name,
-            "endpoint_url": storage_settings.endpoint_url or None,
-            "region_name": storage_settings.region_name or None,
-            "custom_domain": storage_settings.custom_domain or None,
-            "addressing_style": storage_settings.addressing_style or "auto",
-            "default_acl": None,
-            "querystring_auth": True,
-        }
+        return None

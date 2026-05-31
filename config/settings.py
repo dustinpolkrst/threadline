@@ -3,9 +3,20 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
-    DEBUG=(bool, False),
+    DEBUG=(bool, True),
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    SECURE_SSL_REDIRECT=(bool, False),
+    SESSION_COOKIE_SECURE=(bool, False),
+    CSRF_COOKIE_SECURE=(bool, False),
+    SECURE_HSTS_SECONDS=(int, 0),
+    SECURE_HSTS_INCLUDE_SUBDOMAINS=(bool, False),
+    SECURE_HSTS_PRELOAD=(bool, False),
+    USE_X_FORWARDED_PROTO=(bool, False),
+    EMAIL_PORT=(int, 25),
+    EMAIL_USE_TLS=(bool, False),
+    EMAIL_USE_SSL=(bool, False),
+    EMAIL_TIMEOUT=(int, 20),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -13,6 +24,13 @@ SECRET_KEY = env("SECRET_KEY", default="dev-only-change-me")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
+SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
+SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
+CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
+SECURE_HSTS_SECONDS = env("SECURE_HSTS_SECONDS")
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env("SECURE_HSTS_INCLUDE_SUBDOMAINS")
+SECURE_HSTS_PRELOAD = env("SECURE_HSTS_PRELOAD")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") if env("USE_X_FORWARDED_PROTO") else None
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -59,6 +77,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.threadline_theme",
             ],
         },
     },
@@ -102,7 +121,6 @@ if MEDIA_STORAGE_BACKEND == "s3":
     AWS_S3_ADDRESSING_STYLE = env("AWS_S3_ADDRESSING_STYLE", default="auto")
     AWS_DEFAULT_ACL = None
     AWS_QUERYSTRING_AUTH = True
-    STORAGES["default"] = {"BACKEND": "storages.backends.s3.S3Storage"}
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "dashboard"
@@ -111,6 +129,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="threadline@example.com")
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS")
+EMAIL_USE_SSL = env("EMAIL_USE_SSL")
+EMAIL_TIMEOUT = env("EMAIL_TIMEOUT")
 
 CELERY_BROKER_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = env("REDIS_URL", default="redis://localhost:6379/0")

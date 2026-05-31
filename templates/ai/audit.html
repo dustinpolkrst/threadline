@@ -9,6 +9,21 @@
   <form method="post" action="{% url 'workspace_ai_digest' %}">{% csrf_token %}<button class="tl-button-secondary">Generate digest</button></form>
 </div>
 
+<div class="mb-6 grid gap-4 md:grid-cols-3">
+  <section class="tl-panel tl-stat">
+    <div class="tl-kicker">Runs this month</div>
+    <div class="mt-2 text-2xl font-semibold">{{ ai_usage.run_count }}{% if ai_usage.monthly_run_cap %}<span class="text-base text-slate-400"> / {{ ai_usage.monthly_run_cap }}</span>{% endif %}</div>
+  </section>
+  <section class="tl-panel tl-stat">
+    <div class="tl-kicker">Tokens this month</div>
+    <div class="mt-2 text-2xl font-semibold">{{ ai_usage.total_tokens }}{% if ai_usage.monthly_token_cap %}<span class="text-base text-slate-400"> / {{ ai_usage.monthly_token_cap }}</span>{% endif %}</div>
+  </section>
+  <section class="tl-panel tl-stat">
+    <div class="tl-kicker">Usage period</div>
+    <div class="mt-2 text-lg font-semibold">{{ ai_usage.period_start|date:"M j" }} - {{ ai_usage.period_end|date:"M j" }}</div>
+  </section>
+</div>
+
 <div class="grid gap-6 lg:grid-cols-3">
   <section class="tl-panel overflow-hidden lg:col-span-2">
     <div class="tl-toolbar"><div class="font-semibold">AI runs</div></div>

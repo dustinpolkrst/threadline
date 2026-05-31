@@ -1,12 +1,33 @@
 from django.core.exceptions import PermissionDenied
-from workspaces.models import first_workspace_for
+from workspaces.models import WorkspaceMembership
 
 
 def require_internal_workspace(user):
-    workspace = first_workspace_for(user)
-    if workspace is None:
+    membership = _membership_for(user)
+    if membership is None:
         raise PermissionDenied("Internal workspace access required.")
-    return workspace
+    return membership.workspace
+
+
+def require_support_workspace(user):
+    membership = _membership_for(user)
+    if membership is None or membership.role not in [
+        WorkspaceMembership.Role.OWNER,
+        WorkspaceMembership.Role.ADMIN,
+        WorkspaceMembership.Role.AGENT,
+    ]:
+        raise PermissionDenied("Workspace support access required.")
+    return membership.workspace
+
+
+def require_admin_workspace(user):
+    membership = _membership_for(user)
+    if membership is None or membership.role not in [
+        WorkspaceMembership.Role.OWNER,
+        WorkspaceMembership.Role.ADMIN,
+    ]:
+        raise PermissionDenied("Workspace admin access required.")
+    return membership.workspace
 
 
 def customer_profile_for(user):
@@ -18,3 +39,9 @@ def require_customer_profile(user):
     if profile is None:
         raise PermissionDenied("Customer portal access required.")
     return profile
+
+
+def _membership_for(user):
+    if not user.is_authenticated:
+        return None
+    return user.workspace_memberships.select_related("workspace").first()

@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from activity.services import record_event
 from core.pagination import paginate
-from core.permissions import require_internal_workspace
+from core.permissions import require_internal_workspace, require_support_workspace
 from .forms import TimeEntryForm
 from .models import TimeEntry
 import csv
@@ -24,7 +24,7 @@ def timesheet(request):
 
 @login_required
 def time_entry_edit(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     entry = get_object_or_404(TimeEntry.objects.select_related("ticket", "organization", "contact"), pk=pk, workspace=workspace)
     form = TimeEntryForm(request.POST or None, instance=entry)
     if form.is_valid():

@@ -1,11 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count, Q, Sum
 import csv
 from activity.models import ActivityEvent
-from core.permissions import require_internal_workspace
+from core.permissions import require_admin_workspace, require_internal_workspace, require_support_workspace
 from core.pagination import paginate
 from tickets.models import Ticket, TicketComment
 from time_tracking.models import TimeEntry
@@ -15,7 +14,6 @@ from .models import CRMImportJob, Contact, Organization
 from .imports import confirm_import_job, create_import_job, save_import_resolutions
 from .settings_handlers import build_settings_context, handle_settings_post, normalize_settings_section
 from search.services import index_contact, index_organization
-from workspaces.models import WorkspaceMembership
 
 
 @login_required
@@ -38,7 +36,7 @@ def organization_list(request):
 
 @login_required
 def organization_create(request):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     form = OrganizationForm(request.POST or None)
     if form.is_valid():
         organization = form.save(commit=False)
@@ -51,7 +49,7 @@ def organization_create(request):
 
 @login_required
 def organization_edit(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     organization = get_object_or_404(Organization, pk=pk, workspace=workspace)
     form = OrganizationForm(request.POST or None, instance=organization)
     if form.is_valid():
@@ -93,7 +91,7 @@ def contact_list(request):
 
 @login_required
 def contact_create(request):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     form = ContactForm(request.POST or None)
     form.fields["organization"].queryset = Organization.objects.filter(workspace=workspace)
     if form.is_valid():
@@ -117,10 +115,7 @@ def contact_detail(request, pk):
 
 @login_required
 def team_settings(request):
-    workspace = require_internal_workspace(request.user)
-    membership = WorkspaceMembership.objects.filter(workspace=workspace, user=request.user).first()
-    if not membership or membership.role not in [WorkspaceMembership.Role.OWNER, WorkspaceMembership.Role.ADMIN]:
-        raise PermissionDenied("Workspace admin access required.")
+    workspace = require_admin_workspace(request.user)
     active_section = normalize_settings_section(request.GET.get("section", "application"))
     if request.method == "POST":
         return handle_settings_post(request, workspace)
@@ -131,7 +126,7 @@ def team_settings(request):
 
 @login_required
 def crm_import_upload(request):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     form = CRMImportUploadForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         job = create_import_job(workspace=workspace, import_type=form.cleaned_data["import_type"], uploaded_file=form.cleaned_data["file"], user=request.user)
@@ -141,7 +136,7 @@ def crm_import_upload(request):
 
 @login_required
 def crm_import_preview(request, pk):
-    workspace = require_internal_workspace(request.user)
+    workspace = require_support_workspace(request.user)
     job = get_object_or_404(CRMImportJob, pk=pk, workspace=workspace)
     if request.method == "POST" and request.POST.get("action") == "save_resolutions":
         save_import_resolutions(job, request.POST)
@@ -154,7 +149,7 @@ def crm_import_preview(request, pk):
 
 @login_required
 def crm_import_template(request, import_type):
-    require_internal_workspace(request.user)
+    require_support_workspace(request.user)
     headers = _template_headers(import_type)
     if not headers:
         return HttpResponse("Unknown import template.", status=404)

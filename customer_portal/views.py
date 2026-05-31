@@ -4,6 +4,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.db.models import Count, Q, Sum
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from activity.models import ActivityEvent
 from activity.services import record_event
 from core.permissions import require_customer_profile
@@ -18,7 +19,7 @@ from tickets.services import apply_initial_sla, mark_customer_reply
 @login_required
 def portal_ticket_list(request):
     profile = require_customer_profile(request.user)
-    tickets = Ticket.objects.filter(workspace=profile.workspace, organization=profile.organization).select_related("contact")
+    tickets = _portal_tickets(profile).select_related("contact")
     status = request.GET.get("status")
     priority = request.GET.get("priority")
     q = request.GET.get("q", "").strip()
@@ -28,7 +29,7 @@ def portal_ticket_list(request):
         tickets = tickets.filter(priority=priority)
     if q:
         tickets = tickets.filter(Q(title__icontains=q) | Q(description__icontains=q))
-    summary_base = Ticket.objects.filter(workspace=profile.workspace, organization=profile.organization)
+    summary_base = _portal_tickets(profile)
     summary = {
         "open": summary_base.filter(status__in=[Ticket.Status.NEW, Ticket.Status.OPEN, Ticket.Status.PENDING]).count(),
         "closed": summary_base.filter(status__in=[Ticket.Status.RESOLVED, Ticket.Status.CLOSED]).count(),
@@ -61,7 +62,7 @@ def portal_ticket_create(request):
 @login_required
 def portal_ticket_detail(request, pk):
     profile = require_customer_profile(request.user)
-    ticket = get_object_or_404(Ticket, pk=pk, workspace=profile.workspace, organization=profile.organization)
+    ticket = get_object_or_404(_portal_tickets(profile), pk=pk)
     comments = ticket.comments.filter(workspace=profile.workspace, visibility=TicketComment.Visibility.PUBLIC).select_related("author")
     attachments = ticket.attachments.filter(workspace=profile.workspace, customer_visible=True)
     visible_time = TimeEntry.objects.filter(workspace=profile.workspace, ticket=ticket, customer_visible=True)
@@ -71,9 +72,10 @@ def portal_ticket_detail(request, pk):
 
 
 @login_required
+@require_POST
 def portal_ticket_reply(request, pk):
     profile = require_customer_profile(request.user)
-    ticket = get_object_or_404(Ticket, pk=pk, workspace=profile.workspace, organization=profile.organization)
+    ticket = get_object_or_404(_portal_tickets(profile), pk=pk)
     form = PortalCommentForm(request.POST)
     if form.is_valid():
         comment = form.save(commit=False)
@@ -89,9 +91,10 @@ def portal_ticket_reply(request, pk):
 
 
 @login_required
+@require_POST
 def portal_upload_attachment(request, pk):
     profile = require_customer_profile(request.user)
-    ticket = get_object_or_404(Ticket, pk=pk, workspace=profile.workspace, organization=profile.organization)
+    ticket = get_object_or_404(_portal_tickets(profile), pk=pk)
     form = TicketAttachmentForm(request.POST, request.FILES)
     if form.is_valid():
         uploaded = form.cleaned_data["file"]
@@ -111,7 +114,15 @@ def portal_upload_attachment(request, pk):
 @login_required
 def portal_download_attachment(request, pk, attachment_id):
     profile = require_customer_profile(request.user)
-    attachment = get_object_or_404(TicketAttachment, pk=attachment_id, ticket_id=pk, workspace=profile.workspace, ticket__organization=profile.organization, customer_visible=True)
+    attachment = get_object_or_404(
+        TicketAttachment,
+        pk=attachment_id,
+        ticket_id=pk,
+        workspace=profile.workspace,
+        ticket__organization=profile.organization,
+        ticket__contact=profile.contact,
+        customer_visible=True,
+    )
     if not attachment.file:
         raise Http404
     return FileResponse(attachment.file.open("rb"), as_attachment=True, filename=attachment.display_name or attachment.file.name)
@@ -135,3 +146,11 @@ def portal_account(request):
                 update_session_auth_hash(request, user)
                 return redirect("portal_account")
     return render(request, "customer_portal/account.html", {"profile": profile, "password_form": password_form})
+
+
+def _portal_tickets(profile):
+    return Ticket.objects.filter(
+        workspace=profile.workspace,
+        organization=profile.organization,
+        contact=profile.contact,
+    )

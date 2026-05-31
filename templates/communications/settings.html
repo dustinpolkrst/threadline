@@ -4,13 +4,13 @@
   <div>
     <div class="tl-kicker">Workspace settings</div>
     <h1 class="tl-page-title">Email plumbing</h1>
-    <p class="tl-page-subtitle">Provider-neutral email records and stub status. Real inbound and outbound email are not connected yet.</p>
+    <p class="tl-page-subtitle">Provider-neutral email records with optional IMAP inbound polling and SMTP outbound delivery.</p>
   </div>
 </div>
 <div class="grid gap-6 lg:grid-cols-2">
   <section class="tl-panel overflow-hidden">
     <div class="tl-toolbar"><div class="font-semibold">Mailbox channels</div></div>
-    <div class="divide-y divide-slate-100">{% for mailbox in mailboxes %}<div class="p-4 text-sm"><div class="font-medium">{{ mailbox.name }}</div><div class="tl-meta mt-1">{{ mailbox.address }} - {{ mailbox.get_status_display }}</div></div>{% empty %}<div class="tl-empty">No mailbox placeholders yet. Add them in Django admin for now.</div>{% endfor %}</div>
+    <div class="divide-y divide-slate-100">{% for mailbox in mailboxes %}<div class="p-4 text-sm"><div class="font-medium">{{ mailbox.name }}</div><div class="tl-meta mt-1">{{ mailbox.address }} - {{ mailbox.get_status_display }} - Inbound {% if mailbox.inbound_enabled %}on{% else %}off{% endif %} - Outbound {% if mailbox.outbound_enabled %}on{% else %}off{% endif %}</div></div>{% empty %}<div class="tl-empty">No mailbox channels yet. Add IMAP/SMTP channels in Django admin.</div>{% endfor %}</div>
   </section>
   <section class="tl-panel overflow-hidden">
     <div class="tl-toolbar"><div class="font-semibold">Recent messages</div></div>
